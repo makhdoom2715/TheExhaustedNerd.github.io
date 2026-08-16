@@ -354,3 +354,46 @@ footer{
   overflow: hidden; white-space: nowrap; border-right: 2px solid var(--amber);
   animation: typewriter 1.6s steps(40) forwards, blink 0.8s step-end infinite;
 }
+
+/* =========================================================
+   NEW: MATHJAX DARK MODE + REWARD STATEMENT BOX
+   ========================================================= */
+
+/* MathJax renders math in white on dark background */
+mjx-container{
+  color: var(--text) !important;
+}
+mjx-container svg{
+  fill: var(--text) !important;
+  stroke: var(--text) !important;
+}
+.MathJax{
+  color: var(--text) !important;
+}
+
+/* Reward problem statement scrollable box */
+.reward-statement{
+  max-height: 220px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.35);
+  padding: 16px;
+  border-radius: var(--radius);
+  margin: 12px 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+/* Scrollbar styling for the statement box */
+.reward-statement::-webkit-scrollbar{
+  width: 6px;
+}
+.reward-statement::-webkit-scrollbar-track{
+  background: transparent;
+}
+.reward-statement::-webkit-scrollbar-thumb{
+  background: var(--border-strong);
+  border-radius: 3px;
+}
