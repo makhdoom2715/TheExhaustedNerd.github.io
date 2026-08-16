@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Exhausted Nerd</title>
+<meta name="description" content="Olympiad math resources, a problem roulette, and a vault of puzzles for the terminally sleep-deprived.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<!-- architect: 29 -->
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="navbar">
+    <a href="index.html" class="logo">exhausted_nerd<span class="cursor">_</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="nmtc.html">NMTC</a></li>
+      <li><a href="enigma.html">The Enigma</a></li>
+      <li><a href="join.html">Join Us</a></li>
+    </ul>
+    <a href="https://youtube.com/@theexhaustednerd" class="profile-pic-link" target="_blank" rel="noopener">
+      <img src="assets/profile.png" alt="profile-88" class="profile-pic">
+    </a>
+  </nav>
+  <div class="status-bar">SYSTEM ONLINE // STREAK: <span id="navStreak">0</span> // SCORE: <span id="navScore">0</span></div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>THE ENIGMA</h1>
+    <p class="subhead">Not everyone is built for this.</p>
+  </section>
+
+  <div class="stats-row">
+    <div class="stat-card streak">
+      <span class="stat-emoji">🔥</span>
+      <div class="stat-num" id="statStreak">0</div>
+      <div class="stat-label">Fire Streak</div>
+    </div>
+    <div class="stat-card heart">
+      <span class="stat-emoji">♥</span>
+      <div class="stat-num" id="statHearts">0</div>
+      <div class="stat-label">Hearts</div>
+    </div>
+    <div class="stat-card diamond">
+      <span class="stat-emoji">♦</span>
+      <div class="stat-num" id="statDiamonds">0</div>
+      <div class="stat-label">Diamonds</div>
+    </div>
+    <div class="stat-card spade">
+      <span class="stat-emoji">♠</span>
+      <div class="stat-num" id="statSpades">0</div>
+      <div class="stat-label">Spades</div>
+    </div>
+    <div class="stat-card crown">
+      <span class="stat-emoji">♛</span>
+      <div class="stat-num" id="statCrowns">0</div>
+      <div class="stat-label">Crowns</div>
+    </div>
+    <div class="stat-card score">
+      <span class="stat-emoji">Σ</span>
+      <div class="stat-num" id="statScore">0</div>
+      <div class="stat-label">Total Score</div>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <h2>Today's Challenge</h2>
+    </div>
+    <div class="card daily-card">
+      <div class="countdown" id="dailyCountdown">Resets in --:--:--</div>
+      <div class="problem-text" id="dailyProblemText">Loading today's problem...</div>
+      <div class="btn-row mt-24">
+        <button class="btn" id="dailyAttemptedBtn">Attempted</button>
+        <button class="btn btn-primary" id="dailySolvedBtn">Solved</button>
+      </div>
+      <p class="vault-message" id="dailyMsg"></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  (c) 2026 The Exhausted Nerd. Built by the exhausted. System load: 47% stable
+</footer>
+
+<script src="js/tracker.js"></script>
+<script>
+  fetch("data/weekly.json")
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("dailyProblemText").textContent = data.problem;
+
+      const attemptedBtn = document.getElementById("dailyAttemptedBtn");
+      const solvedBtn = document.getElementById("dailySolvedBtn");
+      const msg = document.getElementById("dailyMsg");
+
+      function lockButtons(text) {
+        attemptedBtn.disabled = true;
+        solvedBtn.disabled = true;
+        msg.className = "vault-message success";
+        msg.textContent = text;
+      }
+
+      const state = TEN.getDailyState();
+      if (state === "solved") lockButtons("Solved. 1 heart added to today's tally.");
+      if (state === "attempted") attemptedBtn.disabled = true;
+
+      attemptedBtn.addEventListener("click", () => {
+        TEN.markDaily("attempted");
+        attemptedBtn.disabled = true;
+      });
+      solvedBtn.addEventListener("click", () => {
+        TEN.markDaily("solved");
+        lockButtons("Solved. 1 heart added to today's tally.");
+      });
+
+      // countdown to midnight local time
+      const countdownEl = document.getElementById("dailyCountdown");
+      function tick() {
+        const now = new Date();
+        const midnight = new Date(now);
+        midnight.setHours(24, 0, 0, 0);
+        const diff = midnight - now;
+        const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
+        const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
+        const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+        countdownEl.textContent = `Resets in ${h}:${m}:${s}`;
+      }
+      tick();
+      setInterval(tick, 1000);
+    })
+    .catch(() => {
+      document.getElementById("dailyProblemText").textContent = "Could not load today's problem.";
+    });
+</script>
+</body>
+</html>

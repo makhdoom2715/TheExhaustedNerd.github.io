@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resources - The Exhausted Nerd</title>
+<meta name="description" content="Olympiad mathematics chapters and Further Mathematics paper resources, plus the problem roulette.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="navbar">
+    <a href="index.html" class="logo">exhausted_nerd<span class="cursor">_</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="resources.html" class="active">Resources</a></li>
+      <li><a href="nmtc.html">NMTC</a></li>
+      <li><a href="enigma.html">The Enigma</a></li>
+      <li><a href="join.html">Join Us</a></li>
+    </ul>
+    <a href="https://youtube.com/@theexhaustednerd" class="profile-pic-link" target="_blank" rel="noopener">
+      <img src="assets/profile.png" alt="profile-88" class="profile-pic">
+    </a>
+  </nav>
+  <div class="status-bar">SYSTEM ONLINE // STREAK: <span id="navStreak">0</span> // SCORE: <span id="navScore">0</span></div>
+</header>
+
+<main>
+  <div class="page-header">
+    <h1>Resources</h1>
+    <p class="subhead">Everything you need. Nothing you don't.</p>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <h2>Olympiad Mathematics</h2>
+    </div>
+    <div class="grid grid-4" id="topicGrid"></div>
+    <div id="topicChapterPanel"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Further Mathematics (A-Levels)</h2>
+    </div>
+    <div class="grid grid-4" id="paperGrid"></div>
+    <div id="paperResourcePanel"></div>
+  </section>
+
+  <section id="roulette">
+    <div class="section-head">
+      <h2>Problem Roulette</h2>
+      <p class="subhead" style="font-family:var(--font-mono); font-size:14px;">Spin the wheel. Face your fate.</p>
+    </div>
+
+    <div class="roulette-controls">
+      <select id="rouletteTopic">
+        <option value="Any">Any Topic</option>
+        <option value="Number Theory">Number Theory</option>
+        <option value="Algebra">Algebra</option>
+        <option value="Geometry">Geometry</option>
+        <option value="Combinatorics">Combinatorics</option>
+      </select>
+      <select id="rouletteDifficulty">
+        <option value="Any">Any Difficulty</option>
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+        <option value="IMO">IMO</option>
+      </select>
+      <button class="btn btn-primary" id="rouletteTryBtn">TRY ME</button>
+    </div>
+
+    <div class="roulette-result" id="rouletteResult">
+      <p class="roulette-placeholder">No problem drawn yet. Pick your filters and press TRY ME.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  (c) 2026 The Exhausted Nerd. Built by the exhausted.
+  <!-- chaos: 29 -->
+</footer>
+
+<script src="js/tracker.js"></script>
+<script src="js/roulette.js"></script>
+<script>
+  const TOPICS = {
+    "Number Theory": ["Divisibility", "GCD & LCM", "Primes", "Modular Arithmetic", "Diophantine Equations"],
+    "Algebra": ["Polynomials", "Inequalities", "Functional Equations", "Sequences & Series"],
+    "Geometry": ["Circles", "Centers", "Triangles", "Power of a Point", "Transformations"],
+    "Combinatorics": ["Counting", "Graph Theory", "Pigeonhole", "Extremal Principle"]
+  };
+
+  const PAPERS = ["P1", "P3", "M1", "S1"];
+  const PAPER_RESOURCES = ["Class Notes", "Worksheets", "Solved Worksheets", "Cheat Sheets", "Study Plan"];
+
+  function chapterListHTML(topic) {
+    return TOPICS[topic].map(ch => `
+      <div class="chapter-card">
+        <span class="chapter-name">${ch}</span>
+        <div class="btn-row">
+          <a class="btn btn-sm" href="https://drive.google.com/placeholder" target="_blank" rel="noopener">Drive Folder</a>
+          <a class="btn btn-sm" href="https://youtube.com/placeholder" target="_blank" rel="noopener">YouTube Playlist</a>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function paperListHTML(paper) {
+    return PAPER_RESOURCES.map(r => `
+      <div class="chapter-card">
+        <span class="chapter-name">${r}</span>
+        <a class="btn btn-sm" href="https://drive.google.com/placeholder" target="_blank" rel="noopener">Open</a>
+      </div>
+    `).join("");
+  }
+
+  const topicGrid = document.getElementById("topicGrid");
+  const topicPanel = document.getElementById("topicChapterPanel");
+  Object.keys(TOPICS).forEach(topic => {
+    const box = document.createElement("div");
+    box.className = "card topic-box";
+    box.textContent = topic;
+    box.dataset.topic = topic;
+    topicGrid.appendChild(box);
+  });
+
+  document.querySelectorAll("#topicGrid .topic-box").forEach(box => {
+    box.addEventListener("click", () => {
+      const alreadyOpen = box.classList.contains("open");
+      document.querySelectorAll("#topicGrid .topic-box").forEach(b => b.classList.remove("open"));
+      if (alreadyOpen) {
+        topicPanel.innerHTML = "";
+        return;
+      }
+      box.classList.add("open");
+      topicPanel.innerHTML = `<div class="chapter-list show">${chapterListHTML(box.dataset.topic)}</div>`;
+    });
+  });
+
+  const paperGrid = document.getElementById("paperGrid");
+  const paperPanel = document.getElementById("paperResourcePanel");
+  PAPERS.forEach(paper => {
+    const box = document.createElement("div");
+    box.className = "card topic-box";
+    box.textContent = paper;
+    box.dataset.paper = paper;
+    paperGrid.appendChild(box);
+  });
+
+  document.querySelectorAll("#paperGrid .topic-box").forEach(box => {
+    box.addEventListener("click", () => {
+      const alreadyOpen = box.classList.contains("open");
+      document.querySelectorAll("#paperGrid .topic-box").forEach(b => b.classList.remove("open"));
+      if (alreadyOpen) {
+        paperPanel.innerHTML = "";
+        return;
+      }
+      box.classList.add("open");
+      paperPanel.innerHTML = `<div class="chapter-list show">${paperListHTML(box.dataset.paper)}</div>`;
+    });
+  });
+</script>
+</body>
+</html>

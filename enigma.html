@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Enigma - The Exhausted Nerd</title>
+<meta name="description" content="Four sealed puzzles. One vault. Solve them for diamonds and crowns.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="navbar">
+    <a href="index.html" class="logo">exhausted_nerd<span class="cursor">_</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="nmtc.html">NMTC</a></li>
+      <li><a href="enigma.html" class="active">The Enigma</a></li>
+      <li><a href="join.html">Join Us</a></li>
+    </ul>
+    <a href="https://youtube.com/@theexhaustednerd" class="profile-pic-link" target="_blank" rel="noopener">
+      <img src="assets/profile.png" alt="profile-88" class="profile-pic">
+    </a>
+  </nav>
+  <div class="status-bar">SYSTEM ONLINE // STREAK: <span id="navStreak">0</span> // SCORE: <span id="navScore">0</span></div>
+</header>
+
+<main>
+  <div class="page-header">
+    <h1>THE ENIGMA</h1>
+    <p class="subhead">Some doors should stay closed. You knocked anyway.</p>
+  </div>
+
+  <section>
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table class="vault-table">
+        <thead>
+          <tr><th>Puzzle</th><th>Status</th><th>Reward</th></tr>
+        </thead>
+        <tbody>
+          <tr class="vault-row" id="puzzle1Toggle">
+            <td>Puzzle 1 - The Architect's Mark</td>
+            <td><span class="vault-status locked" id="vaultRowStatus1">LOCKED</span></td>
+            <td class="vault-reward">Crown + 20 Diamonds</td>
+          </tr>
+          <tr class="vault-row" id="puzzle2Toggle">
+            <td>Puzzle 2</td>
+            <td><span class="vault-status locked">LOCKED</span></td>
+            <td class="vault-reward">Crown + 20 Diamonds</td>
+          </tr>
+          <tr class="vault-row" id="puzzle3Toggle">
+            <td>Puzzle 3</td>
+            <td><span class="vault-status locked">LOCKED</span></td>
+            <td class="vault-reward">Crown + 20 Diamonds</td>
+          </tr>
+          <tr class="vault-row" id="puzzle4Toggle">
+            <td>Puzzle 4</td>
+            <td><span class="vault-status locked">LOCKED</span></td>
+            <td class="vault-reward">Crown + 20 Diamonds</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="puzzle-panel" id="puzzle1Panel">
+      <p class="puzzle-riddle">Three fingerprints remain. One burns where the day begins. One hides in the house of chaos. One reflects where the world watches. Find them. Concatenate. Six digits. No spaces.</p>
+
+      <div class="btn-row">
+        <button class="btn btn-amber btn-sm" id="hint1Btn">Hint 1 (1 diamond)</button>
+        <button class="btn btn-amber btn-sm" id="hint2Btn" disabled>Hint 2 (1 diamond)</button>
+        <button class="btn btn-amber btn-sm" id="hint3Btn" disabled>Hint 3 (1 diamond)</button>
+      </div>
+
+      <div class="hint-box" id="hint1Box">Hint 1: The day begins at the bottom of your screen.</div>
+      <div class="hint-box" id="hint2Box">Hint 2: Chaos lives where problems are born. Look beneath the surface.</div>
+      <div class="hint-box" id="hint3Box">Hint 3: The answer is 472988. 47 from the footer, 29 from the chaos, 88 from the architect.</div>
+
+      <div class="code-entry">
+        <input type="text" id="vaultCodeInput" placeholder="000000" maxlength="6">
+        <button class="btn btn-primary" id="vaultSubmitBtn">SUBMIT</button>
+      </div>
+      <p class="vault-message" id="vaultMsg"></p>
+
+      <div class="vault-reward-panel" id="vaultRewardPanel">
+        <p style="color: var(--success); margin-bottom: 10px;">Reward: IMO 1988 Problem 6</p>
+        <div class="btn-row">
+          <a class="btn btn-sm" href="#" target="_blank" rel="noopener">Problem PDF</a>
+          <span class="btn btn-sm" style="opacity:0.5; cursor:not-allowed;">Solution Video - Not made yet</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  (c) 2026 The Exhausted Nerd. Built by the exhausted.
+</footer>
+
+<script src="js/tracker.js"></script>
+<script src="js/enigma.js"></script>
+<script>
+  document.getElementById("puzzle2Toggle").addEventListener("click", () => {
+    window.location.href = "enigma/vault/puzzle2/start.html";
+  });
+  document.getElementById("puzzle3Toggle").addEventListener("click", () => {
+    window.location.href = "enigma/vault/puzzle3/start.html";
+  });
+  document.getElementById("puzzle4Toggle").addEventListener("click", () => {
+    window.location.href = "enigma/vault/puzzle4/start.html";
+  });
+</script>
+</body>
+</html>
