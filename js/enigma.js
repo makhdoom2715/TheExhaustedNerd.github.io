@@ -19,14 +19,37 @@
   };
 
   /* -------------------------------------------------------
-     STEP 2: ADD YOUR REWARD NAMES HERE
-     This is what shows up when the player solves the puzzle.
+     STEP 2: ADD YOUR REWARD NAMES AND STATEMENTS HERE
+     - name: short title shown at top
+     - statement: full problem text with LaTeX (optional, leave "" to hide)
+     - pdf: link to problem PDF
+     - video: link to solution video
      ------------------------------------------------------- */
   const VAULT_REWARDS = {
-    puzzle1: { name: "IMO 1988 Problem 6", pdf: "#", video: "#" },
-    puzzle2: { name: "IMO 1993 Problem 1", pdf: "#", video: "#" },
-    puzzle3: { name: "Legendary Problem 3", pdf: "#", video: "#" },
-    puzzle4: { name: "Legendary Problem 4", pdf: "#", video: "#" },
+    puzzle1: { 
+      name: "IMO 1988 Problem 6", 
+      statement: "",
+      pdf: "#", 
+      video: "#" 
+    },
+    puzzle2: { 
+      name: "IMO 1993 Problem 1", 
+      statement: "Let \\(f(x) = x^n + 5x^{n-1} + 3\\), where \\(n > 1\\) is an integer. Prove that \\(f(x)\\) cannot be expressed as the product of two nonconstant polynomials with integer coefficients.",
+      pdf: "#", 
+      video: "#" 
+    },
+    puzzle3: { 
+      name: "Legendary Problem 3", 
+      statement: "",
+      pdf: "#", 
+      video: "#" 
+    },
+    puzzle4: { 
+      name: "Legendary Problem 4", 
+      statement: "",
+      pdf: "#", 
+      video: "#" 
+    },
   };
 
   /* -------------------------------------------------------
@@ -46,15 +69,33 @@
   function showReward(id, msgEl, rewardPanel) {
     const r = VAULT_REWARDS[id];
     if (!r) return;
+    
     let html = '<p class="reward-title">Reward: ' + r.name + '</p>';
-    html += '<a href="' + r.pdf + '" class="reward-link">[Problem PDF]</a>';
-    html += '<a href="' + r.video + '" class="reward-link">[Solution Video - Not made yet]</a>';
+    
+    if (r.statement && r.statement.length > 0) {
+      html += '<div class="reward-statement" style="max-height: 220px; overflow-y: auto; background: rgba(0,0,0,0.35); padding: 16px; border-radius: 8px; margin: 12px 0; font-size: 0.95rem; line-height: 1.6; border: 1px solid var(--border); color: var(--text);">';
+      html += r.statement;
+      html += '</div>';
+    }
+    
+    html += '<div class="btn-row" style="margin-top: 10px;">';
+    html += '<a href="' + r.pdf + '" class="btn btn-sm" target="_blank" rel="noopener">[Problem PDF]</a>';
+    html += '<span class="btn btn-sm" style="opacity:0.5; cursor:not-allowed;">[Solution Video - Not made yet]</span>';
+    html += '</div>';
+    
     rewardPanel.innerHTML = html;
     rewardPanel.classList.add("show");
+    
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([rewardPanel]).catch(function (err) {
+        console.log("MathJax error:", err);
+      });
+    }
   }
 
   function updateRowStatus(id, statusText) {
-    const el = document.getElementById("vaultRowStatus" + id.replace("puzzle", ""));
+    const num = id.replace("puzzle", "");
+    const el = document.getElementById("vaultRowStatus" + num);
     if (el) {
       el.textContent = statusText;
       el.classList.remove("locked");
