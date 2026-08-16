@@ -1,0 +1,86 @@
+[
+  {
+    "topic": "Number Theory",
+    "subtopic": "Divisibility",
+    "difficulty": "Easy",
+    "name": "Divisible Digit Sum",
+    "latex": "\\text{Find the smallest positive integer whose digits sum to } 20 \\text{ and which is divisible by } 9."
+  },
+  {
+    "topic": "Algebra",
+    "subtopic": "Sequences & Series",
+    "difficulty": "Easy",
+    "name": "Arithmetic Warm-Up",
+    "latex": "\\text{The 3rd term of an arithmetic sequence is } 11 \\text{ and the 7th term is } 27. \\text{ Find the 20th term.}"
+  },
+  {
+    "topic": "Geometry",
+    "subtopic": "Triangles",
+    "difficulty": "Easy",
+    "name": "Right Triangle Altitude",
+    "latex": "\\text{In right triangle } ABC \\text{ with the right angle at } C, \\ AC = 6, \\ BC = 8. \\text{ Find the length of the altitude from } C \\text{ to } AB."
+  },
+  {
+    "topic": "Combinatorics",
+    "subtopic": "Counting",
+    "difficulty": "Medium",
+    "name": "Handshakes at the Table",
+    "latex": "\\text{Twelve people sit at a round table. Each person shakes hands with everyone except their two immediate neighbors. How many handshakes occur in total?}"
+  },
+  {
+    "topic": "Number Theory",
+    "subtopic": "Modular Arithmetic",
+    "difficulty": "Medium",
+    "name": "Remainder Chase",
+    "latex": "\\text{Find the remainder when } 7^{100} \\text{ is divided by } 12."
+  },
+  {
+    "topic": "Algebra",
+    "subtopic": "Functional Equations",
+    "difficulty": "Medium",
+    "name": "A Gentle Functional Equation",
+    "latex": "\\text{Find all functions } f: \\mathbb{R} \\to \\mathbb{R} \\text{ such that } f(x+y) = f(x) + f(y) + xy \\text{ for all real } x, y, \\text{ given } f(1) = 2."
+  },
+  {
+    "topic": "Geometry",
+    "subtopic": "Circles",
+    "difficulty": "Hard",
+    "name": "Tangent Circles Chain",
+    "latex": "\\text{Circle } \\omega_1 \\text{ of radius } 4 \\text{ and circle } \\omega_2 \\text{ of radius } 9 \\text{ are externally tangent. A common external tangent touches } \\omega_1 \\text{ at } P \\text{ and } \\omega_2 \\text{ at } Q. \\text{ Find } PQ."
+  },
+  {
+    "topic": "Combinatorics",
+    "subtopic": "Pigeonhole",
+    "difficulty": "Hard",
+    "name": "Subset Sum Guarantee",
+    "latex": "\\text{Prove that among any } 10 \\text{ integers chosen from } \\{1, 2, \\ldots, 100\\}, \\text{ some nonempty subset has a sum divisible by } 10."
+  },
+  {
+    "topic": "Algebra",
+    "subtopic": "Inequalities",
+    "difficulty": "Hard",
+    "name": "AM-GM Squeeze",
+    "latex": "\\text{For positive reals } a, b, c \\text{ with } abc = 1, \\text{ prove that } a^2 + b^2 + c^2 \\ge a + b + c."
+  },
+  {
+    "topic": "Number Theory",
+    "subtopic": "Diophantine Equations",
+    "difficulty": "IMO",
+    "name": "The Elusive Triple",
+    "latex": "\\text{Determine all triples of positive integers } (x, y, z) \\text{ satisfying } x^2 + y^2 + z^2 = 2(xy + yz + zx) - 3."
+  },
+  {
+    "topic": "Geometry",
+    "subtopic": "Power of a Point",
+    "difficulty": "IMO",
+    "name": "The Cyclic Quadrilateral Trap",
+    "latex": "\\text{Let } ABCD \\text{ be a cyclic quadrilateral with } AC \\cap BD = P. \\text{ Prove that } PA \\cdot PC = PB \\cdot PD \\text{ and use this to determine } AB \\cdot CD + AD \\cdot BC \\text{ in terms of the diagonals and the circumradius.}"
+  },
+  {
+    "topic": "Combinatorics",
+    "subtopic": "Graph Theory",
+    "difficulty": "IMO",
+    "name": "The Committee Graph",
+    "latex": "\\text{In a country with } 2023 \\text{ cities, some pairs are connected by roads such that every city has degree at least } 1012. \\text{ Prove the road network is connected.}"
+  }
+]
