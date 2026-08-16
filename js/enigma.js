@@ -13,7 +13,7 @@
      ------------------------------------------------------- */
   const VAULT_CODES = {
     puzzle1: "472988",   // The Architect's Mark (already set)
-    puzzle2: "V1ETA_JUMP",   // CHANGE THIS when you make Puzzle 2
+    puzzle2: "271500",   // CHANGE THIS when you make Puzzle 2
     puzzle3: "000000",   // CHANGE THIS when you make Puzzle 3
     puzzle4: "000000",   // CHANGE THIS when you make Puzzle 4
   };
