@@ -19,16 +19,25 @@ a.dead { color: #ff4444; text-decoration: none; font-size: 16px; width: fit-cont
 a.dead:hover { text-shadow: 0 0 8px #ff4444, 0 0 16px #ff4444; }
 .success-text { color: #00ff88; }
 .dead-title { color: #ff4444; }
-.code-line { font-size: 20px; letter-spacing: 2px; margin-top: 24px; }
-.reward-line { color: #888; font-size: 13px; margin-top: 14px; }
+.code-box { margin-top: 24px; }
+.code-label { color: var(--text-dim); font-size: 13px; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
+.code-input { background: rgba(0,0,0,0.5); border: 1px solid #00ff88; color: #00ff88; font-family: 'Courier New', monospace; font-size: 22px; letter-spacing: 3px; padding: 14px 18px; border-radius: 6px; width: 100%; text-align: center; cursor: text; }
+.code-input:focus { outline: none; }
+.reward-line { color: #888; font-size: 13px; margin-top: 18px; }
 </style>
 </head>
 <body>
 <div class="container">
   <h1 class="success-text">The Seal Shatters</h1>
   <p class="story success-text">You have survived the descent. The vault yields its secret.<span class="cursor"></span></p>
-  <p class="code-line success-text">Vault Code: V1ETA_JUMP</p>
+  
+  <div class="code-box">
+    <div class="code-label">Vault Code</div>
+    <input type="text" class="code-input" value="V1ETA_JUMP" readonly onclick="this.select()">
+  </div>
+  
   <p class="reward-line">Reward: Crown + 20 Diamonds + Legendary Problem</p>
+  
   <div class="choices">
     <a class="choice" href="../../../enigma.html">Return to The Enigma</a>
   </div>
