@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Infinite Descent - Success</title>
+<style>
+* { box-sizing: border-box; }
+body { background-color: #0a0a0f; color: #e6e6e6; font-family: 'Courier New', Courier, monospace; font-size: 16px; min-height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; }
+.container { max-width: 600px; width: 100%; padding: 40px; }
+h1 { font-size: 18px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 24px 0; opacity: 0; animation: fadeIn 1s ease forwards; }
+p.story { line-height: 1.7; margin: 0; opacity: 0; animation: fadeIn 1.5s ease forwards 0.3s; }
+.cursor { display: inline-block; width: 8px; height: 15px; background: #e6e6e6; margin-left: 4px; vertical-align: middle; animation: blink 1s steps(1) infinite; }
+@keyframes fadeIn { to { opacity: 1; } }
+@keyframes blink { 50% { opacity: 0; } }
+.choices { margin-top: 32px; display: flex; flex-direction: column; gap: 16px; }
+a.choice { color: #00d4aa; text-decoration: none; font-size: 16px; width: fit-content; transition: text-shadow 0.2s ease; }
+a.choice:hover { text-shadow: 0 0 8px #00d4aa, 0 0 16px #00d4aa; }
+a.dead { color: #ff4444; text-decoration: none; font-size: 16px; width: fit-content; transition: text-shadow 0.2s ease; }
+a.dead:hover { text-shadow: 0 0 8px #ff4444, 0 0 16px #ff4444; }
+.success-text { color: #00ff88; }
+.dead-title { color: #ff4444; }
+.code-line { font-size: 20px; letter-spacing: 2px; margin-top: 24px; }
+.reward-line { color: #888; font-size: 13px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="success-text">The Seal Shatters</h1>
+  <p class="story success-text">You have survived the descent. The vault yields its secret.<span class="cursor"></span></p>
+  <p class="code-line success-text">Vault Code: V1ETA_JUMP</p>
+  <p class="reward-line">Reward: Crown + 20 Diamonds + Legendary Problem</p>
+  <div class="choices">
+    <a class="choice" href="../../enigma.html">Return to The Enigma</a>
+  </div>
+</div>
+</body>
+</html>

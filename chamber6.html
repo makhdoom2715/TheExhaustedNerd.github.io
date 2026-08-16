@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Infinite Descent - The Sixth Chamber</title>
+<style>
+* { box-sizing: border-box; }
+body { background-color: #0a0a0f; color: #e6e6e6; font-family: 'Courier New', Courier, monospace; font-size: 16px; min-height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; }
+.container { max-width: 600px; width: 100%; padding: 40px; }
+h1 { font-size: 18px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 24px 0; opacity: 0; animation: fadeIn 1s ease forwards; }
+p.story { line-height: 1.7; margin: 0; opacity: 0; animation: fadeIn 1.5s ease forwards 0.3s; }
+.cursor { display: inline-block; width: 8px; height: 15px; background: #e6e6e6; margin-left: 4px; vertical-align: middle; animation: blink 1s steps(1) infinite; }
+@keyframes fadeIn { to { opacity: 1; } }
+@keyframes blink { 50% { opacity: 0; } }
+.choices { margin-top: 32px; display: flex; flex-direction: column; gap: 16px; }
+a.choice { color: #00d4aa; text-decoration: none; font-size: 16px; width: fit-content; transition: text-shadow 0.2s ease; }
+a.choice:hover { text-shadow: 0 0 8px #00d4aa, 0 0 16px #00d4aa; }
+a.dead { color: #ff4444; text-decoration: none; font-size: 16px; width: fit-content; transition: text-shadow 0.2s ease; }
+a.dead:hover { text-shadow: 0 0 8px #ff4444, 0 0 16px #ff4444; }
+.success-text { color: #00ff88; }
+.dead-title { color: #ff4444; }
+.hint-btn { margin-top: 32px; background: none; border: 1px solid #333; color: #888; font-family: inherit; font-size: 13px; padding: 8px 14px; cursor: pointer; }
+.hint-btn:hover { border-color: #00d4aa; color: #00d4aa; }
+.hint-text { margin-top: 12px; font-size: 13px; color: #888; line-height: 1.6; display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>The Sixth Chamber</h1>
+  <p class="story">You are running out of breath. A flickering light reveals the words: <em>"The starting path is never right."</em> A vast void lies ahead.<span class="cursor"></span></p>
+  <div class="choices">
+    <a class="choice" href="chamber7.html" onclick="localStorage.setItem('c6','wrong')">Silence</a>
+    <a class="choice" href="chamber7.html" onclick="localStorage.setItem('c6','right')">Echo</a>
+  </div>
+</div>
+</body>
+</html>
