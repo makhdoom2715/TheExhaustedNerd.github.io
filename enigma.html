@@ -48,23 +48,24 @@
           </tr>
           <tr class="vault-row" id="puzzle2Toggle">
             <td>Puzzle 2</td>
-            <td><span class="vault-status locked">LOCKED</span></td>
+            <td><span class="vault-status locked" id="vaultRowStatus2">LOCKED</span></td>
             <td class="vault-reward">Crown + 20 Diamonds</td>
           </tr>
           <tr class="vault-row" id="puzzle3Toggle">
             <td>Puzzle 3</td>
-            <td><span class="vault-status locked">LOCKED</span></td>
+            <td><span class="vault-status locked" id="vaultRowStatus3">LOCKED</span></td>
             <td class="vault-reward">Crown + 20 Diamonds</td>
           </tr>
           <tr class="vault-row" id="puzzle4Toggle">
             <td>Puzzle 4</td>
-            <td><span class="vault-status locked">LOCKED</span></td>
+            <td><span class="vault-status locked" id="vaultRowStatus4">LOCKED</span></td>
             <td class="vault-reward">Crown + 20 Diamonds</td>
           </tr>
         </tbody>
       </table>
     </div>
 
+    <!-- PUZZLE 1 PANEL -->
     <div class="puzzle-panel" id="puzzle1Panel">
       <p class="puzzle-riddle">Three fingerprints remain. One burns where the day begins. One hides in the house of chaos. One reflects where the world watches. Find them. Concatenate. Six digits. No spaces.</p>
 
@@ -84,12 +85,54 @@
       </div>
       <p class="vault-message" id="vaultMsg"></p>
 
-      <div class="vault-reward-panel" id="vaultRewardPanel">
-        <p style="color: var(--success); margin-bottom: 10px;">Reward: IMO 1988 Problem 6</p>
-        <div class="btn-row">
-          <a class="btn btn-sm" href="#" target="_blank" rel="noopener">Problem PDF</a>
-          <span class="btn btn-sm" style="opacity:0.5; cursor:not-allowed;">Solution Video - Not made yet</span>
+      <div class="vault-reward-panel" id="vaultRewardPanel"></div>
+    </div>
+
+    <!-- PUZZLE 2 PANEL -->
+    <div class="puzzle-panel" id="puzzle2Panel">
+      <p class="puzzle-riddle">A sealed path awaits. Enter the vault and find the code.</p>
+      <a href="enigma/vault/puzzle2/start.html" class="btn btn-primary">Enter the Vault</a>
+
+      <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">If you have found the code, enter it here:</p>
+        <div class="code-entry">
+          <input type="text" id="p2code" placeholder="000000" maxlength="6">
+          <button class="btn btn-primary" id="p2submit">SUBMIT</button>
         </div>
+        <p class="vault-message" id="p2msg"></p>
+        <div class="vault-reward-panel" id="p2reward"></div>
+      </div>
+    </div>
+
+    <!-- PUZZLE 3 PANEL -->
+    <div class="puzzle-panel" id="puzzle3Panel">
+      <p class="puzzle-riddle">A sealed path awaits. Enter the vault and find the code.</p>
+      <a href="enigma/vault/puzzle3/start.html" class="btn btn-primary">Enter the Vault</a>
+
+      <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">If you have found the code, enter it here:</p>
+        <div class="code-entry">
+          <input type="text" id="p3code" placeholder="000000" maxlength="6">
+          <button class="btn btn-primary" id="p3submit">SUBMIT</button>
+        </div>
+        <p class="vault-message" id="p3msg"></p>
+        <div class="vault-reward-panel" id="p3reward"></div>
+      </div>
+    </div>
+
+    <!-- PUZZLE 4 PANEL -->
+    <div class="puzzle-panel" id="puzzle4Panel">
+      <p class="puzzle-riddle">A sealed path awaits. Enter the vault and find the code.</p>
+      <a href="enigma/vault/puzzle4/start.html" class="btn btn-primary">Enter the Vault</a>
+
+      <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">If you have found the code, enter it here:</p>
+        <div class="code-entry">
+          <input type="text" id="p4code" placeholder="000000" maxlength="6">
+          <button class="btn btn-primary" id="p4submit">SUBMIT</button>
+        </div>
+        <p class="vault-message" id="p4msg"></p>
+        <div class="vault-reward-panel" id="p4reward"></div>
       </div>
     </div>
   </section>
@@ -101,16 +144,5 @@
 
 <script src="js/tracker.js"></script>
 <script src="js/enigma.js"></script>
-<script>
-  document.getElementById("puzzle2Toggle").addEventListener("click", () => {
-    window.location.href = "enigma/vault/puzzle2/start.html";
-  });
-  document.getElementById("puzzle3Toggle").addEventListener("click", () => {
-    window.location.href = "enigma/vault/puzzle3/start.html";
-  });
-  document.getElementById("puzzle4Toggle").addEventListener("click", () => {
-    window.location.href = "enigma/vault/puzzle4/start.html";
-  });
-</script>
 </body>
 </html>
