@@ -35,51 +35,6 @@
     <p class="subhead">Everything you need. Nothing you don't.</p>
   </div>
 
-  <!-- AVAILABLE NOW: Content with real links -->
-  <section>
-    <div class="section-head">
-      <h2>Available Now</h2>
-      <p class="subhead" style="font-family:var(--font-mono); font-size:14px;">Full video playlists and drive folders ready.</p>
-    </div>
-    <div class="grid grid-2">
-      <div class="card chapter-card">
-        <span class="chapter-name">Divisibility</span>
-        <div class="btn-row">
-          <a class="btn btn-sm" href="https://drive.google.com/drive/folders/1Q254Oeuu-ySVulaZqAFovjP5B69DdRUN" target="_blank" rel="noopener">Drive Folder</a>
-          <a class="btn btn-sm" href="https://youtube.com/playlist?list=PLCyWmJ9Gikvw&si=9lsrje0CeEEXi-2A" target="_blank" rel="noopener">YouTube Playlist</a>
-        </div>
-      </div>
-      <div class="card chapter-card">
-        <span class="chapter-name">Euclidean Algorithm</span>
-        <div class="btn-row">
-          <a class="btn btn-sm" href="https://drive.google.com/drive/folders/1PA-tXbvViZn_3yiYkUvGJDP0v-cuKfPw" target="_blank" rel="noopener">Drive Folder</a>
-          <a class="btn btn-sm" href="https://youtube.com/playlist?list=PLSJlEDEjB7m0&si=9T6XpYW9QRW8bKUj" target="_blank" rel="noopener">YouTube Playlist</a>
-        </div>
-      </div>
-      <div class="card chapter-card">
-        <span class="chapter-name">GCD - LCM</span>
-        <div class="btn-row">
-          <a class="btn btn-sm" href="https://drive.google.com/drive/folders/1ctOf_DPIu8N1J_9iyTqDKp4cKyGAkYnm" target="_blank" rel="noopener">Drive Folder</a>
-          <a class="btn btn-sm" href="https://youtube.com/playlist?list=PLD7w_a1zuJAo&si=eqGNB1h5xIVjCPpl" target="_blank" rel="noopener">YouTube Playlist</a>
-        </div>
-      </div>
-      <div class="card chapter-card">
-        <span class="chapter-name">Olympiad Primes</span>
-        <div class="btn-row">
-          <a class="btn btn-sm" href="https://drive.google.com/drive/folders/1kMeRzWi4XtNdxJ6jJu_UYSDI8bFm3dm7" target="_blank" rel="noopener">Drive Folder</a>
-          <a class="btn btn-sm" href="https://youtube.com/playlist?list=PLcIUmhgTiMfE&si=S4hV_UKZIJi4Z0O9" target="_blank" rel="noopener">YouTube Playlist</a>
-        </div>
-      </div>
-      <div class="card chapter-card">
-        <span class="chapter-name">Inequalities</span>
-        <div class="btn-row">
-          <a class="btn btn-sm" href="https://drive.google.com/drive/folders/1ts7a3bxOI7m7ItzDnCuiaaVi-qqxgn2t" target="_blank" rel="noopener">Drive Folder</a>
-          <a class="btn btn-sm" href="https://youtube.com/playlist?list=PLE4wDGc-HLz4&si=2Gbpgztb0xp8g3EQ" target="_blank" rel="noopener">YouTube Playlist</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <section>
     <div class="section-head">
       <h2>Olympiad Mathematics</h2>
@@ -135,25 +90,50 @@
 <script src="js/roulette.js"></script>
 <script>
   const TOPICS = {
-    "Number Theory": ["Divisibility", "GCD & LCM", "Primes", "Modular Arithmetic", "Diophantine Equations"],
+    "Number Theory": ["Divisibility", "Euclidean Algorithm", "GCD & LCM", "Primes", "Modular Arithmetic", "Diophantine Equations"],
     "Algebra": ["Polynomials", "Inequalities", "Functional Equations", "Sequences & Series"],
     "Geometry": ["Circles", "Centers", "Triangles", "Power of a Point", "Transformations"],
     "Combinatorics": ["Counting", "Graph Theory", "Pigeonhole", "Extremal Principle"]
+  };
+
+  const LINKS = {
+    "Divisibility": {
+      drive: "https://drive.google.com/drive/folders/1Q254Oeuu-ySVulaZqAFovjP5B69DdRUN",
+      yt: "https://youtube.com/playlist?list=PLCyWmJ9Gikvw&si=9lsrje0CeEEXi-2A"
+    },
+    "Euclidean Algorithm": {
+      drive: "https://drive.google.com/drive/folders/1PA-tXbvViZn_3yiYkUvGJDP0v-cuKfPw",
+      yt: "https://youtube.com/playlist?list=PLSJlEDEjB7m0&si=9T6XpYW9QRW8bKUj"
+    },
+    "GCD & LCM": {
+      drive: "https://drive.google.com/drive/folders/1ctOf_DPIu8N1J_9iyTqDKp4cKyGAkYnm",
+      yt: "https://youtube.com/playlist?list=PLD7w_a1zuJAo&si=eqGNB1h5xIVjCPpl"
+    },
+    "Primes": {
+      drive: "https://drive.google.com/drive/folders/1kMeRzWi4XtNdxJ6jJu_UYSDI8bFm3dm7",
+      yt: "https://youtube.com/playlist?list=PLcIUmhgTiMfE&si=S4hV_UKZIJi4Z0O9"
+    },
+    "Inequalities": {
+      drive: "https://drive.google.com/drive/folders/1ts7a3bxOI7m7ItzDnCuiaaVi-qqxgn2t",
+      yt: "https://youtube.com/playlist?list=PLE4wDGc-HLz4&si=2Gbpgztb0xp8g3EQ"
+    }
   };
 
   const PAPERS = ["P1", "P3", "M1", "S1"];
   const PAPER_RESOURCES = ["Class Notes", "Worksheets", "Solved Worksheets", "Cheat Sheets", "Study Plan"];
 
   function chapterListHTML(topic) {
-    return TOPICS[topic].map(ch => `
+    return TOPICS[topic].map(ch => {
+      const links = LINKS[ch] || { drive: "https://drive.google.com/placeholder", yt: "https://youtube.com/placeholder" };
+      return `
       <div class="chapter-card">
         <span class="chapter-name">${ch}</span>
         <div class="btn-row">
-          <a class="btn btn-sm" href="https://drive.google.com/placeholder" target="_blank" rel="noopener">Drive Folder</a>
-          <a class="btn btn-sm" href="https://youtube.com/placeholder" target="_blank" rel="noopener">YouTube Playlist</a>
+          <a class="btn btn-sm" href="${links.drive}" target="_blank" rel="noopener">Drive Folder</a>
+          <a class="btn btn-sm" href="${links.yt}" target="_blank" rel="noopener">YouTube Playlist</a>
         </div>
       </div>
-    `).join("");
+    `}).join("");
   }
 
   function paperListHTML(paper) {
