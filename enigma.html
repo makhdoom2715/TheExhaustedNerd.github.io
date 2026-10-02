@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Enigma - The Exhausted Nerd</title>
-<meta name="description" content="Four sealed puzzles. One vault. Solve them for diamonds and crowns.">
+<meta name="description" content="Two sealed puzzles. One vault. Solve them for diamonds and crowns.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -52,16 +52,6 @@
             <td><span class="vault-status locked" id="vaultRowStatus2">LOCKED</span></td>
             <td class="vault-reward">Crown + 20 Diamonds</td>
           </tr>
-          <tr class="vault-row" id="puzzle3Toggle">
-            <td>Puzzle 3</td>
-            <td><span class="vault-status locked" id="vaultRowStatus3">LOCKED</span></td>
-            <td class="vault-reward">Crown + 20 Diamonds</td>
-          </tr>
-          <tr class="vault-row" id="puzzle4Toggle">
-            <td>Puzzle 4</td>
-            <td><span class="vault-status locked" id="vaultRowStatus4">LOCKED</span></td>
-            <td class="vault-reward">Crown + 20 Diamonds</td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -102,38 +92,6 @@
         </div>
         <p class="vault-message" id="p2msg"></p>
         <div class="vault-reward-panel" id="p2reward"></div>
-      </div>
-    </div>
-
-    <!-- PUZZLE 3 PANEL -->
-    <div class="puzzle-panel" id="puzzle3Panel">
-      <p class="puzzle-riddle">A sealed path awaits. Enter the vault and find the code.</p>
-      <a href="enigma/vault/puzzle3/start.html" class="btn btn-primary">Enter the Vault</a>
-
-      <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
-        <p style="color: var(--text-secondary); font-size: 0.9rem;">If you have found the code, enter it here:</p>
-        <div class="code-entry">
-          <input type="text" id="p3code" placeholder="000000" maxlength="6">
-          <button class="btn btn-primary" id="p3submit">SUBMIT</button>
-        </div>
-        <p class="vault-message" id="p3msg"></p>
-        <div class="vault-reward-panel" id="p3reward"></div>
-      </div>
-    </div>
-
-    <!-- PUZZLE 4 PANEL -->
-    <div class="puzzle-panel" id="puzzle4Panel">
-      <p class="puzzle-riddle">A sealed path awaits. Enter the vault and find the code.</p>
-      <a href="enigma/vault/puzzle4/start.html" class="btn btn-primary">Enter the Vault</a>
-
-      <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
-        <p style="color: var(--text-secondary); font-size: 0.9rem;">If you have found the code, enter it here:</p>
-        <div class="code-entry">
-          <input type="text" id="p4code" placeholder="000000" maxlength="6">
-          <button class="btn btn-primary" id="p4submit">SUBMIT</button>
-        </div>
-        <p class="vault-message" id="p4msg"></p>
-        <div class="vault-reward-panel" id="p4reward"></div>
       </div>
     </div>
   </section>
