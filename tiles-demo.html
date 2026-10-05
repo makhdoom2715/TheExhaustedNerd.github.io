@@ -6,7 +6,8 @@
 <title>Tiles Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;900&family=JetBrains+Mono:wght@400;500;700&family=VT323&family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;500;600&family=Doto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;900&family=JetBrains+Mono:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/w95fa" rel="stylesheet">
 <style>
   body {
     background: #0a0a0f;
@@ -76,32 +77,28 @@
     z-index: 2;
   }
 
-  /* Font comparison */
-  .font-block {
+  .body-wrap textarea {
+    width: 100%;
+    min-height: 400px;
+    background: transparent;
     border: 1px solid rgba(255,255,255,0.09);
     border-radius: 8px;
-    padding: 24px 28px;
-    margin-bottom: 20px;
-  }
-  .font-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: #ffb000;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    display: block;
-  }
-  .font-body {
-    font-size: 18px;
-    line-height: 1.85;
     color: #e6e6e6;
-    letter-spacing: 0.01em;
+    font-family: 'W95FA', 'VT323', monospace;
+    font-size: 16px;
+    line-height: 1.85;
+    padding: 28px 32px;
+    outline: none;
+    resize: vertical;
+    box-sizing: border-box;
+    letter-spacing: 0.02em;
   }
-  .font-1 { font-family: 'VT323', monospace; font-size: 22px; }
-  .font-2 { font-family: 'Silkscreen', monospace; font-size: 15px; }
-  .font-3 { font-family: 'Pixelify Sans', monospace; font-size: 18px; }
-  .font-4 { font-family: 'Doto', monospace; font-size: 20px; font-weight: 500; }
+  .body-wrap textarea:focus {
+    border-color: rgba(255,255,255,0.2);
+  }
+  .body-wrap textarea::placeholder {
+    color: #55555f;
+  }
 
   .hint {
     margin: 40px 0 0;
@@ -123,27 +120,14 @@
 
   <h1 class="tile-heading" id="tileHeading"></h1>
 
-  <div class="font-block">
-    <span class="font-label">01 — VT323 (terminal, tall, thin)</span>
-    <div class="font-body font-1">This month, I started two projects. One new, one repaired. The font you are reading now is VT323.</div>
+  <div class="body-wrap">
+    <label>&gt; write your transmission</label>
+    <textarea id="bodyInput" placeholder="Start writing here...">This month, I started two projects that I've been thinking about for a while. For the first, I built something completely new to me, and for the second, I repaired something old.
+
+One of my favorite tapes is Sounds of Summer: Field Recordings of Solar Electronics by my friend Max Hamel. Their handmade synthesizers respond to the level of sunlight over two fifteen-minute recordings, set within the ambient sounds of the city.</textarea>
   </div>
 
-  <div class="font-block">
-    <span class="font-label">02 — Silkscreen (clean pixel, chunky)</span>
-    <div class="font-body font-2">This month, I started two projects. One new, one repaired. The font you are reading now is Silkscreen.</div>
-  </div>
-
-  <div class="font-block">
-    <span class="font-label">03 — Pixelify Sans (pixel but softer)</span>
-    <div class="font-body font-3">This month, I started two projects. One new, one repaired. The font you are reading now is Pixelify Sans.</div>
-  </div>
-
-  <div class="font-block">
-    <span class="font-label">04 — Doto (dot matrix, LCD style)</span>
-    <div class="font-body font-4">This month, I started two projects. One new, one repaired. The font you are reading now is Doto.</div>
-  </div>
-
-  <p class="hint">Tell me the number of the font you like. That becomes the body font for Transmissions.</p>
+  <p class="hint">Body font: W95FA (same as Nic Chan). Tiles: random color, font, size, position.</p>
 
 </div>
 
