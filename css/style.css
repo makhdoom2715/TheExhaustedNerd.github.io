@@ -17,11 +17,11 @@
   --text-dim: #8b8b9a;
   --text-faint: #55555f;
 
-  --accent: #00d4aa;       /* cyan - primary interactive */
+  --accent: #00d4aa;
   --accent-dim: #0a3d33;
   --accent-glow: rgba(0,212,170,0.30);
 
-  --amber: #ffb000;        /* enigma / terminal voice */
+  --amber: #ffb000;
   --amber-dim: #4a3400;
   --amber-glow: rgba(255,176,0,0.30);
 
@@ -126,13 +126,37 @@ button, input{ font-family: inherit; }
 }
 .status-bar span{ color: var(--amber); }
 
-/* mobile nav */
+/* ---------- mobile nav ---------- */
 .nav-toggle{ display: none; }
 @media (max-width: 760px){
-  .navbar{ flex-wrap: wrap; }
+  .navbar{
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .profile-pic-link{ display: none; }
   .nav-links{
-    order: 3; width: 100%; justify-content: flex-start;
-    gap: 18px; overflow-x: auto; padding-top: 4px;
+    order: 3;
+    flex: 0 0 100%;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 8px 0 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar{ display: none; }
+  .nav-links a{
+    font-size: 13px;
+    white-space: nowrap;
+    padding: 4px 2px;
+  }
+  .auth-btn{
+    min-width: auto;
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 }
 
@@ -187,7 +211,7 @@ button, input{ font-family: inherit; }
 .stat-emoji{ font-size: 22px; display: block; margin-bottom: 8px; }
 .stat-num{ font-family: var(--font-mono); font-size: 26px; font-weight: 700; }
 .stat-label{ font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
-.stat-card.heart .stat-num{ color: var(--heart); }
+.stat-card.heart .600stat-num{ color: var(--heart); }
 .stat-card.diamond .stat-num{ color: var(--diamond); }
 .stat-card.spade .stat-num{ color: var(--spade); }
 .stat-card.crown .stat-num{ color: var(--crown); }
@@ -216,7 +240,7 @@ section{ padding: 48px 24px; max-width: var(--maxw); margin: 0 auto; }
 /* topic / paper boxes */
 .topic-box{
   cursor: pointer; text-align: center; padding: 30px 16px;
-  font-family: var(--font-display); font-weight: 600; font-size: 17px;
+  font-family: var(--font-display); font-weight: ; font-size: 17px;
 }
 .topic-box:hover{ border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
 .topic-box.open{ border-color: var(--accent); }
@@ -359,7 +383,6 @@ footer{
    NEW: MATHJAX DARK MODE + REWARD STATEMENT BOX
    ========================================================= */
 
-/* MathJax renders math in white on dark background */
 mjx-container{
   color: var(--text) !important;
 }
@@ -371,7 +394,6 @@ mjx-container svg{
   color: var(--text) !important;
 }
 
-/* Reward problem statement scrollable box */
 .reward-statement{
   max-height: 220px;
   overflow-y: auto;
@@ -385,14 +407,8 @@ mjx-container svg{
   color: var(--text);
   font-family: var(--font-mono);
 }
-
-/* Scrollbar styling for the statement box */
-.reward-statement::-webkit-scrollbar{
-  width: 6px;
-}
-.reward-statement::-webkit-scrollbar-track{
-  background: transparent;
-}
+.reward-statement::-webkit-scrollbar{ width: 6px; }
+.reward-statement::-webkit-scrollbar-track{ background: transparent; }
 .reward-statement::-webkit-scrollbar-thumb{
   background: var(--border-strong);
   border-radius: 3px;
