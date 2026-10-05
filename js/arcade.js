@@ -21,21 +21,18 @@
      STEP 2: REWARD NAMES AND STATEMENTS
      - name: short title shown at top
      - statement: full problem text with LaTeX (optional, leave "" to hide)
-     - pdf: link to problem PDF
-     - video: link to solution video
+     - video: link to solution video (leave "#" to hide the button)
      ------------------------------------------------------- */
   const VAULT_REWARDS = {
     puzzle1: {
       name: "IMO 1988 Problem 6",
       statement: "",
-      pdf: "#",
       video: "#"
     },
     puzzle2: {
       name: "IMO 1993 Problem 1",
       statement: "Let \\(f(x) = x^n + 5x^{n-1} + 3\\), where \\(n > 1\\) is an integer. Prove that \\(f(x)\\) cannot be expressed as the product of two nonconstant polynomials with integer coefficients.",
-      pdf: "#",
-      video: "#"
+      video: "https://youtu.be/yIYI8w_5zaE"
     },
   };
 
@@ -65,10 +62,13 @@
       html += '</div>';
     }
 
-    html += '<div class="btn-row" style="margin-top: 10px;">';
-    html += '<a href="' + r.pdf + '" class="btn btn-sm" target="_blank" rel="noopener">[Problem PDF]</a>';
-    html += '<span class="btn btn-sm" style="opacity:0.5; cursor:not-allowed;">[Solution Video - Not made yet]</span>';
-    html += '</div>';
+    const hasVideo = r.video && r.video !== "#" && r.video.length > 0;
+
+    if (hasVideo) {
+      html += '<div class="btn-row" style="margin-top: 10px;">';
+      html += '<a href="' + r.video + '" class="btn btn-sm" target="_blank" rel="noopener">[Solution Video]</a>';
+      html += '</div>';
+    }
 
     rewardPanel.innerHTML = html;
     rewardPanel.classList.add("show");
@@ -200,7 +200,6 @@
      ------------------------------------------------------- */
   function initSimplePuzzle(id, inputId, btnId, msgId, panelId) {
     const CODE = VAULT_CODES[id];
-    const SOLVED_KEY = getSolvedKey(id);
 
     const input = document.getElementById(inputId);
     const btn = document.getElementById(btnId);
