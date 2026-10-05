@@ -1,54 +1,41 @@
 /* =========================================================
-   THE EXHAUSTED NERD - enigma.js
+   THE EXHAUSTED NERD - arcade.js
    Puzzle 1: The Architect's Mark
-   Puzzles 2-4: Add your codes below where it says ADD NEW CODES HERE
+   Puzzle 2: Simple code check
+   To add a new puzzle: add it to VAULT_CODES, VAULT_REWARDS,
+   add the HTML panel with matching IDs, and call initSimplePuzzle.
    ========================================================= */
 
 (function () {
 
   /* -------------------------------------------------------
-     STEP 1: ADD YOUR PUZZLE CODES HERE
-     Just replace the placeholder with the real 6-digit code.
-     When you generate a new puzzle, come here and change the number.
+     STEP 1: PUZZLE CODES
+     Replace the placeholder with the real 6-digit code.
      ------------------------------------------------------- */
   const VAULT_CODES = {
     puzzle1: "472988",   // The Architect's Mark (already set)
-    puzzle2: "271500",   // CHANGE THIS when you make Puzzle 2
-    puzzle3: "000000",   // CHANGE THIS when you make Puzzle 3
-    puzzle4: "000000",   // CHANGE THIS when you make Puzzle 4
+    puzzle2: "271500",   // Puzzle 2
   };
 
   /* -------------------------------------------------------
-     STEP 2: ADD YOUR REWARD NAMES AND STATEMENTS HERE
+     STEP 2: REWARD NAMES AND STATEMENTS
      - name: short title shown at top
      - statement: full problem text with LaTeX (optional, leave "" to hide)
      - pdf: link to problem PDF
      - video: link to solution video
      ------------------------------------------------------- */
   const VAULT_REWARDS = {
-    puzzle1: { 
-      name: "IMO 1988 Problem 6", 
+    puzzle1: {
+      name: "IMO 1988 Problem 6",
       statement: "",
-      pdf: "#", 
-      video: "#" 
+      pdf: "#",
+      video: "#"
     },
-    puzzle2: { 
-      name: "IMO 1993 Problem 1", 
+    puzzle2: {
+      name: "IMO 1993 Problem 1",
       statement: "Let \\(f(x) = x^n + 5x^{n-1} + 3\\), where \\(n > 1\\) is an integer. Prove that \\(f(x)\\) cannot be expressed as the product of two nonconstant polynomials with integer coefficients.",
-      pdf: "#", 
-      video: "#" 
-    },
-    puzzle3: { 
-      name: "Legendary Problem 3", 
-      statement: "",
-      pdf: "#", 
-      video: "#" 
-    },
-    puzzle4: { 
-      name: "Legendary Problem 4", 
-      statement: "",
-      pdf: "#", 
-      video: "#" 
+      pdf: "#",
+      video: "#"
     },
   };
 
@@ -69,23 +56,23 @@
   function showReward(id, msgEl, rewardPanel) {
     const r = VAULT_REWARDS[id];
     if (!r) return;
-    
+
     let html = '<p class="reward-title">Reward: ' + r.name + '</p>';
-    
+
     if (r.statement && r.statement.length > 0) {
       html += '<div class="reward-statement" style="max-height: 220px; overflow-y: auto; background: rgba(0,0,0,0.35); padding: 16px; border-radius: 8px; margin: 12px 0; font-size: 0.95rem; line-height: 1.6; border: 1px solid var(--border); color: var(--text);">';
       html += r.statement;
       html += '</div>';
     }
-    
+
     html += '<div class="btn-row" style="margin-top: 10px;">';
     html += '<a href="' + r.pdf + '" class="btn btn-sm" target="_blank" rel="noopener">[Problem PDF]</a>';
     html += '<span class="btn btn-sm" style="opacity:0.5; cursor:not-allowed;">[Solution Video - Not made yet]</span>';
     html += '</div>';
-    
+
     rewardPanel.innerHTML = html;
     rewardPanel.classList.add("show");
-    
+
     if (window.MathJax && window.MathJax.typesetPromise) {
       window.MathJax.typesetPromise([rewardPanel]).catch(function (err) {
         console.log("MathJax error:", err);
@@ -109,7 +96,6 @@
   (function initPuzzle1() {
     const ID = "puzzle1";
     const CODE = VAULT_CODES[ID];
-    const SOLVED_KEY = getSolvedKey(ID);
     const HINT_KEY = "ten_puzzle1_hints_unlocked";
 
     const toggle = document.getElementById("puzzle1Toggle");
@@ -210,8 +196,7 @@
   })();
 
   /* -------------------------------------------------------
-     PUZZLE 2, 3, 4: Simple code checkers (no hints)
-     When you generate a puzzle, just change the code above.
+     SIMPLE PUZZLES: no hints, just code entry
      ------------------------------------------------------- */
   function initSimplePuzzle(id, inputId, btnId, msgId, panelId) {
     const CODE = VAULT_CODES[id];
@@ -273,7 +258,5 @@
   }
 
   initSimplePuzzle("puzzle2", "p2code", "p2submit", "p2msg", "p2reward");
-  initSimplePuzzle("puzzle3", "p3code", "p3submit", "p3msg", "p3reward");
-  initSimplePuzzle("puzzle4", "p4code", "p4submit", "p4msg", "p4reward");
 
 })();
