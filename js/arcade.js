@@ -32,7 +32,7 @@
     puzzle2: {
       name: "IMO 1993 Problem 1",
       statement: "Let \\(f(x) = x^n + 5x^{n-1} + 3\\), where \\(n > 1\\) is an integer. Prove that \\(f(x)\\) cannot be expressed as the product of two nonconstant polynomials with integer coefficients.",
-      video: "https://youtu.be/yIYI8w_5zaE"
+      video: "#"
     },
   };
 
