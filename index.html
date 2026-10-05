@@ -146,24 +146,5 @@
 
 <!-- Your Firebase setup -->
 <script src="js/firebase.js"></script>
-
-<!-- TEMP TEST - REMOVE AFTER CONFIRMING -->
-<script>
-(async () => {
-  try {
-    await db.collection("scores").doc("test").set({
-      name: "Test User",
-      score: 123,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    console.log("Write worked");
-
-    const doc = await db.collection("scores").doc("test").get();
-    console.log("Read worked:", doc.data());
-  } catch (e) {
-    console.error("Firebase test failed:", e);
-  }
-})();
-</script>
 </body>
 </html>
