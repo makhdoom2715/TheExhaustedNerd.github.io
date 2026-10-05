@@ -247,8 +247,8 @@
 
   const editor = document.getElementById('editor');
   const hiddenPicInput = document.getElementById('hiddenPicInput');
-  const headingBtn = document.getElementById('addHeadingBtn');
-  const quoteBtn = document.getElementById('addQuoteBtn');
+  const addHeadingBtn = document.getElementById('addHeadingBtn');
+  const addQuoteBtn = document.getElementById('addQuoteBtn');
 
   let savedRange = null;
   let imageBeingReplaced = null;
@@ -268,52 +268,39 @@
     sel.addRange(range);
   }
 
-  // Update button visual state based on current block
-  function updateToolbarState() {
+  function currentBlockTag() {
     const sel = window.getSelection();
-    if (!sel.rangeCount || !editor.contains(sel.anchorNode)) {
-      headingBtn.classList.remove('active');
-      quoteBtn.classList.remove('active');
-      return;
-    }
-
+    if (!sel.rangeCount) return '';
     let node = sel.anchorNode;
-    // Walk up to find block element
     while (node && node !== editor) {
-      if (node.nodeType === 1) {
-        const tag = node.tagName;
-        if (tag === 'H2') {
-          headingBtn.classList.add('active');
-          quoteBtn.classList.remove('active');
-          return;
-        }
-        if (tag === 'BLOCKQUOTE') {
-          quoteBtn.classList.add('active');
-          headingBtn.classList.remove('active');
-          return;
-        }
+      if (node.nodeType === 1 && /^(H1|H2|H3|P|BLOCKQUOTE|DIV)$/.test(node.tagName)) {
+        return node.tagName;
       }
       node = node.parentNode;
     }
+    return '';
+  }
 
-    headingBtn.classList.remove('active');
-    quoteBtn.classList.remove('active');
+  function updateToolbarState() {
+    const tag = currentBlockTag();
+    addHeadingBtn.classList.toggle('active', tag === 'H2');
+    addQuoteBtn.classList.toggle('active', tag === 'BLOCKQUOTE');
   }
 
   document.addEventListener('selectionchange', () => {
-    if (document.activeElement === editor || editor.contains(document.activeElement)) {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
       updateToolbarState();
     }
   });
-
-  editor.addEventListener('keyup', updateToolbarState);
-  editor.addEventListener('click', updateToolbarState);
 
   editor.addEventListener('click', (e) => {
     if (e.target.tagName === 'IMG') {
       imageBeingReplaced = e.target;
       hiddenPicInput.click();
+      return;
     }
+    updateToolbarState();
   });
 
   document.getElementById('addPicBtn').addEventListener('click', () => {
@@ -369,15 +356,14 @@
       }
 
       hiddenPicInput.value = '';
-      updateToolbarState();
     };
     reader.readAsDataURL(file);
   });
 
-  headingBtn.addEventListener('click', () => {
+  addHeadingBtn.addEventListener('click', () => {
     editor.focus();
-    const current = document.queryCommandValue('formatBlock').toLowerCase();
-    if (current === 'h2') {
+    const tag = currentBlockTag();
+    if (tag === 'H2') {
       document.execCommand('formatBlock', false, 'P');
     } else {
       document.execCommand('formatBlock', false, 'H2');
@@ -385,10 +371,10 @@
     updateToolbarState();
   });
 
-  quoteBtn.addEventListener('click', () => {
+  addQuoteBtn.addEventListener('click', () => {
     editor.focus();
-    const current = document.queryCommandValue('formatBlock').toLowerCase();
-    if (current === 'blockquote') {
+    const tag = currentBlockTag();
+    if (tag === 'BLOCKQUOTE') {
       document.execCommand('formatBlock', false, 'P');
     } else {
       document.execCommand('formatBlock', false, 'BLOCKQUOTE');
