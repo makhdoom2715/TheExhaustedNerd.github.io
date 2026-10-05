@@ -85,14 +85,14 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 22px;
     margin: 1.5em 0 0.8em;
-    color: #e6e6e6;
+    color: #ffb000;
     font-weight: 700;
   }
   .editor blockquote {
     border-left: 3px solid rgba(255,255,255,0.3);
     margin: 1.2em 0;
     padding-left: 20px;
-    color: #e6e6e6;
+    color: #b8b8c0;
     font-style: italic;
   }
   .editor img {
@@ -247,8 +247,6 @@
 
   const editor = document.getElementById('editor');
   const hiddenPicInput = document.getElementById('hiddenPicInput');
-  const addHeadingBtn = document.getElementById('addHeadingBtn');
-  const addQuoteBtn = document.getElementById('addQuoteBtn');
 
   let savedRange = null;
   let imageBeingReplaced = null;
@@ -268,39 +266,12 @@
     sel.addRange(range);
   }
 
-  function currentBlockTag() {
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return '';
-    let node = sel.anchorNode;
-    while (node && node !== editor) {
-      if (node.nodeType === 1 && /^(H1|H2|H3|P|BLOCKQUOTE|DIV)$/.test(node.tagName)) {
-        return node.tagName;
-      }
-      node = node.parentNode;
-    }
-    return '';
-  }
-
-  function updateToolbarState() {
-    const tag = currentBlockTag();
-    addHeadingBtn.classList.toggle('active', tag === 'H2');
-    addQuoteBtn.classList.toggle('active', tag === 'BLOCKQUOTE');
-  }
-
-  document.addEventListener('selectionchange', () => {
-    const sel = window.getSelection();
-    if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
-      updateToolbarState();
-    }
-  });
-
+  // Click on an image to replace it
   editor.addEventListener('click', (e) => {
     if (e.target.tagName === 'IMG') {
       imageBeingReplaced = e.target;
       hiddenPicInput.click();
-      return;
     }
-    updateToolbarState();
   });
 
   document.getElementById('addPicBtn').addEventListener('click', () => {
@@ -315,6 +286,7 @@
     const reader = new FileReader();
     reader.onload = (ev) => {
 
+      // REPLACE MODE
       if (imageBeingReplaced) {
         imageBeingReplaced.src = ev.target.result;
         imageBeingReplaced = null;
@@ -322,6 +294,7 @@
         return;
       }
 
+      // INSERT MODE
       editor.focus();
       restoreSelection(savedRange);
 
@@ -360,26 +333,26 @@
     reader.readAsDataURL(file);
   });
 
-  addHeadingBtn.addEventListener('click', () => {
+  // Toggle heading
+  document.getElementById('addHeadingBtn').addEventListener('click', () => {
     editor.focus();
-    const tag = currentBlockTag();
-    if (tag === 'H2') {
+    const current = document.queryCommandValue('formatBlock').toLowerCase();
+    if (current === 'h2') {
       document.execCommand('formatBlock', false, 'P');
     } else {
       document.execCommand('formatBlock', false, 'H2');
     }
-    updateToolbarState();
   });
 
-  addQuoteBtn.addEventListener('click', () => {
+  // Toggle quote
+  document.getElementById('addQuoteBtn').addEventListener('click', () => {
     editor.focus();
-    const tag = currentBlockTag();
-    if (tag === 'BLOCKQUOTE') {
+    const current = document.queryCommandValue('formatBlock').toLowerCase();
+    if (current === 'blockquote') {
       document.execCommand('formatBlock', false, 'P');
     } else {
       document.execCommand('formatBlock', false, 'BLOCKQUOTE');
     }
-    updateToolbarState();
   });
 </script>
 
