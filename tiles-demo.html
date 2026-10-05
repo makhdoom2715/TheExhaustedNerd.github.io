@@ -14,46 +14,48 @@
     color: #e6e6e6;
     font-family: 'Inter', sans-serif;
     margin: 0;
-    padding: 40px 24px;
+    padding: 60px 24px;
     min-height: 100vh;
   }
 
-  .container {
+  .page-wrap {
     max-width: 900px;
     margin: 0 auto;
   }
 
-  .input-wrap { margin-bottom: 40px; }
-  .input-wrap label, .body-wrap label, .picture-wrap label {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: #8b8b9a;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
+  /* THE ONE BORDER. Everything lives inside this. */
+  .page {
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    padding: 56px 64px 40px;
+    background: rgba(255,255,255,0.01);
   }
-  .input-wrap input {
+
+  /* Title input - no border, transparent, just text */
+  .title-input {
     width: 100%;
-    background: #15151f;
-    border: 1px solid rgba(255,255,255,0.16);
+    background: transparent;
+    border: none;
+    outline: none;
     color: #e6e6e6;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 18px;
-    padding: 14px 18px;
-    border-radius: 8px;
-    outline: none;
-    box-sizing: border-box;
+    font-size: 22px;
+    font-weight: 500;
+    padding: 0;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
   }
-  .input-wrap input:focus { border-color: #ffb000; }
+  .title-input::placeholder { color: #55555f; }
 
+  /* Tiles preview */
   .tile-heading {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 20px 0;
-    margin: 0 0 48px;
+    margin: 0 0 40px;
     line-height: 1;
+    min-height: 0;
   }
   .tile-word {
     display: inline-flex;
@@ -71,59 +73,54 @@
   }
   .tile:hover { transform: scale(1.05) !important; z-index: 2; }
 
-  .picture-wrap { margin: 32px 0; }
-  .picture-drop {
-    border: 1px dashed rgba(255,255,255,0.2);
-    border-radius: 8px;
-    padding: 48px 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    background: rgba(255,255,255,0.01);
-  }
-  .picture-drop:hover {
-    border-color: #ffb000;
-    background: rgba(255,176,0,0.03);
-  }
-  .picture-drop .icon {
-    font-size: 28px;
-    color: #55555f;
-    margin-bottom: 8px;
-  }
-  .picture-drop .text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: #8b8b9a;
-  }
-  .picture-drop input[type="file"] { display: none; }
-
-  .picture-preview {
-    width: 100%;
-    border-radius: 8px;
-    display: none;
-    margin-top: 12px;
-  }
-  .picture-preview.show { display: block; }
-
-  .body-wrap { margin-top: 12px; }
-  .body-wrap textarea {
-    width: 100%;
-    min-height: 400px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 8px;
+  /* Contenteditable body - continuous writing, images inline */
+  .editor {
+    min-height: 320px;
+    outline: none;
     color: #e6e6e6;
     font-family: 'W95FA', 'VT323', monospace;
-    font-size: 16px;
-    line-height: 1.85;
-    padding: 28px 32px;
-    outline: none;
-    resize: vertical;
-    box-sizing: border-box;
+    font-size: 17px;
+    line-height: 1.9;
     letter-spacing: 0.02em;
+    caret-color: #ffb000;
   }
-  .body-wrap textarea:focus { border-color: rgba(255,255,255,0.2); }
-  .body-wrap textarea::placeholder { color: #55555f; }
+  .editor p { margin: 0 0 1.2em; color: inherit; }
+  .editor img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 24px 0;
+  }
+  .editor:empty:before {
+    content: attr(data-placeholder);
+    color: #55555f;
+  }
+
+  /* Toolbar inside the page, bottom */
+  .toolbar {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    gap: 10px;
+  }
+  .tool-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.16);
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    letter-spacing: 0.04em;
+  }
+  .tool-btn:hover {
+    border-color: #ffb000;
+    color: #ffb000;
+  }
 
   .hint {
     margin: 40px 0 0;
@@ -136,35 +133,24 @@
 </head>
 <body>
 
-<div class="container">
+<div class="page-wrap">
 
-  <div class="input-wrap">
-    <label>&gt; type a title</label>
-    <input id="titleInput" type="text" value="Making and mending">
-  </div>
+  <div class="page">
+    <input id="titleInput" class="title-input" type="text" placeholder="Title" value="Making and mending">
+    <div class="tile-heading" id="tileHeading"></div>
 
-  <h1 class="tile-heading" id="tileHeading"></h1>
+    <div id="editor" class="editor" contenteditable="true" data-placeholder="Start writing..."><p>This month, I started two projects that I've been thinking about for a while. For the first, I built something completely new to me, and for the second, I repaired something old.</p><p>One of my favorite tapes is Sounds of Summer: Field Recordings of Solar Electronics by my friend Max Hamel. Their handmade synthesizers respond to the level of sunlight over two fifteen-minute recordings.</p></div>
 
-  <!-- PICTURE SECTION -->
-  <div class="picture-wrap">
-    <label>&gt; add a picture (optional)</label>
-    <div class="picture-drop" id="pictureDrop">
-      <div class="icon">+</div>
-      <div class="text">click to upload an image</div>
-      <input type="file" id="pictureInput" accept="image/*">
+    <div class="toolbar">
+      <button class="tool-btn" id="addPicBtn">+ Picture</button>
+      <button class="tool-btn" id="addHeadingBtn">+ Heading</button>
+      <button class="tool-btn" id="addQuoteBtn">+ Quote</button>
     </div>
-    <img class="picture-preview" id="picturePreview" alt="preview">
   </div>
 
-  <div class="body-wrap">
-    <label>&gt; write your transmission</label>
-    <textarea id="bodyInput" placeholder="Start writing here...">This month, I started two projects that I've been thinking about for a while. For the first, I built something completely new to me, and for the second, I repaired something old.
+  <p class="hint">Click + Picture to insert an image wherever your cursor is.</p>
 
-One of my favorite tapes is Sounds of Summer: Field Recordings of Solar Electronics by my friend Max Hamel. Their handmade synthesizers respond to the level of sunlight over two fifteen-minute recordings, set within the ambient sounds of the city.</textarea>
-  </div>
-
-  <p class="hint">Picture sits between the title and the body. Full width. Like The Moss.</p>
-
+  <input type="file" id="hiddenPicInput" accept="image/*" style="display:none">
 </div>
 
 <script>
@@ -233,33 +219,87 @@ One of my favorite tapes is Sounds of Summer: Field Recordings of Solar Electron
     heading.innerHTML = html;
   }
 
-  const input = document.getElementById('titleInput');
-  input.addEventListener('input', () => renderTiles(input.value));
-  renderTiles(input.value);
+  const titleInput = document.getElementById('titleInput');
+  titleInput.addEventListener('input', () => renderTiles(titleInput.value));
+  renderTiles(titleInput.value);
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && document.activeElement === input) {
-      renderTiles(input.value);
+  // Contenteditable + insert at cursor
+  const editor = document.getElementById('editor');
+  const hiddenPicInput = document.getElementById('hiddenPicInput');
+
+  function saveSelection() {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+      return sel.getRangeAt(0).cloneRange();
     }
+    return null;
+  }
+
+  function restoreSelection(range) {
+    if (!range) return;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  let savedRange = null;
+
+  document.getElementById('addPicBtn').addEventListener('click', () => {
+    savedRange = saveSelection();
+    hiddenPicInput.click();
   });
 
-  // Picture upload
-  const pictureDrop = document.getElementById('pictureDrop');
-  const pictureInput = document.getElementById('pictureInput');
-  const picturePreview = document.getElementById('picturePreview');
-
-  pictureDrop.addEventListener('click', () => pictureInput.click());
-
-  pictureInput.addEventListener('change', (e) => {
+  hiddenPicInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      picturePreview.src = ev.target.result;
-      picturePreview.classList.add('show');
-      pictureDrop.style.display = 'none';
+      editor.focus();
+      restoreSelection(savedRange);
+
+      const img = document.createElement('img');
+      img.src = ev.target.result;
+      img.alt = '';
+
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(img);
+
+        // Ensure a paragraph after the image so user can keep typing
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        if (img.nextSibling) {
+          img.parentNode.insertBefore(p, img.nextSibling);
+        } else {
+          img.parentNode.appendChild(p);
+        }
+
+        // Put cursor inside the new paragraph
+        const newRange = document.createRange();
+        newRange.setStart(p, 0);
+        newRange.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(newRange);
+      } else {
+        editor.appendChild(img);
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        editor.appendChild(p);
+      }
+
+      hiddenPicInput.value = '';
     };
     reader.readAsDataURL(file);
+  });
+
+  document.getElementById('addHeadingBtn').addEventListener('click', () => {
+    document.execCommand('formatBlock', false, 'H2');
+  });
+
+  document.getElementById('addQuoteBtn').addEventListener('click', () => {
+    document.execCommand('formatBlock', false, 'BLOCKQUOTE');
   });
 </script>
 
