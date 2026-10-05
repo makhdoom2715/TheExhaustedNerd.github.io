@@ -247,6 +247,8 @@
 
   const editor = document.getElementById('editor');
   const hiddenPicInput = document.getElementById('hiddenPicInput');
+  const headingBtn = document.getElementById('addHeadingBtn');
+  const quoteBtn = document.getElementById('addQuoteBtn');
 
   let savedRange = null;
   let imageBeingReplaced = null;
@@ -266,7 +268,47 @@
     sel.addRange(range);
   }
 
-  // Click on an image to replace it
+  // Update button visual state based on current block
+  function updateToolbarState() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount || !editor.contains(sel.anchorNode)) {
+      headingBtn.classList.remove('active');
+      quoteBtn.classList.remove('active');
+      return;
+    }
+
+    let node = sel.anchorNode;
+    // Walk up to find block element
+    while (node && node !== editor) {
+      if (node.nodeType === 1) {
+        const tag = node.tagName;
+        if (tag === 'H2') {
+          headingBtn.classList.add('active');
+          quoteBtn.classList.remove('active');
+          return;
+        }
+        if (tag === 'BLOCKQUOTE') {
+          quoteBtn.classList.add('active');
+          headingBtn.classList.remove('active');
+          return;
+        }
+      }
+      node = node.parentNode;
+    }
+
+    headingBtn.classList.remove('active');
+    quoteBtn.classList.remove('active');
+  }
+
+  document.addEventListener('selectionchange', () => {
+    if (document.activeElement === editor || editor.contains(document.activeElement)) {
+      updateToolbarState();
+    }
+  });
+
+  editor.addEventListener('keyup', updateToolbarState);
+  editor.addEventListener('click', updateToolbarState);
+
   editor.addEventListener('click', (e) => {
     if (e.target.tagName === 'IMG') {
       imageBeingReplaced = e.target;
@@ -286,7 +328,6 @@
     const reader = new FileReader();
     reader.onload = (ev) => {
 
-      // REPLACE MODE
       if (imageBeingReplaced) {
         imageBeingReplaced.src = ev.target.result;
         imageBeingReplaced = null;
@@ -294,7 +335,6 @@
         return;
       }
 
-      // INSERT MODE
       editor.focus();
       restoreSelection(savedRange);
 
@@ -329,12 +369,12 @@
       }
 
       hiddenPicInput.value = '';
+      updateToolbarState();
     };
     reader.readAsDataURL(file);
   });
 
-  // Toggle heading
-  document.getElementById('addHeadingBtn').addEventListener('click', () => {
+  headingBtn.addEventListener('click', () => {
     editor.focus();
     const current = document.queryCommandValue('formatBlock').toLowerCase();
     if (current === 'h2') {
@@ -342,10 +382,10 @@
     } else {
       document.execCommand('formatBlock', false, 'H2');
     }
+    updateToolbarState();
   });
 
-  // Toggle quote
-  document.getElementById('addQuoteBtn').addEventListener('click', () => {
+  quoteBtn.addEventListener('click', () => {
     editor.focus();
     const current = document.queryCommandValue('formatBlock').toLowerCase();
     if (current === 'blockquote') {
@@ -353,6 +393,7 @@
     } else {
       document.execCommand('formatBlock', false, 'BLOCKQUOTE');
     }
+    updateToolbarState();
   });
 </script>
 
