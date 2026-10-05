@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tiles Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   body {
     background: #0a0a0f;
@@ -15,11 +15,17 @@
     padding: 40px 24px;
     min-height: 100vh;
   }
-  .input-wrap {
+
+  .container {
     max-width: 900px;
-    margin: 0 auto 48px;
+    margin: 0 auto;
   }
-  .input-wrap label {
+
+  .input-wrap {
+    margin-bottom: 40px;
+  }
+  .input-wrap label,
+  .body-wrap label {
     display: block;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
@@ -38,23 +44,24 @@
     padding: 14px 18px;
     border-radius: 8px;
     outline: none;
+    box-sizing: border-box;
   }
   .input-wrap input:focus { border-color: #ffb000; }
 
+  /* Tiles */
   .tile-heading {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 4px;
-    max-width: 900px;
-    margin: 0 auto;
+    gap: 20px 0;
+    margin: 0 0 48px;
     line-height: 1;
   }
   .tile-word {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-right: 12px;
+    margin-right: 32px;
   }
   .tile {
     display: inline-flex;
@@ -69,9 +76,35 @@
     z-index: 2;
   }
 
+  /* Article body */
+  .body-wrap {
+    margin-top: 12px;
+  }
+  .body-wrap textarea {
+    width: 100%;
+    min-height: 400px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 8px;
+    color: #e6e6e6;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    line-height: 1.85;
+    padding: 28px 32px;
+    outline: none;
+    resize: vertical;
+    box-sizing: border-box;
+    letter-spacing: 0.01em;
+  }
+  .body-wrap textarea:focus {
+    border-color: rgba(255,255,255,0.2);
+  }
+  .body-wrap textarea::placeholder {
+    color: #55555f;
+  }
+
   .hint {
-    max-width: 900px;
-    margin: 48px auto 0;
+    margin: 40px 0 0;
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
     color: #55555f;
@@ -81,14 +114,25 @@
 </head>
 <body>
 
-<div class="input-wrap">
-  <label>&gt; type a title</label>
-  <input id="titleInput" type="text" value="Making and mending" autofocus>
+<div class="container">
+
+  <div class="input-wrap">
+    <label>&gt; type a title</label>
+    <input id="titleInput" type="text" value="Making and mending">
+  </div>
+
+  <h1 class="tile-heading" id="tileHeading"></h1>
+
+  <div class="body-wrap">
+    <label>&gt; write your transmission</label>
+    <textarea id="bodyInput" placeholder="Start writing here...">This month, I started two projects that I've been thinking about for a while. For the first, I built something completely new to me, and for the second, I repaired something old.
+
+One of my favorite tapes is Sounds of Summer: Field Recordings of Solar Electronics by my friend Max Hamel. Their handmade synthesizers respond to the level of sunlight over two fifteen-minute recordings, set within the ambient sounds of the city.</textarea>
+  </div>
+
+  <p class="hint">Every letter gets random color, font, size, and position. Refresh to shuffle.</p>
+
 </div>
-
-<h1 class="tile-heading" id="tileHeading"></h1>
-
-<p class="hint">Every letter gets random color, font, size, and position. Refresh to shuffle.</p>
 
 <script>
   const TILE_COLORS = [
@@ -134,11 +178,11 @@
         const bg = pick(TILE_COLORS);
         const fg = textColorFor(bg);
         const font = pick(TILE_FONTS);
-        const size = 22 + Math.floor(Math.random() * 30);      // 22–52
-        const padX = 8 + Math.floor(Math.random() * 16);        // 8–24
-        const padY = 4 + Math.floor(Math.random() * 14);        // 4–18
-        const dy = -10 + Math.floor(Math.random() * 21);        // -10 to +10
-        const rot = -3 + Math.random() * 6;                     // -3 to +3
+        const size = 22 + Math.floor(Math.random() * 30);
+        const padX = 8 + Math.floor(Math.random() * 16);
+        const padY = 4 + Math.floor(Math.random() * 14);
+        const dy = -10 + Math.floor(Math.random() * 21);
+        const rot = -3 + Math.random() * 6;
         html += `<span class="tile" style="
           background:${bg};
           color:${fg};
@@ -158,13 +202,12 @@
 
   const input = document.getElementById('titleInput');
   input.addEventListener('input', () => renderTiles(input.value));
-
-  // initial render
   renderTiles(input.value);
 
-  // press space to shuffle (fun for testing)
   document.addEventListener('keydown', e => {
-    if (e.key === 'Enter') renderTiles(input.value);
+    if (e.key === 'Enter' && document.activeElement === input) {
+      renderTiles(input.value);
+    }
   });
 </script>
 
