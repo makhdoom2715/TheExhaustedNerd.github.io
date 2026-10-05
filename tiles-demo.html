@@ -85,12 +85,28 @@
     caret-color: #ffb000;
   }
   .editor p { margin: 0 0 1.2em; color: inherit; }
+
+  /* Heading = same font, same color as body, just bigger */
+  .editor h2 {
+    font-family: 'W95FA', 'VT323', monospace;
+    font-size: 26px;
+    line-height: 1.5;
+    color: #e6e6e6;
+    font-weight: 400;
+    margin: 1.2em 0 0.6em;
+  }
+
   .editor img {
     display: block;
     width: 100%;
     max-width: 100%;
     border-radius: 6px;
     margin: 24px 0;
+    cursor: pointer;
+  }
+  .editor img:hover {
+    outline: 2px solid rgba(255,176,0,0.5);
+    outline-offset: 4px;
   }
   .editor:empty:before {
     content: attr(data-placeholder);
@@ -120,6 +136,11 @@
   .tool-btn:hover {
     border-color: #ffb000;
     color: #ffb000;
+  }
+  .tool-btn.active {
+    border-color: #ffb000;
+    color: #ffb000;
+    background: rgba(255,176,0,0.08);
   }
 
   .hint {
@@ -226,6 +247,7 @@
   // Contenteditable + insert at cursor
   const editor = document.getElementById('editor');
   const hiddenPicInput = document.getElementById('hiddenPicInput');
+  const addHeadingBtn = document.getElementById('addHeadingBtn');
 
   function saveSelection() {
     const sel = window.getSelection();
@@ -242,9 +264,46 @@
     sel.addRange(range);
   }
 
+  function currentBlockTag() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return '';
+    let node = sel.anchorNode;
+    while (node && node !== editor) {
+      if (node.nodeType === 1 && /^(H1|H2|H3|P|BLOCKQUOTE|DIV)$/.test(node.tagName)) {
+        return node.tagName;
+      }
+      node = node.parentNode;
+    }
+    return '';
+  }
+
+  function updateToolbarState() {
+    const tag = currentBlockTag();
+    addHeadingBtn.classList.toggle('active', tag === 'H2');
+  }
+
+  document.addEventListener('selectionchange', () => {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+      updateToolbarState();
+    }
+  });
+
   let savedRange = null;
+  let imageBeingReplaced = null;
+
+  // Click on an image inside the editor to replace it
+  editor.addEventListener('click', (e) => {
+    if (e.target.tagName === 'IMG') {
+      imageBeingReplaced = e.target;
+      hiddenPicInput.click();
+      return;
+    }
+    updateToolbarState();
+  });
 
   document.getElementById('addPicBtn').addEventListener('click', () => {
+    imageBeingReplaced = null;
     savedRange = saveSelection();
     hiddenPicInput.click();
   });
@@ -254,6 +313,16 @@
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
+
+      // REPLACE MODE: swap the src of the clicked image
+      if (imageBeingReplaced) {
+        imageBeingReplaced.src = ev.target.result;
+        imageBeingReplaced = null;
+        hiddenPicInput.value = '';
+        return;
+      }
+
+      // INSERT MODE: drop the new image at the cursor
       editor.focus();
       restoreSelection(savedRange);
 
@@ -294,8 +363,16 @@
     reader.readAsDataURL(file);
   });
 
-  document.getElementById('addHeadingBtn').addEventListener('click', () => {
-    document.execCommand('formatBlock', false, 'H2');
+  // Heading toggle: H2 on, H2 off, back to paragraph
+  addHeadingBtn.addEventListener('click', () => {
+    editor.focus();
+    const tag = currentBlockTag();
+    if (tag === 'H2') {
+      document.execCommand('formatBlock', false, 'P');
+    } else {
+      document.execCommand('formatBlock', false, 'H2');
+    }
+    updateToolbarState();
   });
 
   document.getElementById('addQuoteBtn').addEventListener('click', () => {
