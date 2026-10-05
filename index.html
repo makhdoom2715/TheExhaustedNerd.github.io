@@ -70,6 +70,23 @@
 
   <section>
     <div class="section-head">
+      <h2>Leaderboard</h2>
+      <p class="subhead" style="font-family:var(--font-mono); font-size:14px;">All-time. No resets. No mercy.</p>
+    </div>
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table class="vault-table" id="leaderboardTable">
+        <thead>
+          <tr><th>Rank</th><th>Name</th><th>Score</th></tr>
+        </thead>
+        <tbody id="leaderboardBody">
+          <tr><td colspan="3" style="text-align:center; color:var(--text-faint);">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
       <h2>Today's Challenge</h2>
     </div>
     <div class="card daily-card">
@@ -146,5 +163,36 @@
 
 <!-- Your Firebase setup -->
 <script src="js/firebase.js"></script>
+
+<!-- Leaderboard -->
+<script>
+(async () => {
+  const body = document.getElementById("leaderboardBody");
+  try {
+    const snap = await db.collection("scores")
+      .orderBy("score", "desc")
+      .limit(10)
+      .get();
+
+    if (snap.empty) {
+      body.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-faint);">No scores yet. Be the first.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = "";
+    let rank = 1;
+    snap.forEach(doc => {
+      const data = doc.data();
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${rank}</td><td>${data.name || "Anonymous"}</td><td>${data.score || 0}</td>`;
+      body.appendChild(tr);
+      rank++;
+    });
+  } catch (e) {
+    console.error("Leaderboard load failed:", e);
+    body.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-faint);">Could not load leaderboard.</td></tr>';
+  }
+})();
+</script>
 </body>
 </html>
