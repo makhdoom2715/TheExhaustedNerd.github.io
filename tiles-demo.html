@@ -23,11 +23,8 @@
     margin: 0 auto;
   }
 
-  .input-wrap {
-    margin-bottom: 40px;
-  }
-  .input-wrap label,
-  .body-wrap label {
+  .input-wrap { margin-bottom: 40px; }
+  .input-wrap label, .body-wrap label, .picture-wrap label {
     display: block;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
@@ -72,11 +69,43 @@
     border-radius: 2px;
     transition: transform 0.15s ease;
   }
-  .tile:hover {
-    transform: scale(1.05) !important;
-    z-index: 2;
-  }
+  .tile:hover { transform: scale(1.05) !important; z-index: 2; }
 
+  .picture-wrap { margin: 32px 0; }
+  .picture-drop {
+    border: 1px dashed rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: rgba(255,255,255,0.01);
+  }
+  .picture-drop:hover {
+    border-color: #ffb000;
+    background: rgba(255,176,0,0.03);
+  }
+  .picture-drop .icon {
+    font-size: 28px;
+    color: #55555f;
+    margin-bottom: 8px;
+  }
+  .picture-drop .text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #8b8b9a;
+  }
+  .picture-drop input[type="file"] { display: none; }
+
+  .picture-preview {
+    width: 100%;
+    border-radius: 8px;
+    display: none;
+    margin-top: 12px;
+  }
+  .picture-preview.show { display: block; }
+
+  .body-wrap { margin-top: 12px; }
   .body-wrap textarea {
     width: 100%;
     min-height: 400px;
@@ -93,12 +122,8 @@
     box-sizing: border-box;
     letter-spacing: 0.02em;
   }
-  .body-wrap textarea:focus {
-    border-color: rgba(255,255,255,0.2);
-  }
-  .body-wrap textarea::placeholder {
-    color: #55555f;
-  }
+  .body-wrap textarea:focus { border-color: rgba(255,255,255,0.2); }
+  .body-wrap textarea::placeholder { color: #55555f; }
 
   .hint {
     margin: 40px 0 0;
@@ -120,6 +145,17 @@
 
   <h1 class="tile-heading" id="tileHeading"></h1>
 
+  <!-- PICTURE SECTION -->
+  <div class="picture-wrap">
+    <label>&gt; add a picture (optional)</label>
+    <div class="picture-drop" id="pictureDrop">
+      <div class="icon">+</div>
+      <div class="text">click to upload an image</div>
+      <input type="file" id="pictureInput" accept="image/*">
+    </div>
+    <img class="picture-preview" id="picturePreview" alt="preview">
+  </div>
+
   <div class="body-wrap">
     <label>&gt; write your transmission</label>
     <textarea id="bodyInput" placeholder="Start writing here...">This month, I started two projects that I've been thinking about for a while. For the first, I built something completely new to me, and for the second, I repaired something old.
@@ -127,7 +163,7 @@
 One of my favorite tapes is Sounds of Summer: Field Recordings of Solar Electronics by my friend Max Hamel. Their handmade synthesizers respond to the level of sunlight over two fifteen-minute recordings, set within the ambient sounds of the city.</textarea>
   </div>
 
-  <p class="hint">Body font: W95FA (same as Nic Chan). Tiles: random color, font, size, position.</p>
+  <p class="hint">Picture sits between the title and the body. Full width. Like The Moss.</p>
 
 </div>
 
@@ -205,6 +241,25 @@ One of my favorite tapes is Sounds of Summer: Field Recordings of Solar Electron
     if (e.key === 'Enter' && document.activeElement === input) {
       renderTiles(input.value);
     }
+  });
+
+  // Picture upload
+  const pictureDrop = document.getElementById('pictureDrop');
+  const pictureInput = document.getElementById('pictureInput');
+  const picturePreview = document.getElementById('picturePreview');
+
+  pictureDrop.addEventListener('click', () => pictureInput.click());
+
+  pictureInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      picturePreview.src = ev.target.result;
+      picturePreview.classList.add('show');
+      pictureDrop.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
   });
 </script>
 
