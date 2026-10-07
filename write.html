@@ -23,6 +23,49 @@
     background: rgba(255,255,255,0.01);
   }
 
+  /* Draft restore banner */
+  .draft-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 24px 0 0;
+    padding: 14px 20px;
+    border: 1px solid #ffb000;
+    border-radius: 10px;
+    background: rgba(255,176,0,0.06);
+  }
+  .draft-msg {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #ffb000;
+    letter-spacing: 0.04em;
+  }
+  .draft-actions { display: flex; gap: 8px; }
+  .draft-btn {
+    background: rgba(255,176,0,0.08);
+    border: 1px solid #ffb000;
+    color: #ffb000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    padding: 7px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .draft-btn:hover { background: rgba(255,176,0,0.16); }
+  .draft-btn.ghost {
+    border-color: rgba(255,255,255,0.2);
+    color: #8b8b9a;
+    background: transparent;
+  }
+  .draft-btn.ghost:hover {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+
   .title-input {
     width: 100%;
     background: transparent;
@@ -85,7 +128,6 @@
     margin: 1.2em 0 0.6em;
   }
 
-  /* Italic, bold, underline, strikethrough, code all survive paste */
   .editor em, .editor i { font-style: italic; }
   .editor strong, .editor b { font-weight: 700; }
   .editor u { text-decoration: underline; }
@@ -288,6 +330,14 @@
   <div class="write-wrap">
     <div id="writeGuard" class="signin-note">Checking sign-in...</div>
 
+    <div id="draftBanner" class="draft-banner">
+      <span class="draft-msg" id="draftMsg">You have unsaved work.</span>
+      <div class="draft-actions">
+        <button class="draft-btn" id="draftRestoreBtn" type="button">RESTORE</button>
+        <button class="draft-btn ghost" id="draftDiscardBtn" type="button">DISCARD</button>
+      </div>
+    </div>
+
     <div id="writePage" class="write-page" style="display:none;">
       <input id="titleInput" class="title-input" type="text" placeholder="Title">
       <div class="tile-heading" id="tileHeading"></div>
@@ -406,7 +456,92 @@
   const submitBtn = document.getElementById('submitBtn');
   const submitMsg = document.getElementById('submitMsg');
 
-  titleInput.addEventListener('input', () => renderTiles(titleInput.value));
+  /* ---------- Autosave / Draft ---------- */
+  const DRAFT_TITLE_KEY = 'ten_lore_draft_title';
+  const DRAFT_BODY_KEY = 'ten_lore_draft_body';
+  const DRAFT_TAG_KEY = 'ten_lore_draft_tag';
+  const DRAFT_TIME_KEY = 'ten_lore_draft_time';
+  let autosaveTimer = null;
+
+  function scheduleSave() {
+    if (autosaveTimer) clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(saveDraft, 1500);
+  }
+
+  function saveDraft() {
+    const title = titleInput.value;
+    const body = editor.innerHTML;
+    const tag = selectedTag;
+    if (!title.trim() && !body.trim() && !tag) {
+      // nothing worth saving
+      return;
+    }
+    try {
+      localStorage.setItem(DRAFT_TITLE_KEY, title);
+      localStorage.setItem(DRAFT_BODY_KEY, body);
+      localStorage.setItem(DRAFT_TAG_KEY, tag);
+      localStorage.setItem(DRAFT_TIME_KEY, String(Date.now()));
+    } catch (e) {
+      console.warn('Draft save failed:', e);
+    }
+  }
+
+  function clearDraft() {
+    localStorage.removeItem(DRAFT_TITLE_KEY);
+    localStorage.removeItem(DRAFT_BODY_KEY);
+    localStorage.removeItem(DRAFT_TAG_KEY);
+    localStorage.removeItem(DRAFT_TIME_KEY);
+  }
+
+  function hasDraft() {
+    const t = localStorage.getItem(DRAFT_TITLE_KEY);
+    const b = localStorage.getItem(DRAFT_BODY_KEY);
+    const tag = localStorage.getItem(DRAFT_TAG_KEY);
+    return (t && t.trim()) || (b && b.trim()) || (tag && tag.trim());
+  }
+
+  function showDraftBannerIfAny() {
+    if (!hasDraft()) return;
+    const t = parseInt(localStorage.getItem(DRAFT_TIME_KEY), 10) || 0;
+    const when = t
+      ? new Date(t).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+      : '';
+    const msg = document.getElementById('draftMsg');
+    msg.textContent = when ? 'Unsaved draft from ' + when : 'You have unsaved work.';
+    document.getElementById('draftBanner').style.display = 'flex';
+  }
+
+  function restoreDraft() {
+    const title = localStorage.getItem(DRAFT_TITLE_KEY) || '';
+    const body = localStorage.getItem(DRAFT_BODY_KEY) || '';
+    const tag = localStorage.getItem(DRAFT_TAG_KEY) || '';
+
+    titleInput.value = title;
+    renderTiles(title);
+    editor.innerHTML = body;
+
+    selectedTag = '';
+    document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
+    if (tag) {
+      selectedTag = tag;
+      const pill = document.querySelector('.tag-pill[data-tag="' + tag + '"]');
+      if (pill) pill.classList.add('active');
+    }
+
+    document.getElementById('draftBanner').style.display = 'none';
+  }
+
+  function discardDraft() {
+    clearDraft();
+    document.getElementById('draftBanner').style.display = 'none';
+  }
+
+  document.getElementById('draftRestoreBtn').addEventListener('click', restoreDraft);
+  document.getElementById('draftDiscardBtn').addEventListener('click', discardDraft);
+
+  titleInput.addEventListener('input', () => { renderTiles(titleInput.value); scheduleSave(); });
+  editor.addEventListener('input', scheduleSave);
+  editor.addEventListener('blur', saveDraft);
 
   /* ---------- Tag picker ---------- */
   let selectedTag = '';
@@ -421,14 +556,11 @@
         document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
       }
+      scheduleSave();
     });
   });
 
-  /* ---------- PASTE CLEANER ----------
-     Strips inline fonts, sizes, colors, classes, style attributes.
-     Keeps italics, bold, underline, strikethrough, links, images,
-     headings, blockquotes, lists. Everything pasted then inherits
-     our site font (W95FA) but keeps its semantic formatting. */
+  /* ---------- PASTE CLEANER ---------- */
   const ALLOWED_TAGS = ['P','BR','EM','I','STRONG','B','U','S','STRIKE','DEL',
                         'H1','H2','H3','BLOCKQUOTE','UL','OL','LI','A','IMG','CODE'];
 
@@ -436,30 +568,24 @@
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
 
-    // Remove junk tags entirely
     tmp.querySelectorAll('script, style, meta, link, title, iframe, object, embed, svg, math').forEach(n => n.remove());
 
-    // Walk all elements; unwrap or strip
     tmp.querySelectorAll('*').forEach(el => {
       const tag = el.tagName;
 
       if (!ALLOWED_TAGS.includes(tag)) {
-        // unwrap: keep children, kill the tag
         const parent = el.parentNode;
         while (el.firstChild) parent.insertBefore(el.firstChild, el);
         parent.removeChild(el);
         return;
       }
 
-      // Normalize Google Docs / Gemini em / i / strong / b
-      // Already allowed. Now strip all attributes except safe ones.
       [...el.attributes].forEach(attr => {
         const name = attr.name.toLowerCase();
         const keepHref = (tag === 'A' && name === 'href');
         const keepImg = (tag === 'IMG' && (name === 'src' || name === 'alt'));
         if (keepHref || keepImg) return;
 
-        // Convert style="font-style: italic" into a real <em> if it exists
         if (name === 'style') {
           const styleVal = attr.value.toLowerCase();
           if ((styleVal.includes('font-style') && styleVal.includes('italic')) ||
@@ -477,15 +603,12 @@
           }
         }
 
-        // Strip everything else
         if (!['style'].includes(name)) {
           el.removeAttribute(attr.name);
         }
       });
     });
 
-    // If the paste was wrapped in a single span/div with no block children,
-    // wrap loose text in <p> tags so paragraphs work.
     const wrapper = document.createElement('div');
     wrapper.innerHTML = tmp.innerHTML;
 
@@ -508,12 +631,12 @@
     if (html && html.trim().length > 0) {
       toInsert = cleanPastedHTML(html);
     } else {
-      // Plain text: split on blank lines into paragraphs
       const blocks = (text || '').split(/\n{2,}/).map(b => b.trim()).filter(Boolean);
       toInsert = blocks.map(b => '<p>' + b.replace(/\n/g, '<br>') + '</p>').join('');
     }
 
     document.execCommand('insertHTML', false, toInsert);
+    scheduleSave();
   });
 
   /* ---------- Selection helpers ---------- */
@@ -586,6 +709,7 @@
         imageBeingReplaced.src = ev.target.result;
         imageBeingReplaced = null;
         hiddenPicInput.value = '';
+        scheduleSave();
         return;
       }
 
@@ -623,6 +747,7 @@
       }
 
       hiddenPicInput.value = '';
+      scheduleSave();
     };
     reader.readAsDataURL(file);
   });
@@ -636,6 +761,7 @@
       document.execCommand('formatBlock', false, 'H2');
     }
     updateToolbarState();
+    scheduleSave();
   });
 
   document.getElementById('addQuoteBtn').addEventListener('click', () => {
@@ -647,6 +773,7 @@
       document.execCommand('formatBlock', false, 'BLOCKQUOTE');
     }
     updateToolbarState();
+    scheduleSave();
   });
 
   function plainTextFromBody() {
@@ -671,6 +798,8 @@
         guard.style.display = 'none';
         page.style.display = 'block';
         hint.style.display = 'block';
+        // Only show banner once user is allowed to write
+        showDraftBannerIfAny();
       } else {
         guard.innerHTML = 'You need to sign in before writing a lore.<br>Click <strong>Sign In</strong> in the top right.';
         page.style.display = 'none';
@@ -731,11 +860,15 @@
       submitMsg.className = 'submit-msg ok';
       submitMsg.textContent = 'Submitted. Wait for approval.';
 
+      // Clear draft on success
+      clearDraft();
+
       titleInput.value = '';
       editor.innerHTML = '';
       renderTiles('');
       selectedTag = '';
       document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
+      document.getElementById('draftBanner').style.display = 'none';
     } catch (e) {
       console.error('Submit failed:', e);
       submitMsg.className = 'submit-msg err';
