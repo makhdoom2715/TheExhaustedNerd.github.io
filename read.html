@@ -374,7 +374,6 @@
     });
   }
 
-  // Wait for auth to settle before loading, so we know who the user is.
   let fired = false;
   firebase.auth().onAuthStateChanged(() => {
     if (fired) return;
