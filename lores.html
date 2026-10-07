@@ -16,7 +16,6 @@
     margin: 0 auto;
   }
 
-  /* Header row: title + two buttons */
   .lores-header {
     display: flex;
     align-items: center;
@@ -67,7 +66,6 @@
     color: #ffb000;
   }
 
-  /* Filter pills */
   .lores-filters {
     display: flex;
     gap: 8px;
@@ -77,7 +75,7 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
-  .lores-filters::-webkit-scrollbar { display: none; }
+  .lores-filters::-webkit-scrollbar{ display: none; }
   .filter-pill {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.16);
@@ -101,7 +99,6 @@
     background: rgba(255,176,0,0.08);
   }
 
-  /* Wide rectangular cards */
   .lores-list {
     display: flex;
     flex-direction: column;
@@ -252,6 +249,7 @@
       <li><a href="nmtc.html">NMTC</a></li>
       <li><a href="arcade.html">Arcade</a></li>
       <li><a href="lores.html" class="active">Lores</a></li>
+      <li class="my-lores-nav"><a href="my-lores.html">My Lores</a></li>
       <li><a href="join.html">Join Us</a></li>
     </ul>
   </nav>
@@ -263,7 +261,7 @@
     <div class="lores-header">
       <h1 class="lores-title">Lores</h1>
       <div class="header-btn-row">
-        <a href="my-lores.html" class="header-btn ghost">MY LORES</a>
+        <a href="my-lores.html" class="header-btn ghost my-lores-btn">MY LORES</a>
         <a href="write.html" class="header-btn">SUBMIT A LORE</a>
       </div>
     </div>
@@ -406,13 +404,11 @@
       card.className = 'lore-card';
       card.href = 'read.html?id=' + encodeURIComponent(lore.id);
 
-      // Tiles title
       const tiles = document.createElement('div');
       tiles.className = 'lore-tiles';
       renderTilesInto(tiles, lore.title || 'Untitled', 14, 26);
       card.appendChild(tiles);
 
-      // Meta: author · date · reading time
       const meta = document.createElement('div');
       meta.className = 'lore-meta';
       const author = escapeHTML(lore.author || 'Anonymous');
@@ -425,7 +421,6 @@
       meta.innerHTML = metaHTML;
       card.appendChild(meta);
 
-      // Blurb
       if (lore.blurb) {
         const blurb = document.createElement('div');
         blurb.className = 'lore-blurb';
@@ -433,7 +428,6 @@
         card.appendChild(blurb);
       }
 
-      // Footer: likes on left, read on right
       const footer = document.createElement('div');
       footer.className = 'lore-footer';
 
