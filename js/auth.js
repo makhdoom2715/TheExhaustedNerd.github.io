@@ -16,11 +16,29 @@
     return isSafari || isMobile;
   }
 
+  // Force Google to always ask which account to use
+  if (typeof googleProvider !== "undefined" && googleProvider.setCustomParameters) {
+    googleProvider.setCustomParameters({ prompt: "select_account" });
+  }
+
+  // If we just came back from a redirect sign-in, resolve it here.
+  // Without this line, the page never learns that the user signed in.
+  auth.getRedirectResult().then(function (result) {
+    if (result && result.user) {
+      console.log("Redirect sign-in resolved for:", result.user.email);
+    }
+  }).catch(function (e) {
+    // Ignore the "no redirect pending" case, log everything else
+    if (e && e.code && e.code !== "auth/no-auth-event" && e.code !== "auth/argument-error") {
+      console.error("Redirect sign-in failed:", e);
+    }
+  });
+
   auth.onAuthStateChanged(function (user) {
     btn.disabled = false;
     if (user) {
       const name = user.displayName ? user.displayName.split(" ")[0] : "User";
-      btn.textContent = name + " ▾";
+      btn.textContent = name + " \u25BE";
       btn.classList.add("signed-in");
 
       btn.onclick = function (e) {
