@@ -520,3 +520,17 @@ mjx-container svg{ fill: var(--text) !important; stroke: var(--text) !important;
   border-color: var(--amber);
   box-shadow: 0 0 14px var(--amber-glow);
 }
+
+/* =========================================================
+   MY LORES: nav item only in mobile hamburger, button hidden
+   on mobile because hamburger already provides the link.
+   ========================================================= */
+
+/* Nav item: hidden by default (desktop / iPad), shown only in mobile hamburger. */
+.nav-links .my-lores-nav { display: none; }
+
+@media (max-width: 760px) {
+  .navbar.with-hamburger .nav-links .my-lores-nav { display: block; }
+  /* MY LORES header button is redundant on mobile since hamburger has it. */
+  .my-lores-btn { display: none !important; }
+}
