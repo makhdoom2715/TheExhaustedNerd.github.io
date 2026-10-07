@@ -106,6 +106,7 @@
     padding: 0 24px 48px;
   }
 
+  /* Card is now a div, not an <a> */
   .lore-card {
     display: flex;
     flex-direction: column;
@@ -118,6 +119,7 @@
     text-decoration: none;
     color: inherit;
     transition: border-color 0.15s ease, background 0.15s ease;
+    cursor: pointer;
   }
   .lore-card:hover {
     border-color: rgba(255,176,0,0.55);
@@ -131,6 +133,7 @@
     align-items: center;
     gap: 10px 0;
     line-height: 1;
+    pointer-events: none;
   }
   .lore-tiles .tile-word {
     display: inline-flex;
@@ -155,6 +158,7 @@
     font-size: 12px;
     color: #8b8b9a;
     letter-spacing: 0.05em;
+    pointer-events: none;
   }
   .lore-meta .dot {
     width: 3px;
@@ -172,6 +176,7 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    pointer-events: none;
   }
 
   .lore-footer {
@@ -195,6 +200,8 @@
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.15s ease;
+    position: relative;
+    z-index: 2;
   }
   .lore-like-btn:hover {
     border-color: #ff5d7a;
@@ -203,10 +210,6 @@
   .lore-like-btn.liked {
     background: rgba(255,93,122,0.16);
     border-color: #ff5d7a;
-  }
-  .lore-like-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
   .lore-like-btn .heart-icon {
     font-size: 13px;
@@ -220,6 +223,7 @@
     font-size: 12px;
     color: #ffb000;
     letter-spacing: 0.08em;
+    pointer-events: none;
   }
   .lore-card:hover .lore-read {
     text-decoration: underline;
@@ -423,9 +427,14 @@
 
     list.innerHTML = '';
     filtered.forEach(lore => {
-      const card = document.createElement('a');
+      const card = document.createElement('div');
       card.className = 'lore-card';
-      card.href = 'read.html?id=' + encodeURIComponent(lore.id);
+
+      // Navigate on click, unless the click came from a button inside the card
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('button')) return;
+        window.location.href = 'read.html?id=' + encodeURIComponent(lore.id);
+      });
 
       const tiles = document.createElement('div');
       tiles.className = 'lore-tiles';
@@ -461,7 +470,6 @@
       likeBtn.innerHTML = '<span class="heart-icon">\u2665</span><span class="like-count">' + likeCount + '</span>';
       if (likedSet.has(lore.id)) likeBtn.classList.add('liked');
 
-      // Prevent the card link from firing when clicking the like button
       likeBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -486,32 +494,46 @@
       return;
     }
 
-    btn.disabled = true;
-    const loreRef = db.collection('lores').doc(loreId);
-    const likeRef = loreRef.collection('likes').doc(currentUid);
     const countEl = btn.querySelector('.like-count');
     const wasLiked = likedSet.has(loreId);
     const currentCount = parseInt(countEl.textContent, 10) || 0;
+
+    // Optimistic update: change UI immediately
+    if (wasLiked) {
+      likedSet.delete(loreId);
+      btn.classList.remove('liked');
+      countEl.textContent = Math.max(0, currentCount - 1);
+    } else {
+      likedSet.add(loreId);
+      btn.classList.add('liked');
+      countEl.textContent = currentCount + 1;
+    }
+
+    // Fire the Firestore write in the background
+    const loreRef = db.collection('lores').doc(loreId);
+    const likeRef = loreRef.collection('likes').doc(currentUid);
 
     try {
       if (wasLiked) {
         await likeRef.delete();
         await loreRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
-        likedSet.delete(loreId);
-        btn.classList.remove('liked');
-        countEl.textContent = Math.max(0, currentCount - 1);
       } else {
         await likeRef.set({ likedAt: firebase.firestore.FieldValue.serverTimestamp() });
         await loreRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-        likedSet.add(loreId);
-        btn.classList.add('liked');
-        countEl.textContent = currentCount + 1;
       }
     } catch (e) {
       console.error('Like toggle failed:', e);
+      // Revert optimistic UI on error
+      if (wasLiked) {
+        likedSet.add(loreId);
+        btn.classList.add('liked');
+        countEl.textContent = currentCount;
+      } else {
+        likedSet.delete(loreId);
+        btn.classList.remove('liked');
+        countEl.textContent = currentCount;
+      }
       alert('Could not update like. Try again.');
-    } finally {
-      btn.disabled = false;
     }
   }
 
@@ -559,7 +581,6 @@
       allDocs.sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
       renderList();
 
-      // After lored render, if signed in, load liked state
       if (currentUid) loadUserLikes();
     } catch (e) {
       console.error('Lores load failed:', e);
@@ -571,7 +592,6 @@
   firebase.auth().onAuthStateChanged(user => {
     currentUid = user ? user.uid : null;
     if (fired) {
-      // Already loaded; just refresh liked state
       likedSet.clear();
       if (currentUid) loadUserLikes();
       else renderList();
