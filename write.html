@@ -85,6 +85,20 @@
     margin: 1.2em 0 0.6em;
   }
 
+  /* Italic, bold, underline, strikethrough, code all survive paste */
+  .editor em, .editor i { font-style: italic; }
+  .editor strong, .editor b { font-weight: 700; }
+  .editor u { text-decoration: underline; }
+  .editor s, .editor strike, .editor del { text-decoration: line-through; }
+  .editor code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255,255,255,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.92em;
+  }
+  .editor a { color: #00d4aa; text-decoration: underline; }
+
   .editor blockquote {
     margin: 1.4em 0;
     padding: 4px 0 4px 18px;
@@ -92,6 +106,14 @@
     color: #c8c8d2;
     font-style: italic;
   }
+
+  .editor ul, .editor ol {
+    padding-left: 24px;
+    margin: 0 0 1.2em;
+    list-style: disc;
+  }
+  .editor ol { list-style: decimal; }
+  .editor li { color: inherit; }
 
   .editor img {
     display: block;
@@ -140,7 +162,6 @@
     background: rgba(255,176,0,0.08);
   }
 
-  /* Tag picker */
   .tag-row {
     margin-top: 24px;
     padding-top: 20px;
@@ -393,7 +414,6 @@
     pill.addEventListener('click', () => {
       const tag = pill.dataset.tag;
       if (selectedTag === tag) {
-        // deselect
         selectedTag = '';
         pill.classList.remove('active');
       } else {
@@ -402,6 +422,98 @@
         pill.classList.add('active');
       }
     });
+  });
+
+  /* ---------- PASTE CLEANER ----------
+     Strips inline fonts, sizes, colors, classes, style attributes.
+     Keeps italics, bold, underline, strikethrough, links, images,
+     headings, blockquotes, lists. Everything pasted then inherits
+     our site font (W95FA) but keeps its semantic formatting. */
+  const ALLOWED_TAGS = ['P','BR','EM','I','STRONG','B','U','S','STRIKE','DEL',
+                        'H1','H2','H3','BLOCKQUOTE','UL','OL','LI','A','IMG','CODE'];
+
+  function cleanPastedHTML(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+
+    // Remove junk tags entirely
+    tmp.querySelectorAll('script, style, meta, link, title, iframe, object, embed, svg, math').forEach(n => n.remove());
+
+    // Walk all elements; unwrap or strip
+    tmp.querySelectorAll('*').forEach(el => {
+      const tag = el.tagName;
+
+      if (!ALLOWED_TAGS.includes(tag)) {
+        // unwrap: keep children, kill the tag
+        const parent = el.parentNode;
+        while (el.firstChild) parent.insertBefore(el.firstChild, el);
+        parent.removeChild(el);
+        return;
+      }
+
+      // Normalize Google Docs / Gemini em / i / strong / b
+      // Already allowed. Now strip all attributes except safe ones.
+      [...el.attributes].forEach(attr => {
+        const name = attr.name.toLowerCase();
+        const keepHref = (tag === 'A' && name === 'href');
+        const keepImg = (tag === 'IMG' && (name === 'src' || name === 'alt'));
+        if (keepHref || keepImg) return;
+
+        // Convert style="font-style: italic" into a real <em> if it exists
+        if (name === 'style') {
+          const styleVal = attr.value.toLowerCase();
+          if ((styleVal.includes('font-style') && styleVal.includes('italic')) ||
+              (styleVal.includes('font-style') && styleVal.includes('oblique'))) {
+            el.style.fontStyle = 'italic';
+          }
+          if (styleVal.includes('font-weight') && (styleVal.includes('bold') || /:\s*[6-9]00/.test(styleVal))) {
+            el.style.fontWeight = '700';
+          }
+          if (styleVal.includes('text-decoration') && styleVal.includes('underline')) {
+            el.style.textDecoration = 'underline';
+          }
+          if (styleVal.includes('text-decoration') && styleVal.includes('line-through')) {
+            el.style.textDecoration = 'line-through';
+          }
+        }
+
+        // Strip everything else
+        if (!['style'].includes(name)) {
+          el.removeAttribute(attr.name);
+        }
+      });
+    });
+
+    // If the paste was wrapped in a single span/div with no block children,
+    // wrap loose text in <p> tags so paragraphs work.
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = tmp.innerHTML;
+
+    if (!wrapper.querySelector('p, h1, h2, h3, blockquote, ul, ol')) {
+      const text = wrapper.textContent || '';
+      const blocks = text.split(/\n{2,}/).map(b => b.trim()).filter(Boolean);
+      wrapper.innerHTML = blocks.map(b => '<p>' + b.replace(/\n/g, '<br>') + '</p>').join('');
+    }
+
+    return wrapper.innerHTML;
+  }
+
+  editor.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const cd = e.clipboardData || window.clipboardData;
+    const html = cd.getData('text/html');
+    const text = cd.getData('text/plain');
+
+    let toInsert;
+    if (html && html.trim().length > 0) {
+      toInsert = cleanPastedHTML(html);
+    } else {
+      // Plain text: split on blank lines into paragraphs
+      const blocks = (text || '').split(/\n{2,}/).map(b => b.trim()).filter(Boolean);
+      toInsert = blocks.map(b => '<p>' + b.replace(/\n/g, '<br>') + '</p>').join('');
+    }
+
+    document.execCommand('insertHTML', false, toInsert);
   });
 
   /* ---------- Selection helpers ---------- */
