@@ -1,13 +1,5 @@
 /* =========================================================
    THE EXHAUSTED NERD - tracker.js
-   Handles currency (hearts/diamonds/spades/crowns), the daily
-   streak, and score display.
-
-   Storage:
-   - localStorage is the source of truth for guests.
-   - If a user is signed in, every write also goes to Firestore
-     under users/{uid} (full stats) and scores/{uid} (leaderboard).
-   - On sign-in, Firestore overwrites localStorage for that user.
    ========================================================= */
 
 const TEN = (function () {
@@ -51,17 +43,29 @@ const TEN = (function () {
     return stats.hearts * 1 + stats.diamonds * 5 + stats.spades * 10 + stats.crowns * 20;
   }
 
-  /* ---------- Firestore sync ---------- */
+  /* ---------- Firebase accessors ---------- */
+  // Use firebase.auth() / firebase.firestore() directly so we do not
+  // depend on firebase.js having set window.auth / window.db.
 
-  function firestoreReady() {
-    return currentUser
-      && window.db
-      && typeof firebase !== "undefined"
-      && firebase.firestore;
+  function fb() {
+    return (typeof window.firebase !== "undefined") ? window.firebase : null;
+  }
+  function getAuth() {
+    const f = fb();
+    if (!f || typeof f.auth !== "function") return null;
+    try { return f.auth(); } catch (e) { return null; }
+  }
+  function getDb() {
+    const f = fb();
+    if (!f || typeof f.firestore !== "function") return null;
+    try { return f.firestore(); } catch (e) { return null; }
   }
 
+  /* ---------- Firestore sync ---------- */
+
   function syncToFirestore() {
-    if (!firestoreReady()) return;
+    const db = getDb();
+    if (!currentUser || !db) return;
     const stats = getStats();
     const score = totalScore(stats);
     const name = currentUser.displayName || "Anonymous";
@@ -75,7 +79,7 @@ const TEN = (function () {
       crowns: stats.crowns,
       streak: stats.streak,
       score: score,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
     };
 
     const scoreDoc = {
@@ -83,17 +87,18 @@ const TEN = (function () {
       score: score
     };
 
-    window.db.collection("users").doc(uid).set(userDoc, { merge: true })
+    db.collection("users").doc(uid).set(userDoc, { merge: true })
       .catch(function (e) { console.error("users sync failed:", e); });
 
-    window.db.collection("scores").doc(uid).set(scoreDoc, { merge: true })
+    db.collection("scores").doc(uid).set(scoreDoc, { merge: true })
       .catch(function (e) { console.error("scores sync failed:", e); });
   }
 
   async function loadFromFirestore() {
-    if (!window.db || !currentUser) return;
+    const db = getDb();
+    if (!db || !currentUser) return;
     try {
-      const doc = await window.db.collection("users").doc(currentUser.uid).get();
+      const doc = await db.collection("users").doc(currentUser.uid).get();
       if (doc.exists) {
         const data = doc.data();
         if (typeof data.hearts === "number") setInt(KEYS.hearts, data.hearts);
@@ -102,7 +107,6 @@ const TEN = (function () {
         if (typeof data.crowns === "number") setInt(KEYS.crowns, data.crowns);
         if (typeof data.streak === "number") setInt(KEYS.streak, data.streak);
       } else {
-        // First time we see this user. Seed their Firestore doc with local stats.
         syncToFirestore();
       }
     } catch (e) {
@@ -240,13 +244,13 @@ const TEN = (function () {
     checkStreakBreak();
     render();
 
-    // tracker.js loads before firebase.js, so poll until Firebase is ready.
     function attachAuth() {
-      if (!window.auth || !window.db) {
+      const authInst = getAuth();
+      if (!authInst) {
         setTimeout(attachAuth, 100);
         return;
       }
-      window.auth.onAuthStateChanged(async function (user) {
+      authInst.onAuthStateChanged(async function (user) {
         currentUser = user;
         if (user) {
           await loadFromFirestore();
