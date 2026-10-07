@@ -2,25 +2,19 @@
    THE EXHAUSTED NERD - arcade.js
    Puzzle 1: The Architect's Mark
    Puzzle 2: Simple code check
-   To add a new puzzle: add it to VAULT_CODES, VAULT_REWARDS,
-   add the HTML panel with matching IDs, and call initSimplePuzzle.
-   Puzzle solved state is saved to localStorage AND synced to
-   Firestore under users/{uid}.puzzles so it works across devices.
+   Puzzle solved state: local cache + Firestore merge.
+   Firestore is the source of truth for signed-in users.
+   We only ever write TRUE values up, never false, so clearing
+   local storage can never wipe a solved state.
    ========================================================= */
 
 (function () {
 
-  /* -------------------------------------------------------
-     STEP 1: PUZZLE CODES
-     ------------------------------------------------------- */
   const VAULT_CODES = {
-    puzzle1: "472988",   // The Architect's Mark (already set)
-    puzzle2: "271500",   // Puzzle 2
+    puzzle1: "472988",
+    puzzle2: "271500",
   };
 
-  /* -------------------------------------------------------
-     STEP 2: REWARD NAMES AND STATEMENTS
-     ------------------------------------------------------- */
   const VAULT_REWARDS = {
     puzzle1: {
       name: "IMO 1988 Problem 6",
@@ -34,10 +28,6 @@
     },
   };
 
-  /* -------------------------------------------------------
-     STEP 3: NOTHING ELSE TO CHANGE BELOW THIS LINE
-     ------------------------------------------------------- */
-
   function getSolvedKey(id) { return "ten_" + id + "_solved"; }
 
   function isSolved(id) {
@@ -46,12 +36,13 @@
 
   function markSolved(id) {
     localStorage.setItem(getSolvedKey(id), "1");
-    savePuzzlesToFirestore();
+    pushSolvedUp(id);
   }
 
-  /* ---------- Firestore sync for puzzle state ---------- */
+  /* ---------- Firestore sync ---------- */
 
   let currentUser = null;
+  let firestorePuzzles = {}; // cache of what Firestore says is solved
   const rechecks = [];
 
   function registerRecheck(fn) { rechecks.push(fn); }
@@ -72,34 +63,30 @@
       : null;
   }
 
-  function collectSolvedPuzzles() {
-    const out = {};
-    Object.keys(VAULT_CODES).forEach(function (pid) {
-      out[pid] = isSolved(pid);
-    });
-    return out;
-  }
-
-  function savePuzzlesToFirestore() {
+  // Called when this user just solved something. Push only this true up.
+  function pushSolvedUp(id) {
     const db = getDb();
     if (!db || !currentUser) return;
-    const puzzles = collectSolvedPuzzles();
-    db.collection("users").doc(currentUser.uid).set(
-      { puzzles: puzzles },
-      { merge: true }
-    ).catch(function (e) {
-      console.error("puzzle sync failed:", e);
-    });
+    const field = "puzzles." + id;
+    const update = {};
+    update[field] = true;
+    db.collection("users").doc(currentUser.uid).set(update, { merge: true })
+      .catch(function (e) { console.error("puzzle push failed:", e); });
   }
 
-  async function loadPuzzlesFromFirestore() {
+  // On sign-in: pull Firestore first, then push any local truths up.
+  // Never push false, so local clears cannot wipe Firestore.
+  async function syncPuzzles() {
     const db = getDb();
     if (!db || !currentUser) return;
+
+    // 1. Pull from Firestore
     try {
       const doc = await db.collection("users").doc(currentUser.uid).get();
       if (doc.exists) {
         const data = doc.data();
         if (data.puzzles && typeof data.puzzles === "object") {
+          firestorePuzzles = data.puzzles;
           Object.keys(data.puzzles).forEach(function (pid) {
             if (data.puzzles[pid] === true) {
               localStorage.setItem(getSolvedKey(pid), "1");
@@ -108,7 +95,24 @@
         }
       }
     } catch (e) {
-      console.error("puzzle load failed:", e);
+      console.error("puzzle pull failed:", e);
+    }
+
+    // 2. Push any local truths up (only true values)
+    const merge = {};
+    let hasLocal = false;
+    Object.keys(VAULT_CODES).forEach(function (pid) {
+      if (isSolved(pid)) {
+        merge["puzzles." + pid] = true;
+        hasLocal = true;
+      }
+    });
+    if (hasLocal) {
+      try {
+        await db.collection("users").doc(currentUser.uid).set(merge, { merge: true });
+      } catch (e) {
+        console.error("puzzle merge-up failed:", e);
+      }
     }
   }
 
@@ -121,9 +125,9 @@
     authInst.onAuthStateChanged(async function (user) {
       currentUser = user;
       if (user) {
-        await loadPuzzlesFromFirestore();
-        // Push any local-only solves up to Firestore too
-        savePuzzlesToFirestore();
+        await syncPuzzles();
+      } else {
+        firestorePuzzles = {};
       }
       runRechecks();
     });
@@ -145,7 +149,6 @@
     }
 
     const hasVideo = r.video && r.video !== "#" && r.video.length > 0;
-
     if (hasVideo) {
       html += '<div class="btn-row" style="margin-top: 10px;">';
       html += '<a href="' + r.video + '" class="btn btn-sm" target="_blank" rel="noopener">[Solution Video]</a>';
@@ -170,6 +173,11 @@
       el.classList.remove("locked");
       el.classList.add(statusText === "UNLOCKED" ? "unlocked" : "locked");
     }
+  }
+
+  // Is this puzzle solved according to either local or Firestore?
+  function solvedAnywhere(id) {
+    return isSolved(id) || firestorePuzzles[id] === true;
   }
 
   /* -------------------------------------------------------
@@ -204,7 +212,6 @@
       if (u >= 1 && hint1Box) hint1Box.classList.add("show");
       if (u >= 2 && hint2Box) hint2Box.classList.add("show");
       if (u >= 3 && hint3Box) hint3Box.classList.add("show");
-
       if (hint1Btn) hint1Btn.disabled = u >= 1;
       if (hint2Btn) hint2Btn.disabled = u < 1 || u >= 2;
       if (hint3Btn) hint3Btn.disabled = u < 2 || u >= 3;
@@ -227,11 +234,9 @@
     if (hint3Btn) hint3Btn.addEventListener("click", () => unlockHint(3));
 
     function checkSolved() {
-      if (isSolved(ID)) {
+      if (solvedAnywhere(ID)) {
         updateRowStatus(ID, "UNLOCKED");
-        if (rewardPanel) {
-          showReward(ID, vaultMsg, rewardPanel);
-        }
+        if (rewardPanel) showReward(ID, vaultMsg, rewardPanel);
         if (vaultMsg) {
           vaultMsg.className = "vault-message success";
           vaultMsg.textContent = "Vault breached. 20 diamonds and 1 crown added.";
@@ -245,11 +250,14 @@
       submitBtn.addEventListener("click", () => {
         const attempt = (codeInput.value || "").trim();
         if (attempt === CODE) {
-          if (typeof TEN !== "undefined") {
-            TEN.addDiamonds(20);
-            TEN.addCrowns(1);
+          if (!solvedAnywhere(ID)) {
+            // First time solving. Grant reward.
+            if (typeof TEN !== "undefined") {
+              TEN.addDiamonds(20);
+              TEN.addCrowns(1);
+            }
+            markSolved(ID);
           }
-          markSolved(ID);
           updateRowStatus(ID, "UNLOCKED");
           if (vaultMsg) {
             vaultMsg.className = "vault-message success";
@@ -279,7 +287,7 @@
   })();
 
   /* -------------------------------------------------------
-     SIMPLE PUZZLES: no hints, just code entry
+     SIMPLE PUZZLES
      ------------------------------------------------------- */
   function initSimplePuzzle(id, inputId, btnId, msgId, panelId) {
     const CODE = VAULT_CODES[id];
@@ -293,7 +301,7 @@
     if (!input || !btn) return;
 
     function checkSolved() {
-      if (isSolved(id)) {
+      if (solvedAnywhere(id)) {
         updateRowStatus(id, "UNLOCKED");
         if (msg) {
           msg.className = "vault-message success";
@@ -308,11 +316,13 @@
     btn.addEventListener("click", () => {
       const attempt = (input.value || "").trim();
       if (attempt === CODE) {
-        if (typeof TEN !== "undefined") {
-          TEN.addDiamonds(20);
-          TEN.addCrowns(1);
+        if (!solvedAnywhere(id)) {
+          if (typeof TEN !== "undefined") {
+            TEN.addDiamonds(20);
+            TEN.addCrowns(1);
+          }
+          markSolved(id);
         }
-        markSolved(id);
         updateRowStatus(id, "UNLOCKED");
         if (msg) {
           msg.className = "vault-message success";
