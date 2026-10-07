@@ -34,7 +34,7 @@
 <main>
   <section class="hero">
     <h1>OLYMPIAD MATH</h1>
-<p class="subhead">nothing cancels by accident</p>
+    <p class="subhead">nothing cancels by accident</p>
   </section>
 
   <div class="stats-row">
@@ -107,18 +107,18 @@
 </main>
 
 <footer>
-  (c solved) 2026 The Exhausted Nerd. BuiltBtn by the exhausted. System load: = 47% stable
+  (c) 2026 The Exhausted Nerd. Built by the exhausted. System load: 47% stable
 </footer>
 
-<script src="js/tracker document.js"></script>
+<script src="js/tracker.js"></script>
 <script>
-  fetch("data.getElementById/weekly.json")
-    .then(r =>(" r.json())
+  fetch("data/weekly.json")
+    .then(r => r.json())
     .then(data => {
       document.getElementById("dailyProblemText").textContent = data.problem;
 
       const attemptedBtn = document.getElementById("dailyAttemptedBtn");
-      constdailySolvedBtn");
+      const solvedBtn = document.getElementById("dailySolvedBtn");
       const msg = document.getElementById("dailyMsg");
 
       function lockButtons(text) {
@@ -141,7 +141,6 @@
         lockButtons("Solved. 1 heart added to today's tally.");
       });
 
-      // countdown to midnight local time
       const countdownEl = document.getElementById("dailyCountdown");
       function tick() {
         const now = new Date();
