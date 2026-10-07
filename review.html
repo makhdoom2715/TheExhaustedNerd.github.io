@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Lores - The Exhausted Nerd</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;900&family=JetBrains+Mono:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/w95fa" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .review-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .review-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 24px 0 32px;
+    flex-wrap: wrap;
+  }
+  .review-tab {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.16);
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.15s ease;
+  }
+  .review-tab:hover { border-color: #ffb000; color: #ffb000; }
+  .review-tab.active {
+    border-color: #ffb000;
+    color: #ffb000;
+    background: rgba(255,176,0,0.08);
+  }
+
+  .review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .review-card {
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    padding: 24px 26px 22px;
+    background: rgba(255,255,255,0.01);
+  }
+
+  .review-card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #e6e6e6;
+    margin: 0 0 8px;
+    letter-spacing: 0.02em;
+  }
+
+  .review-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #8b8b9a;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+  .review-meta .dot {
+    width: 3px; height: 3px;
+    background: #55555f;
+    border-radius: 50%;
+  }
+
+  .review-body {
+    color: #c8c8d2;
+    font-family: 'W95FA', 'VT323', monospace;
+    font-size: 15px;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 14px 16px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    background: rgba(0,0,0,0.2);
+    margin-bottom: 18px;
+  }
+  .review-body p { margin: 0 0 1em; }
+  .review-body h2 {
+    font-family: 'W95FA', 'VT323', monospace;
+    font-size: 22px;
+    color: #e6e6e6;
+    font-weight: 400;
+    margin: 1em 0 0.5em;
+  }
+  .review-body blockquote {
+    margin: 1em 0;
+    padding: 4px 0 4px 14px;
+    border-left: 3px solid #ffb000;
+    color: #c8c8d2;
+    font-style: italic;
+  }
+  .review-body img {
+    display: block;
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 14px 0;
+  }
+
+  .review-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .review-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.16);
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 9px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.15s ease;
+  }
+  .review-btn.approve { border-color: #00d4aa; color: #00d4aa; }
+  .review-btn.approve:hover { background: rgba(0,212,170,0.1); }
+  .review-btn.reject { border-color: #ff6b6b; color: #ff6b6b; }
+  .review-btn.reject:hover { background: rgba(255,107,107,0.1); }
+  .review-btn.view { border-color: rgba(255,255,255,0.2); }
+  .review-btn.view:hover { border-color: #ffb000; color: #ffb000; }
+  .review-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .review-empty {
+    text-align: center;
+    padding: 60px 24px;
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 10px;
+  }
+
+  .gate {
+    text-align: center;
+    padding: 80px 24px;
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+</style>
+<!-- architect: 29 -->
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="navbar">
+    <a href="index.html" class="logo">exhausted_nerd<span class="cursor">_</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="nmtc.html">NMTC</a></li>
+      <li><a href="arcade.html">Arcade</a></li>
+      <li><a href="lores.html">Lores</a></li>
+      <li><a href="join.html">Join Us</a></li>
+      <li><button id="authBtn" class="auth-btn">Sign In</button></li>
+    </ul>
+    <a href="https://youtube.com/@theexhaustednerd" class="profile-pic-link" target="_blank" rel="noopener">
+      <img src="assets/profile.png" alt="profile-88" class="profile-pic">
+    </a>
+  </nav>
+  <div class="status-bar">SYSTEM ONLINE // STREAK: <span id="navStreak">0</span> // SCORE: <span id="navScore">0</span></div>
+</header>
+
+<main>
+  <div class="review-wrap">
+    <div id="gate" class="gate">Checking access...</div>
+
+    <div id="panel" style="display:none;">
+      <div class="review-tabs">
+        <button class="review-tab active" data-status="pending" type="button">Pending</button>
+        <button class="review-tab" data-status="approved" type="button">Approved</button>
+        <button class="review-tab" data-status="rejected" type="button">Rejected</button>
+      </div>
+
+      <div class="review-list" id="reviewList"></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  (c) 2026 The Exhausted Nerd. Built by the exhausted. System load: 47% stable
+</footer>
+
+<script src="js/tracker.js"></script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+  const ADMIN_UID = 'XgBatcSvxPOUwOyuttyXJzdulw2';
+
+  let currentStatus = 'pending';
+  let currentDocs = [];
+
+  function ts(v) {
+    if (!v) return 0;
+    if (typeof v === 'number') return v;
+    if (v.toMillis) return v.toMillis();
+    return 0;
+  }
+
+  function escapeHTML(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function sanitizeBody(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    tmp.querySelectorAll('script, style, iframe, object, embed').forEach(n => n.remove());
+    tmp.querySelectorAll('*').forEach(el => {
+      [...el.attributes].forEach(attr => {
+        const name = attr.name.toLowerCase();
+        if (name.startsWith('on')) el.removeAttribute(attr.name);
+      });
+    });
+    return tmp.innerHTML;
+  }
+
+  function renderList() {
+    const list = document.getElementById('reviewList');
+
+    if (!currentDocs.length) {
+      list.innerHTML = '<div class="review-empty">Nothing here.</div>';
+      return;
+    }
+
+    list.innerHTML = '';
+    currentDocs.forEach(doc => {
+      const data = doc.data();
+      const card = document.createElement('div');
+      card.className = 'review-card';
+
+      const title = document.createElement('h3');
+      title.className = 'review-card-title';
+      title.textContent = data.title || 'Untitled';
+      card.appendChild(title);
+
+      const meta = document.createElement('div');
+      meta.className = 'review-meta';
+      const author = escapeHTML(data.author || 'Anonymous');
+      let metaHTML = '<span>' + author + '</span>';
+      if (data.createdAt) {
+        const d = new Date(ts(data.createdAt)).toLocaleString('en-GB', {
+          day: 'numeric', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        metaHTML += '<span class="dot"></span><span>' + d + '</span>';
+      }
+      metaHTML += '<span class="dot"></span><span>ID: ' + escapeHTML(doc.id) + '</span>';
+      meta.innerHTML = metaHTML;
+      card.appendChild(meta);
+
+      const body = document.createElement('div');
+      body.className = 'review-body';
+      body.innerHTML = sanitizeBody(data.body || '');
+      card.appendChild(body);
+
+      const actions = document.createElement('div');
+      actions.className = 'review-actions';
+
+      const viewBtn = document.createElement('button');
+      viewBtn.className = 'review-btn view';
+      viewBtn.textContent = 'OPEN';
+      viewBtn.onclick = () => window.open('read.html?id=' + encodeURIComponent(doc.id), '_blank');
+      actions.appendChild(viewBtn);
+
+      if (data.status !== 'approved') {
+        const approveBtn = document.createElement('button');
+        approveBtn.className = 'review-btn approve';
+        approveBtn.textContent = 'APPROVE';
+        approveBtn.onclick = () => setStatus(doc.id, 'approved', approveBtn);
+        actions.appendChild(approveBtn);
+      }
+
+      if (data.status !== 'rejected') {
+        const rejectBtn = document.createElement('button');
+        rejectBtn.className = 'review-btn reject';
+        rejectBtn.textContent = 'REJECT';
+        rejectBtn.onclick = () => setStatus(doc.id, 'rejected', rejectBtn);
+        actions.appendChild(rejectBtn);
+      }
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'review-btn reject';
+      delBtn.textContent = 'DELETE';
+      delBtn.onclick = () => deleteDoc(doc.id, delBtn);
+      actions.appendChild(delBtn);
+
+      card.appendChild(actions);
+      list.appendChild(card);
+    });
+  }
+
+  async function loadStatus(status) {
+    const list = document.getElementById('reviewList');
+    list.innerHTML = '<div class="review-empty">Loading...</div>';
+    currentStatus = status;
+
+    try {
+      const snap = await db.collection('lores')
+        .where('status', '==', status)
+        .get();
+
+      currentDocs = snap.docs.map(d => ({ id: d.id, data: () => d.data() }));
+      currentDocs.sort((a, b) => ts(b.data().createdAt) - ts(a.data().createdAt));
+      renderList();
+    } catch (e) {
+      console.error('Load failed:', e);
+      list.innerHTML = '<div class="review-empty">Could not load. Check console.</div>';
+    }
+  }
+
+  async function setStatus(id, newStatus, btn) {
+    btn.disabled = true;
+    try {
+      await db.collection('lores').doc(id).update({ status: newStatus });
+      currentDocs = currentDocs.filter(d => d.id !== id);
+      renderList();
+    } catch (e) {
+      console.error('Update failed:', e);
+      btn.disabled = false;
+      alert('Could not update. See console.');
+    }
+  }
+
+  async function deleteDoc(id, btn) {
+    if (!confirm('Delete this lore permanently?')) return;
+    btn.disabled = true;
+    try {
+      await db.collection('lores').doc(id).delete();
+      currentDocs = currentDocs.filter(d => d.id !== id);
+      renderList();
+    } catch (e) {
+      console.error('Delete failed:', e);
+      btn.disabled = false;
+      alert('Could not delete. See console.');
+    }
+  }
+
+  document.querySelectorAll('.review-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.review-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      loadStatus(tab.dataset.status);
+    });
+  });
+
+  firebase.auth().onAuthStateChanged(user => {
+    const gate = document.getElementById('gate');
+    const panel = document.getElementById('panel');
+
+    if (user && user.uid === ADMIN_UID) {
+      gate.style.display = 'none';
+      panel.style.display = 'block';
+      loadStatus('pending');
+    } else {
+      panel.style.display = 'none';
+      gate.innerHTML = user
+        ? 'This page is for the admin only.'
+        : 'Sign in as the admin to review lores.';
+    }
+  });
+</script>
+</body>
+</html>
