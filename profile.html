@@ -198,7 +198,6 @@
   .profile-tag.nerdy   { border-color: rgba(255,176,0,0.4); color: #ffb000; }
   .profile-tag.stories { border-color: rgba(201,166,255,0.4); color: #c9a6ff; }
 
-  /* Edit section - ALWAYS shown for own profile */
   .profile-edit-section {
     border-top: 1px solid rgba(255,255,255,0.08);
     background: rgba(0,0,0,0.18);
@@ -750,11 +749,12 @@
       card.appendChild(tagWrap);
     }
 
-    // Always-visible edit section for own profile
+    // Build edit section for own profile (only if isOwn)
+    let editSection = null;
     if (isOwn) {
-      const section = document.createElement('div');
-      section.className = 'profile-edit-section';
-      section.innerHTML =
+      editSection = document.createElement('div');
+      editSection.className = 'profile-edit-section';
+      editSection.innerHTML =
         '<div class="profile-edit-header">' +
           '<h3>Edit Profile</h3>' +
           '<span class="dot-live">LIVE</span>' +
@@ -791,31 +791,38 @@
           '<button type="button" class="profile-save" id="editSave">SAVE PROFILE</button>' +
           '<span class="profile-form-msg" id="editMsg"></span>' +
         '</div>';
-      card.appendChild(section);
+      card.appendChild(editSection);
+    }
 
-      // Prefill
-      document.getElementById('editBio').value = userData.bio || '';
-      document.getElementById('editInstagram').value = userData.instagram || '';
-      document.getElementById('editTiktok').value = userData.tiktok || '';
-      document.getElementById('editYoutube').value = userData.youtube || '';
-      document.getElementById('editSubstack').value = userData.substack || '';
-      document.getElementById('editDiscord').value = userData.discord || '';
-      document.getElementById('editWebsite').value = userData.website || '';
+    // Append card to page FIRST
+    page.appendChild(card);
 
-      document.getElementById('editSave').addEventListener('click', async () => {
-        const saveBtn = document.getElementById('editSave');
-        const msg = document.getElementById('editMsg');
+    // NOW prefill and wire up the edit section (it is in the DOM)
+    if (editSection) {
+      const $ = id => document.getElementById(id);
+
+      $('editBio').value = userData.bio || '';
+      $('editInstagram').value = userData.instagram || '';
+      $('editTiktok').value = userData.tiktok || '';
+      $('editYoutube').value = userData.youtube || '';
+      $('editSubstack').value = userData.substack || '';
+      $('editDiscord').value = userData.discord || '';
+      $('editWebsite').value = userData.website || '';
+
+      $('editSave').addEventListener('click', async () => {
+        const saveBtn = $('editSave');
+        const msg = $('editMsg');
         msg.className = 'profile-form-msg';
         msg.textContent = '';
 
         const updates = {
-          bio:       document.getElementById('editBio').value.trim(),
-          instagram: document.getElementById('editInstagram').value.trim(),
-          tiktok:    document.getElementById('editTiktok').value.trim(),
-          youtube:   document.getElementById('editYoutube').value.trim(),
-          substack:  document.getElementById('editSubstack').value.trim(),
-          discord:   document.getElementById('editDiscord').value.trim(),
-          website:   document.getElementById('editWebsite').value.trim()
+          bio:       $('editBio').value.trim(),
+          instagram: $('editInstagram').value.trim(),
+          tiktok:    $('editTiktok').value.trim(),
+          youtube:   $('editYoutube').value.trim(),
+          substack:  $('editSubstack').value.trim(),
+          discord:   $('editDiscord').value.trim(),
+          website:   $('editWebsite').value.trim()
         };
 
         saveBtn.disabled = true;
@@ -834,8 +841,6 @@
         }
       });
     }
-
-    page.appendChild(card);
 
     const head = document.createElement('h2');
     head.className = 'profile-lores-head';
