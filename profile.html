@@ -198,31 +198,50 @@
   .profile-tag.nerdy   { border-color: rgba(255,176,0,0.4); color: #ffb000; }
   .profile-tag.stories { border-color: rgba(201,166,255,0.4); color: #c9a6ff; }
 
-  .profile-edit-btn {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.16);
-    color: #8b8b9a;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    margin: 0 28px 24px;
-  }
-  .profile-edit-btn:hover { border-color: #ffb000; color: #ffb000; }
-
-  .profile-form {
-    display: none;
-    flex-direction: column;
-    gap: 14px;
-    padding: 20px 28px 24px;
+  /* Edit section - ALWAYS shown for own profile */
+  .profile-edit-section {
     border-top: 1px solid rgba(255,255,255,0.08);
-    background: rgba(0,0,0,0.15);
+    background: rgba(0,0,0,0.18);
+    padding: 22px 28px 24px;
   }
-  .profile-form.show { display: flex; }
+  .profile-edit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .profile-edit-header h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: #8b8b9a;
+    letter-spacing: 0.06em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+  .profile-edit-header .dot-live {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #00d4aa;
+    letter-spacing: 0.05em;
+  }
+  .profile-edit-header .dot-live::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #00d4aa;
+    border-radius: 50%;
+    margin-right: 6px;
+    box-shadow: 0 0 8px rgba(0,212,170,0.6);
+    vertical-align: middle;
+  }
 
+  .profile-field {
+    margin-bottom: 14px;
+  }
   .profile-field label {
     display: block;
     font-family: 'JetBrains Mono', monospace;
@@ -235,12 +254,12 @@
   .profile-field input,
   .profile-field textarea {
     width: 100%;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.4);
     border: 1px solid rgba(255,255,255,0.16);
     color: #e6e6e6;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
-    padding: 10px 14px;
+    padding: 11px 14px;
     border-radius: 6px;
     outline: none;
     box-sizing: border-box;
@@ -248,8 +267,12 @@
   }
   .profile-field input:focus,
   .profile-field textarea:focus { border-color: #ffb000; }
+  .profile-field input::placeholder,
+  .profile-field textarea::placeholder {
+    color: #44444f;
+  }
   .profile-field textarea {
-    min-height: 70px;
+    min-height: 72px;
     resize: vertical;
     font-family: 'Inter', sans-serif;
   }
@@ -259,6 +282,7 @@
     gap: 10px;
     flex-wrap: wrap;
     align-items: center;
+    margin-top: 18px;
   }
   .profile-save {
     background: rgba(255,176,0,0.08);
@@ -267,26 +291,13 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     letter-spacing: 0.06em;
-    padding: 9px 18px;
+    padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.15s ease;
   }
   .profile-save:hover { background: rgba(255,176,0,0.16); }
   .profile-save:disabled { opacity: 0.4; cursor: not-allowed; }
-  .profile-cancel {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.16);
-    color: #8b8b9a;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    padding: 9px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .profile-cancel:hover { border-color: #ff4444; color: #ff4444; }
   .profile-form-msg {
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
@@ -433,8 +444,7 @@
       padding: 0 20px 20px;
     }
     .profile-tags { padding: 0 20px 18px; }
-    .profile-edit-btn { margin: 0 20px 20px; }
-    .profile-form { padding: 18px 20px 22px; }
+    .profile-edit-section { padding: 18px 20px 20px; }
     .lore-card { padding: 18px 18px 16px; }
   }
 </style>
@@ -606,7 +616,6 @@
       const userDoc = await db.collection('users').doc(uid).get();
       const userData = userDoc.exists ? (userDoc.data() || {}) : {};
 
-      // Query lores by author. If Firestore complains about index, fall back to fetching all approved and filtering.
       let lores = [];
       try {
         const snap = await db.collection('lores')
@@ -615,7 +624,6 @@
           .get();
         lores = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       } catch (e) {
-        console.warn('Indexed query failed, falling back:', e);
         const snap = await db.collection('lores')
           .where('status', '==', 'approved')
           .get();
@@ -685,9 +693,7 @@
       bio.textContent = bioText;
     } else {
       bio.classList.add('empty');
-      bio.textContent = isOwn
-        ? '> no bio yet. add one below._'
-        : '> no bio yet._';
+      bio.textContent = isOwn ? '> no bio yet. add one below._' : '> no bio yet._';
     }
     identity.appendChild(bio);
 
@@ -709,7 +715,6 @@
 
     card.appendChild(identity);
 
-    // Stat tiles
     const stats = document.createElement('div');
     stats.className = 'profile-stats';
     const totalScore = userData.score || 0;
@@ -733,7 +738,6 @@
       '</div>';
     card.appendChild(stats);
 
-    // Tags
     const tagCounts = computeTagCounts(lores);
     const tagBits = [];
     if (tagCounts.Life > 0)    tagBits.push('<span class="profile-tag life">Life \u00D7' + tagCounts.Life + '</span>');
@@ -746,18 +750,93 @@
       card.appendChild(tagWrap);
     }
 
-    // Edit mode (own profile only). Wrapped in its own try in case it fails.
+    // Always-visible edit section for own profile
     if (isOwn) {
-      try {
-        attachEditForm(card, uid, userData, bioText, socials);
-      } catch (e) {
-        console.error('Edit form failed:', e);
-      }
+      const section = document.createElement('div');
+      section.className = 'profile-edit-section';
+      section.innerHTML =
+        '<div class="profile-edit-header">' +
+          '<h3>Edit Profile</h3>' +
+          '<span class="dot-live">LIVE</span>' +
+        '</div>' +
+        '<div class="profile-field">' +
+          '<label>Bio</label>' +
+          '<textarea id="editBio" maxlength="160" placeholder="One line about you..."></textarea>' +
+        '</div>' +
+        '<div class="profile-field">' +
+          '<label>Instagram URL</label>' +
+          '<input id="editInstagram" type="url" placeholder="https://instagram.com/yourname">' +
+        '</div>' +
+        '<div class="profile-field">' +
+          '<label>TikTok URL</label>' +
+          '<input id="editTiktok" type="url" placeholder="https://tiktok.com/@yourname">' +
+        '</div>' +
+        '<div class="profile-field">' +
+          '<label>YouTube URL</label>' +
+          '<input id="editYoutube" type="url" placeholder="https://youtube.com/@yourname">' +
+        '</div>' +
+        '<div class="profile-field">' +
+          '<label>Substack URL</label>' +
+          '<input id="editSubstack" type="url" placeholder="https://yourname.substack.com">' +
+        '</div>' +
+        '<div class="profile-field">' +
+          '<label>Discord invite URL</label>' +
+          '<input id="editDiscord" type="url" placeholder="https://discord.gg/...">' +
+        '</div>' +
+        '<div class="profile-field">' +
+          '<label>Website</label>' +
+          '<input id="editWebsite" type="url" placeholder="https://...">' +
+        '</div>' +
+        '<div class="profile-form-actions">' +
+          '<button type="button" class="profile-save" id="editSave">SAVE PROFILE</button>' +
+          '<span class="profile-form-msg" id="editMsg"></span>' +
+        '</div>';
+      card.appendChild(section);
+
+      // Prefill
+      document.getElementById('editBio').value = userData.bio || '';
+      document.getElementById('editInstagram').value = userData.instagram || '';
+      document.getElementById('editTiktok').value = userData.tiktok || '';
+      document.getElementById('editYoutube').value = userData.youtube || '';
+      document.getElementById('editSubstack').value = userData.substack || '';
+      document.getElementById('editDiscord').value = userData.discord || '';
+      document.getElementById('editWebsite').value = userData.website || '';
+
+      document.getElementById('editSave').addEventListener('click', async () => {
+        const saveBtn = document.getElementById('editSave');
+        const msg = document.getElementById('editMsg');
+        msg.className = 'profile-form-msg';
+        msg.textContent = '';
+
+        const updates = {
+          bio:       document.getElementById('editBio').value.trim(),
+          instagram: document.getElementById('editInstagram').value.trim(),
+          tiktok:    document.getElementById('editTiktok').value.trim(),
+          youtube:   document.getElementById('editYoutube').value.trim(),
+          substack:  document.getElementById('editSubstack').value.trim(),
+          discord:   document.getElementById('editDiscord').value.trim(),
+          website:   document.getElementById('editWebsite').value.trim()
+        };
+
+        saveBtn.disabled = true;
+        msg.textContent = 'Saving...';
+
+        try {
+          await db.collection('users').doc(uid).set(updates, { merge: true });
+          msg.className = 'profile-form-msg ok';
+          msg.textContent = 'Saved.';
+          setTimeout(() => loadProfile(uid), 500);
+        } catch (e) {
+          console.error('Save failed:', e);
+          msg.className = 'profile-form-msg err';
+          msg.textContent = 'Could not save. ' + (e && e.message ? e.message : '');
+          saveBtn.disabled = false;
+        }
+      });
     }
 
     page.appendChild(card);
 
-    // Lores heading
     const head = document.createElement('h2');
     head.className = 'profile-lores-head';
     head.textContent = isOwn ? 'Your lores' : 'Lores by ' + displayName;
@@ -822,112 +901,11 @@
     });
   }
 
-  // Build and wire up the edit button + form. Isolated so a failure here
-  // never takes down the whole profile page.
-  function attachEditForm(card, uid, userData, bioText, socials) {
-    const editBtn = document.createElement('button');
-    editBtn.type = 'button';
-    editBtn.className = 'profile-edit-btn';
-    editBtn.textContent = (bioText || socials.length) ? 'EDIT PROFILE' : 'ADD BIO & LINKS';
-    card.appendChild(editBtn);
-
-    const form = document.createElement('div');
-    form.className = 'profile-form';
-    form.innerHTML =
-      '<div class="profile-field">' +
-        '<label>Bio</label>' +
-        '<textarea id="editBio" maxlength="160" placeholder="One line about you..."></textarea>' +
-      '</div>' +
-      '<div class="profile-field">' +
-        '<label>Instagram URL</label>' +
-        '<input id="editInstagram" type="url" placeholder="https://instagram.com/yourname">' +
-      '</div>' +
-      '<div class="profile-field">' +
-        '<label>TikTok URL</label>' +
-        '<input id="editTiktok" type="url" placeholder="https://tiktok.com/@yourname">' +
-      '</div>' +
-      '<div class="profile-field">' +
-        '<label>YouTube URL</label>' +
-        '<input id="editYoutube" type="url" placeholder="https://youtube.com/@yourname">' +
-      '</div>' +
-      '<div class="profile-field">' +
-        '<label>Substack URL</label>' +
-        '<input id="editSubstack" type="url" placeholder="https://yourname.substack.com">' +
-      '</div>' +
-      '<div class="profile-field">' +
-        '<label>Discord invite URL</label>' +
-        '<input id="editDiscord" type="url" placeholder="https://discord.gg/...">' +
-      '</div>' +
-      '<div class="profile-field">' +
-        '<label>Website</label>' +
-        '<input id="editWebsite" type="url" placeholder="https://...">' +
-      '</div>' +
-      '<div class="profile-form-actions">' +
-        '<button type="button" class="profile-save" id="editSave">SAVE</button>' +
-        '<button type="button" class="profile-cancel" id="editCancel">CANCEL</button>' +
-        '<span class="profile-form-msg" id="editMsg"></span>' +
-      '</div>';
-    card.appendChild(form);
-
-    const $ = id => document.getElementById(id);
-
-    $('editBio').value = userData.bio || '';
-    $('editInstagram').value = userData.instagram || '';
-    $('editTiktok').value = userData.tiktok || '';
-    $('editYoutube').value = userData.youtube || '';
-    $('editSubstack').value = userData.substack || '';
-    $('editDiscord').value = userData.discord || '';
-    $('editWebsite').value = userData.website || '';
-
-    editBtn.addEventListener('click', () => {
-      form.classList.toggle('show');
-      editBtn.textContent = form.classList.contains('show') ? 'CANCEL EDIT' : 'EDIT PROFILE';
-    });
-    $('editCancel').addEventListener('click', () => {
-      form.classList.remove('show');
-      editBtn.textContent = 'EDIT PROFILE';
-    });
-
-    $('editSave').addEventListener('click', async () => {
-      const saveBtn = $('editSave');
-      const msg = $('editMsg');
-      msg.className = 'profile-form-msg';
-      msg.textContent = '';
-
-      const updates = {
-        bio:       $('editBio').value.trim(),
-        instagram: $('editInstagram').value.trim(),
-        tiktok:    $('editTiktok').value.trim(),
-        youtube:   $('editYoutube').value.trim(),
-        substack:  $('editSubstack').value.trim(),
-        discord:   $('editDiscord').value.trim(),
-        website:   $('editWebsite').value.trim()
-      };
-
-      saveBtn.disabled = true;
-      msg.textContent = 'Saving...';
-
-      try {
-        await db.collection('users').doc(uid).set(updates, { merge: true });
-        msg.className = 'profile-form-msg ok';
-        msg.textContent = 'Saved.';
-        setTimeout(() => loadProfile(uid), 500);
-      } catch (e) {
-        console.error('Save failed:', e);
-        msg.className = 'profile-form-err err';
-        msg.textContent = 'Could not save. ' + (e && e.message ? e.message : '');
-        saveBtn.disabled = false;
-      }
-    });
-  }
-
-  // Load profile after auth state settles (so we know if it is your own profile)
   let started = false;
   firebase.auth().onAuthStateChanged(() => {
     if (started) return;
     started = true;
 
-    // Small delay so firebase.auth().currentUser is definitely set if signed in
     setTimeout(() => {
       const uid = new URLSearchParams(window.location.search).get('id');
       if (!uid) { setState('No user specified.'); return; }
