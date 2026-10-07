@@ -123,9 +123,53 @@
     margin: 24px 0;
   }
 
+  /* Like row */
+  .read-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid rgba(255,93,122,0.5);
+    color: #ff5d7a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    padding: 9px 16px;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .like-btn:hover {
+    border-color: #ff5d7a;
+    background: rgba(255,93,122,0.08);
+  }
+  .like-btn.liked {
+    background: rgba(255,93,122,0.16);
+    border-color: #ff5d7a;
+  }
+  .like-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .like-btn .heart-icon {
+    font-size: 15px;
+  }
+  .like-count {
+    font-weight: 700;
+  }
+
   .read-back {
     display: inline-block;
-    margin-top: 40px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     letter-spacing: 0.08em;
@@ -297,10 +341,55 @@
     page.innerHTML = '<div class="read-state">' + escapeHTML(msg) + '</div>';
   }
 
+  let currentLoreId = null;
+  let currentLikeCount = 0;
+  let currentUserLiked = false;
+  let likeBtnEl = null;
+
+  function renderLikeBtn() {
+    if (!likeBtnEl) return;
+    likeBtnEl.innerHTML = '<span class="heart-icon">\u2665</span><span class="like-count">' + currentLikeCount + '</span>';
+    likeBtnEl.classList.toggle('liked', currentUserLiked);
+  }
+
+  async function toggleLike() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      alert('Sign in to like lores.');
+      return;
+    }
+    if (!currentLoreId) return;
+
+    likeBtnEl.disabled = true;
+    try {
+      const loreRef = db.collection('lores').doc(currentLoreId);
+      const likeRef = loreRef.collection('likes').doc(user.uid);
+
+      if (currentUserLiked) {
+        await likeRef.delete();
+        await loreRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
+        currentLikeCount = Math.max(0, currentLikeCount - 1);
+        currentUserLiked = false;
+      } else {
+        await likeRef.set({ likedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        await loreRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+        currentLikeCount += 1;
+        currentUserLiked = true;
+      }
+      renderLikeBtn();
+    } catch (e) {
+      console.error('Like toggle failed:', e);
+      alert('Could not update like. Try again.');
+    } finally {
+      likeBtnEl.disabled = false;
+    }
+  }
+
   function loadLore() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (!id) { setState('No lore specified.'); return; }
+    currentLoreId = id;
 
     db.collection('lores').doc(id).get().then(doc => {
       if (!doc.exists) { setState('This lore does not exist.'); return; }
@@ -316,6 +405,9 @@
         setState('This lore is not available.');
         return;
       }
+
+      currentLikeCount = typeof data.likes === 'number' ? data.likes : 0;
+      currentUserLiked = false;
 
       document.title = (data.title || 'A Lore') + ' - The Exhausted Nerd';
 
@@ -362,11 +454,35 @@
       body.innerHTML = sanitizeBody(data.body || '');
       page.appendChild(body);
 
+      // Action row: like button + back link
+      const actions = document.createElement('div');
+      actions.className = 'read-actions';
+
+      likeBtnEl = document.createElement('button');
+      likeBtnEl.type = 'button';
+      likeBtnEl.className = 'like-btn';
+      likeBtnEl.addEventListener('click', toggleLike);
+      actions.appendChild(likeBtnEl);
+
       const back = document.createElement('a');
       back.href = 'lores.html';
       back.className = 'read-back';
       back.textContent = '\u2190 BACK TO LORES';
-      page.appendChild(back);
+      actions.appendChild(back);
+
+      page.appendChild(actions);
+
+      // Check if this user already liked it, then show correct state
+      if (uid) {
+        db.collection('lores').doc(id).collection('likes').doc(uid).get().then(likeDoc => {
+          currentUserLiked = likeDoc.exists;
+          renderLikeBtn();
+        }).catch(() => {
+          renderLikeBtn();
+        });
+      } else {
+        renderLikeBtn();
+      }
 
     }).catch(e => {
       console.error('Read load failed:', e);
