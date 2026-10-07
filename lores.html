@@ -106,7 +106,6 @@
     padding: 0 24px 48px;
   }
 
-  /* Card is now a div, not an <a> */
   .lore-card {
     display: flex;
     flex-direction: column;
@@ -165,6 +164,17 @@
     height: 3px;
     background: #55555f;
     border-radius: 50%;
+  }
+  /* Author is a clickable link inside the otherwise pointer-events-none meta row */
+  .lore-author {
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    transition: color 0.15s ease;
+  }
+  .lore-author:hover {
+    color: #00d4aa;
+    text-decoration: underline;
   }
 
   .lore-blurb {
@@ -430,9 +440,13 @@
       const card = document.createElement('div');
       card.className = 'lore-card';
 
-      // Navigate on click, unless the click came from a button inside the card
       card.addEventListener('click', (e) => {
         if (e.target.closest('button')) return;
+        const authorEl = e.target.closest('.lore-author');
+        if (authorEl && authorEl.dataset.uid) {
+          window.location.href = 'profile.html?id=' + encodeURIComponent(authorEl.dataset.uid);
+          return;
+        }
         window.location.href = 'read.html?id=' + encodeURIComponent(lore.id);
       });
 
@@ -443,8 +457,11 @@
 
       const meta = document.createElement('div');
       meta.className = 'lore-meta';
-      const author = escapeHTML(lore.author || 'Anonymous');
-      let metaHTML = '<span>' + author + '</span>';
+      const authorText = escapeHTML(lore.author || 'Anonymous');
+      const authorHTML = lore.authorId
+        ? '<span class="lore-author" data-uid="' + escapeHTML(lore.authorId) + '">' + authorText + '</span>'
+        : '<span>' + authorText + '</span>';
+      let metaHTML = authorHTML;
       const dateStr = fmtDate(lore.createdAt);
       if (dateStr) metaHTML += '<span class="dot"></span><span>' + dateStr + '</span>';
       if (typeof lore.readingTime === 'number' && lore.readingTime > 0) {
@@ -498,7 +515,6 @@
     const wasLiked = likedSet.has(loreId);
     const currentCount = parseInt(countEl.textContent, 10) || 0;
 
-    // Optimistic update: change UI immediately
     if (wasLiked) {
       likedSet.delete(loreId);
       btn.classList.remove('liked');
@@ -509,7 +525,6 @@
       countEl.textContent = currentCount + 1;
     }
 
-    // Fire the Firestore write in the background
     const loreRef = db.collection('lores').doc(loreId);
     const likeRef = loreRef.collection('likes').doc(currentUid);
 
@@ -523,7 +538,6 @@
       }
     } catch (e) {
       console.error('Like toggle failed:', e);
-      // Revert optimistic UI on error
       if (wasLiked) {
         likedSet.add(loreId);
         btn.classList.add('liked');
