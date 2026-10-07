@@ -11,12 +11,35 @@
 <link href="https://fonts.cdnfonts.com/css/w95fa" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .lores-actions {
-    display: flex;
-    justify-content: center;
-    margin: 32px 0 48px;
+  .lores-wrap {
+    max-width: 900px;
+    margin: 0 auto;
   }
-  .lores-submit {
+
+  /* Header row: title + two buttons */
+  .lores-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 48px 0 28px;
+    padding: 0 24px;
+  }
+  .lores-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--text);
+  }
+  .header-btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .header-btn {
     display: inline-block;
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
@@ -28,31 +51,81 @@
     border-radius: 6px;
     text-decoration: none;
     transition: all 0.15s ease;
+    white-space: nowrap;
   }
-  .lores-submit:hover {
+  .header-btn:hover {
     background: rgba(255,176,0,0.16);
+    text-decoration: none;
+  }
+  .header-btn.ghost {
+    border-color: rgba(255,255,255,0.16);
+    color: #8b8b9a;
+    background: transparent;
+  }
+  .header-btn.ghost:hover {
+    border-color: #ffb000;
+    color: #ffb000;
   }
 
-  .lores-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
+  /* Filter pills */
+  .lores-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0 24px 28px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .lores-filters::-webkit-scrollbar { display: none; }
+  .filter-pill {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.16);
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .filter-pill:hover {
+    border-color: #ffb000;
+    color: #ffb000;
+  }
+  .filter-pill.active {
+    border-color: #ffb000;
+    color: #ffb000;
+    background: rgba(255,176,0,0.08);
+  }
+
+  /* Wide rectangular cards */
+  .lores-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 24px 48px;
   }
 
   .lore-card {
-    border: 1px solid rgba(255,255,255,0.14);
-    border-radius: 10px;
-    padding: 26px 24px 22px;
-    background: rgba(255,255,255,0.01);
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    transition: border-color 0.15s ease;
+    gap: 14px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-left: 3px solid #ffb000;
+    border-radius: 10px;
+    padding: 24px 26px 22px;
+    background: rgba(255,255,255,0.01);
     text-decoration: none;
     color: inherit;
+    transition: border-color 0.15s ease, background 0.15s ease;
   }
   .lore-card:hover {
     border-color: rgba(255,176,0,0.55);
+    border-left-color: #ffb000;
+    background: rgba(255,255,255,0.02);
   }
 
   .lore-tiles {
@@ -78,6 +151,7 @@
 
   .lore-meta {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 10px;
     font-family: 'JetBrains Mono', monospace;
@@ -97,22 +171,43 @@
     font-size: 14px;
     color: #a8a8b8;
     line-height: 1.6;
-    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
+  .lore-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .lore-likes {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #8b8b9a;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .lore-likes .heart-icon {
+    color: #ff5d7a;
+    font-size: 13px;
+  }
   .lore-read {
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     color: #ffb000;
     letter-spacing: 0.08em;
-    align-self: flex-start;
   }
   .lore-card:hover .lore-read {
     text-decoration: underline;
   }
 
   .lores-empty {
-    grid-column: 1 / -1;
     text-align: center;
     padding: 60px 20px;
     color: #8b8b9a;
@@ -124,8 +219,16 @@
   }
 
   @media (max-width: 600px) {
-    .lores-grid {
-      grid-template-columns: 1fr;
+    .lores-header {
+      padding: 0 20px;
+      margin: 32px 0 20px;
+    }
+    .lores-filters { padding: 0 20px 20px; }
+    .lores-list { padding: 0 20px 32px; }
+    .lore-card { padding: 18px 18px 16px; }
+    .header-btn {
+      font-size: 12px;
+      padding: 10px 16px;
     }
   }
 </style>
@@ -156,20 +259,26 @@
 </header>
 
 <main>
-  <section class="hero">
-    <h1>LORES</h1>
-    <p class="subhead">short writing by students / anything goes</p>
-  </section>
+  <div class="lores-wrap">
+    <div class="lores-header">
+      <h1 class="lores-title">Lores</h1>
+      <div class="header-btn-row">
+        <a href="my-lores.html" class="header-btn ghost">MY LORES</a>
+        <a href="write.html" class="header-btn">SUBMIT A LORE</a>
+      </div>
+    </div>
 
-  <div class="lores-actions">
-    <a href="write.html" class="lores-submit">SUBMIT A LORE</a>
-  </div>
+    <div class="lores-filters" id="loresFilters">
+      <button class="filter-pill active" data-tag="All" type="button">All</button>
+      <button class="filter-pill" data-tag="Life" type="button">Life</button>
+      <button class="filter-pill" data-tag="Nerdy" type="button">Nerdy</button>
+      <button class="filter-pill" data-tag="Stories" type="button">Stories</button>
+    </div>
 
-  <section>
-    <div class="lores-grid" id="loresGrid">
+    <div class="lores-list" id="loresList">
       <div class="lores-empty">Loading lores...</div>
     </div>
-  </section>
+  </div>
 </main>
 
 <footer>
@@ -231,8 +340,8 @@
         const scale = minSize / 22;
         const padX = Math.round((8 + Math.floor(Math.random() * 16)) * scale);
         const padY = Math.round((4 + Math.floor(Math.random() * 14)) * scale);
-        const dy = -10 + Math.floor(Math.random() * 21);
-        const rot = -3 + Math.random() * 6;
+        const dy = -6 + Math.floor(Math.random() * 13);
+        const rot = -2 + Math.random() * 4;
         html += `<span class="tile" style="
           background:${bg};
           color:${fg};
@@ -256,63 +365,122 @@
     return 0;
   }
 
+  function fmtDate(v) {
+    if (!v) return '';
+    return new Date(ts(v)).toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    });
+  }
+
   function escapeHTML(s) {
     return String(s || '').replace(/[&<>"']/g, c => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[c]));
   }
 
+  let allDocs = [];
+  let activeTag = 'All';
+
+  function renderList() {
+    const list = document.getElementById('loresList');
+
+    const filtered = activeTag === 'All'
+      ? allDocs
+      : allDocs.filter(d => {
+          const tags = d.tags || [];
+          return Array.isArray(tags) && tags.includes(activeTag);
+        });
+
+    if (!filtered.length) {
+      list.innerHTML = '<div class="lores-empty">' +
+        (activeTag === 'All'
+          ? 'No lores yet. Be the first to submit.'
+          : 'No lores tagged "' + escapeHTML(activeTag) + '" yet.') +
+        '</div>';
+      return;
+    }
+
+    list.innerHTML = '';
+    filtered.forEach(lore => {
+      const card = document.createElement('a');
+      card.className = 'lore-card';
+      card.href = 'read.html?id=' + encodeURIComponent(lore.id);
+
+      // Tiles title
+      const tiles = document.createElement('div');
+      tiles.className = 'lore-tiles';
+      renderTilesInto(tiles, lore.title || 'Untitled', 14, 26);
+      card.appendChild(tiles);
+
+      // Meta: author · date · reading time
+      const meta = document.createElement('div');
+      meta.className = 'lore-meta';
+      const author = escapeHTML(lore.author || 'Anonymous');
+      let metaHTML = '<span>' + author + '</span>';
+      const dateStr = fmtDate(lore.createdAt);
+      if (dateStr) metaHTML += '<span class="dot"></span><span>' + dateStr + '</span>';
+      if (typeof lore.readingTime === 'number' && lore.readingTime > 0) {
+        metaHTML += '<span class="dot"></span><span>' + lore.readingTime + ' min read</span>';
+      }
+      meta.innerHTML = metaHTML;
+      card.appendChild(meta);
+
+      // Blurb
+      if (lore.blurb) {
+        const blurb = document.createElement('div');
+        blurb.className = 'lore-blurb';
+        blurb.textContent = lore.blurb;
+        card.appendChild(blurb);
+      }
+
+      // Footer: likes on left, read on right
+      const footer = document.createElement('div');
+      footer.className = 'lore-footer';
+
+      const likes = document.createElement('span');
+      likes.className = 'lore-likes';
+      const likeCount = typeof lore.likes === 'number' ? lore.likes : 0;
+      likes.innerHTML = '<span class="heart-icon">\u2665</span><span>' + likeCount + '</span>';
+      footer.appendChild(likes);
+
+      const read = document.createElement('span');
+      read.className = 'lore-read';
+      read.textContent = 'READ \u2192';
+      footer.appendChild(read);
+
+      card.appendChild(footer);
+      list.appendChild(card);
+    });
+  }
+
+  document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeTag = pill.dataset.tag;
+      renderList();
+    });
+  });
+
   (async () => {
-    const grid = document.getElementById('loresGrid');
+    const list = document.getElementById('loresList');
     try {
       const snap = await db.collection('lores')
         .where('status', '==', 'approved')
         .get();
 
       if (snap.empty) {
-        grid.innerHTML = '<div class="lores-empty">No lores yet. Be the first to submit.</div>';
+        allDocs = [];
+        renderList();
         return;
       }
 
-      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      docs.sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
-
-      grid.innerHTML = '';
-      docs.forEach(lore => {
-        const card = document.createElement('a');
-        card.className = 'lore-card';
-        card.href = 'read.html?id=' + encodeURIComponent(lore.id);
-
-        const tiles = document.createElement('div');
-        tiles.className = 'lore-tiles';
-        renderTilesInto(tiles, lore.title || 'Untitled', 14, 28);
-        card.appendChild(tiles);
-
-        const meta = document.createElement('div');
-        meta.className = 'lore-meta';
-        const author = escapeHTML(lore.author || 'Anonymous');
-        const dateStr = lore.createdAt
-          ? new Date(ts(lore.createdAt)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-          : '';
-        meta.innerHTML = '<span>' + author + '</span>'
-          + (dateStr ? '<span class="dot"></span><span>' + dateStr + '</span>' : '');
-        card.appendChild(meta);
-
-        const blurb = document.createElement('div');
-        blurb.className = 'lore-blurb';
-        blurb.textContent = lore.blurb || '';
-        card.appendChild(blurb);
-
-        const read = document.createElement('span');
-        read.className = 'lore-read';
-        read.textContent = 'READ \u2192';
-        card.appendChild(read);
-
-        grid.appendChild(card);
-      });
+      allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      allDocs.sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
+      renderList();
     } catch (e) {
       console.error('Lores load failed:', e);
-      grid.innerHTML = '<div class="lores-empty">Could not load lores. Try again.</div>';
+      list.innerHTML = '<div class="lores-empty">Could not load lores. Try again.</div>';
     }
   })();
 </script>
