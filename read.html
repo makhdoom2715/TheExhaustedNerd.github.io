@@ -96,6 +96,26 @@
     color: #c8c8d2;
     font-style: italic;
   }
+  /* Inline formatting survives from write.html */
+  .read-body em, .read-body i { font-style: italic; }
+  .read-body strong, .read-body b { font-weight: 700; }
+  .read-body u { text-decoration: underline; }
+  .read-body s, .read-body strike, .read-body del { text-decoration: line-through; }
+  .read-body code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255,255,255,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.92em;
+  }
+  .read-body a { color: #00d4aa; text-decoration: underline; }
+  .read-body ul, .read-body ol {
+    padding-left: 24px;
+    margin: 0 0 1.2em;
+    list-style: disc;
+  }
+  .read-body ol { list-style: decimal; }
+  .read-body li { color: inherit; margin-bottom: 0.4em; }
   .read-body img {
     display: block;
     width: 100%;
@@ -256,7 +276,7 @@
   function sanitizeBody(html) {
     const tmp = document.createElement('div');
     tmp.innerHTML = html || '';
-    tmp.querySelectorAll('script, style, iframe, object, embed').forEach(n => n.remove());
+    tmp.querySelectorAll('script, style, iframe, object, embed, svg, math').forEach(n => n.remove());
     tmp.querySelectorAll('*').forEach(el => {
       [...el.attributes].forEach(attr => {
         const name = attr.name.toLowerCase();
@@ -313,6 +333,10 @@
           day: 'numeric', month: 'short', year: 'numeric'
         });
         metaHTML += '<span class="dot"></span><span>' + dateStr + '</span>';
+      }
+
+      if (typeof data.readingTime === 'number' && data.readingTime > 0) {
+        metaHTML += '<span class="dot"></span><span>' + data.readingTime + ' min read</span>';
       }
 
       if (Array.isArray(data.tags) && data.tags.length) {
