@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Write a Lore - The Exhausted Nerd</title>
+<meta name="description" content="Submit a lore.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;900&family=JetBrains+Mono:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/w95fa" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .write-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .write-page {
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    padding: 56px 64px 40px;
+    background: rgba(255,255,255,0.01);
+  }
+
+  .title-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e6e6e6;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    padding: 0;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+    box-sizing: border-box;
+  }
+  .title-input::placeholder { color: #55555f; }
+
+  .tile-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px 0;
+    margin: 0 0 40px;
+    line-height: 1;
+    min-height: 0;
+  }
+  .tile-word {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 32px;
+  }
+  .tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    border-radius: 2px;
+    transition: transform 0.15s ease;
+  }
+  .tile:hover { transform: scale(1.05) !important; z-index: 2; }
+
+  .editor {
+    min-height: 320px;
+    outline: none;
+    color: #e6e6e6;
+    font-family: 'W95FA', 'VT323', monospace;
+    font-size: 17px;
+    line-height: 1.9;
+    letter-spacing: 0.02em;
+    caret-color: #ffb000;
+  }
+  .editor p { margin: 0 0 1.2em; color: inherit; }
+
+  .editor h2 {
+    font-family: 'W95FA', 'VT323', monospace;
+    font-size: 26px;
+    line-height: 1.5;
+    color: #e6e6e6;
+    font-weight: 400;
+    margin: 1.2em 0 0.6em;
+  }
+
+  .editor blockquote {
+    margin: 1.4em 0;
+    padding: 4px 0 4px 18px;
+    border-left: 3px solid #ffb000;
+    color: #c8c8d2;
+    font-style: italic;
+  }
+
+  .editor img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 24px 0;
+    cursor: pointer;
+  }
+  .editor img:hover {
+    outline: 2px solid rgba(255,176,0,0.5);
+    outline-offset: 4px;
+  }
+  .editor:empty:before {
+    content: attr(data-placeholder);
+    color: #55555f;
+  }
+
+  .toolbar {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .tool-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.16);
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    letter-spacing: 0.04em;
+  }
+  .tool-btn:hover {
+    border-color: #ffb000;
+    color: #ffb000;
+  }
+  .tool-btn.active {
+    border-color: #ffb000;
+    color: #ffb000;
+    background: rgba(255,176,0,0.08);
+  }
+
+  .submit-row {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .submit-btn {
+    background: rgba(255,176,0,0.08);
+    border: 1px solid #ffb000;
+    color: #ffb000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    padding: 12px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .submit-btn:hover { background: rgba(255,176,0,0.16); }
+  .submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .submit-msg {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #8b8b9a;
+    letter-spacing: 0.05em;
+  }
+  .submit-msg.ok { color: #00d4aa; }
+  .submit-msg.err { color: #ff6b6b; }
+
+  .signin-note {
+    text-align: center;
+    padding: 60px 24px;
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+
+  .hint {
+    margin: 20px 0 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #55555f;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .write-page { padding: 32px 22px 32px; }
+  }
+</style>
+<!-- architect: 29 -->
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="navbar">
+    <a href="index.html" class="logo">exhausted_nerd<span class="cursor">_</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="nmtc.html">NMTC</a></li>
+      <li><a href="arcade.html">Arcade</a></li>
+      <li><a href="lores.html" class="active">Lores</a></li>
+      <li><a href="join.html">Join Us</a></li>
+      <li><button id="authBtn" class="auth-btn">Sign In</button></li>
+    </ul>
+    <a href="https://youtube.com/@theexhaustednerd" class="profile-pic-link" target="_blank" rel="noopener">
+      <img src="assets/profile.png" alt="profile-88" class="profile-pic">
+    </a>
+  </nav>
+  <div class="status-bar">SYSTEM ONLINE // STREAK: <span id="navStreak">0</span> // SCORE: <span id="navScore">0</span></div>
+</header>
+
+<main>
+  <div class="write-wrap">
+    <div id="writeGuard" class="signin-note">Checking sign-in...</div>
+
+    <div id="writePage" class="write-page" style="display:none;">
+      <input id="titleInput" class="title-input" type="text" placeholder="Title">
+      <div class="tile-heading" id="tileHeading"></div>
+
+      <div id="editor" class="editor" contenteditable="true" data-placeholder="Start writing..."></div>
+
+      <div class="toolbar">
+        <button class="tool-btn" id="addPicBtn" type="button">+ Picture</button>
+        <button class="tool-btn" id="addHeadingBtn" type="button">+ Heading</button>
+        <button class="tool-btn" id="addQuoteBtn" type="button">+ Quote</button>
+      </div>
+
+      <div class="submit-row">
+        <button class="submit-btn" id="submitBtn" type="button">SUBMIT FOR REVIEW</button>
+        <span class="submit-msg" id="submitMsg"></span>
+      </div>
+    </div>
+
+    <p class="hint" id="writeHint" style="display:none;">Images are embedded directly for now, so keep them small. Big images may fail to save.</p>
+  </div>
+</main>
+
+<footer>
+  (c) 2026 The Exhausted Nerd. Built by the exhausted. System load: 47% stable
+</footer>
+
+<input type="file" id="hiddenPicInput" accept="image/*" style="display:none">
+
+<script src="js/tracker.js"></script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+  const TILE_COLORS = [
+    '#5fa8d3', '#2d5a3d', '#6ba8c9', '#a8c96a',
+    '#b3b94d', '#4a90a4', '#c4d68f', '#5a6b9a',
+    '#2c4a6b', '#8db850', '#3d6b8e', '#4a6b9e'
+  ];
+
+  const TILE_FONTS = [
+    { family: "'JetBrains Mono', monospace", weight: 500, style: 'normal' },
+    { family: "'JetBrains Mono', monospace", weight: 700, style: 'normal' },
+    { family: "'Space Grotesk', sans-serif", weight: 700, style: 'normal' },
+    { family: "'Space Grotesk', sans-serif", weight: 500, style: 'italic' },
+    { family: "Inter, sans-serif", weight: 900, style: 'normal' },
+    { family: "Georgia, serif", weight: 400, style: 'normal' },
+    { family: "Georgia, serif", weight: 400, style: 'italic' },
+    { family: "Georgia, serif", weight: 700, style: 'normal' },
+    { family: "'Times New Roman', serif", weight: 400, style: 'italic' },
+    { family: "Garamond, Georgia, serif", weight: 500, style: 'normal' },
+    { family: "'Courier New', monospace", weight: 700, style: 'normal' }
+  ];
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function textColorFor(bg) {
+    const r = parseInt(bg.slice(1, 3), 16);
+    const g = parseInt(bg.slice(3, 5), 16);
+    const b = parseInt(bg.slice(5, 7), 16);
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum > 0.6 ? '#0a0a0a' : '#f2f2f2';
+  }
+
+  function renderTiles(text) {
+    const heading = document.getElementById('tileHeading');
+    if (!text.trim()) { heading.innerHTML = ''; return; }
+
+    const words = text.split(' ').filter(w => w.length > 0);
+    let html = '';
+
+    words.forEach(word => {
+      html += '<span class="tile-word">';
+      for (const ch of word) {
+        const bg = pick(TILE_COLORS);
+        const fg = textColorFor(bg);
+        const font = pick(TILE_FONTS);
+        const size = 22 + Math.floor(Math.random() * 30);
+        const padX = 8 + Math.floor(Math.random() * 16);
+        const padY = 4 + Math.floor(Math.random() * 14);
+        const dy = -10 + Math.floor(Math.random() * 21);
+        const rot = -3 + Math.random() * 6;
+        html += `<span class="tile" style="
+          background:${bg};
+          color:${fg};
+          font-family:${font.family};
+          font-weight:${font.weight};
+          font-style:${font.style};
+          font-size:${size}px;
+          padding:${padY}px ${padX}px;
+          transform: translateY(${dy}px) rotate(${rot}deg);
+        ">${ch}</span>`;
+      }
+      html += '</span>';
+    });
+
+    heading.innerHTML = html;
+  }
+
+  const titleInput = document.getElementById('titleInput');
+  const editor = document.getElementById('editor');
+  const hiddenPicInput = document.getElementById('hiddenPicInput');
+  const addHeadingBtn = document.getElementById('addHeadingBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitMsg = document.getElementById('submitMsg');
+
+  titleInput.addEventListener('input', () => renderTiles(titleInput.value));
+
+  function saveSelection() {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+      return sel.getRangeAt(0).cloneRange();
+    }
+    return null;
+  }
+
+  function restoreSelection(range) {
+    if (!range) return;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function currentBlockTag() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return '';
+    let node = sel.anchorNode;
+    while (node && node !== editor) {
+      if (node.nodeType === 1 && /^(H1|H2|H3|P|BLOCKQUOTE|DIV)$/.test(node.tagName)) {
+        return node.tagName;
+      }
+      node = node.parentNode;
+    }
+    return '';
+  }
+
+  function updateToolbarState() {
+    const tag = currentBlockTag();
+    addHeadingBtn.classList.toggle('active', tag === 'H2');
+    document.getElementById('addQuoteBtn').classList.toggle('active', tag === 'BLOCKQUOTE');
+  }
+
+  document.addEventListener('selectionchange', () => {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+      updateToolbarState();
+    }
+  });
+
+  let savedRange = null;
+  let imageBeingReplaced = null;
+
+  editor.addEventListener('click', (e) => {
+    if (e.target.tagName === 'IMG') {
+      imageBeingReplaced = e.target;
+      hiddenPicInput.click();
+      return;
+    }
+    updateToolbarState();
+  });
+
+  document.getElementById('addPicBtn').addEventListener('click', () => {
+    imageBeingReplaced = null;
+    savedRange = saveSelection();
+    hiddenPicInput.click();
+  });
+
+  hiddenPicInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+
+      if (imageBeingReplaced) {
+        imageBeingReplaced.src = ev.target.result;
+        imageBeingReplaced = null;
+        hiddenPicInput.value = '';
+        return;
+      }
+
+      editor.focus();
+      restoreSelection(savedRange);
+
+      const img = document.createElement('img');
+      img.src = ev.target.result;
+      img.alt = '';
+
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(img);
+
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        if (img.nextSibling) {
+          img.parentNode.insertBefore(p, img.nextSibling);
+        } else {
+          img.parentNode.appendChild(p);
+        }
+
+        const newRange = document.createRange();
+        newRange.setStart(p, 0);
+        newRange.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(newRange);
+      } else {
+        editor.appendChild(img);
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        editor.appendChild(p);
+      }
+
+      hiddenPicInput.value = '';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  addHeadingBtn.addEventListener('click', () => {
+    editor.focus();
+    const tag = currentBlockTag();
+    if (tag === 'H2') {
+      document.execCommand('formatBlock', false, 'P');
+    } else {
+      document.execCommand('formatBlock', false, 'H2');
+    }
+    updateToolbarState();
+  });
+
+  document.getElementById('addQuoteBtn').addEventListener('click', () => {
+    editor.focus();
+    const tag = currentBlockTag();
+    if (tag === 'BLOCKQUOTE') {
+      document.execCommand('formatBlock', false, 'P');
+    } else {
+      document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+    }
+    updateToolbarState();
+  });
+
+  function plainTextFromBody() {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = editor.innerHTML;
+    return (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  async function checkSignedIn() {
+    const guard = document.getElementById('writeGuard');
+    const page = document.getElementById('writePage');
+    const hint = document.getElementById('writeHint');
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        guard.style.display = 'none';
+        page.style.display = 'block';
+        hint.style.display = 'block';
+      } else {
+        guard.innerHTML = 'You need to sign in before writing a lore.<br>Click <strong>Sign In</strong> in the top right.';
+        page.style.display = 'none';
+        hint.style.display = 'none';
+      }
+    });
+  }
+  checkSignedIn();
+
+  submitBtn.addEventListener('click', async () => {
+    submitMsg.className = 'submit-msg';
+    submitMsg.textContent = '';
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      submitMsg.className = 'submit-msg err';
+      submitMsg.textContent = 'Not signed in.';
+      return;
+    }
+
+    const title = titleInput.value.trim();
+    const bodyHTML = editor.innerHTML.trim();
+    const plain = plainTextFromBody();
+
+    if (!title) {
+      submitMsg.className = 'submit-msg err';
+      submitMsg.textContent = 'Add a title first.';
+      return;
+    }
+    if (plain.length < 20) {
+      submitMsg.className = 'submit-msg err';
+      submitMsg.textContent = 'Write at least a couple sentences.';
+      return;
+    }
+
+    const blurb = plain.length > 160 ? plain.slice(0, 157) + '...' : plain;
+    const author = user.displayName || (user.email ? user.email.split('@')[0] : 'Anonymous');
+
+    submitBtn.disabled = true;
+    submitMsg.textContent = 'Submitting...';
+
+    try {
+      await db.collection('lores').add({
+        title: title,
+        body: bodyHTML,
+        blurb: blurb,
+        author: author,
+        authorId: user.uid,
+        status: 'pending',
+        tags: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      submitMsg.className = 'submit-msg ok';
+      submitMsg.textContent = 'Submitted. Wait for approval.';
+
+      titleInput.value = '';
+      editor.innerHTML = '';
+      renderTiles('');
+    } catch (e) {
+      console.error('Submit failed:', e);
+      submitMsg.className = 'submit-msg err';
+      submitMsg.textContent = 'Could not submit. Try a smaller image or shorter post.';
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
