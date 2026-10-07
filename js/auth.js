@@ -30,7 +30,6 @@
   const picLink = document.querySelector(".profile-pic-link");
   const picImg = picLink ? picLink.querySelector(".profile-pic") : null;
 
-  // Convert the pic link into a menu trigger (no HTML changes needed)
   if (picLink) {
     picLink.setAttribute("href", "#");
     picLink.removeAttribute("target");
@@ -39,6 +38,7 @@
   }
 
   let menu = null;
+  let currentUser = null;
 
   function esc(s) {
     return String(s || "").replace(/[&<>"']/g, function (c) {
@@ -83,6 +83,8 @@
     const rect = picLink.getBoundingClientRect();
     menu.style.top = (rect.bottom + 10) + "px";
     menu.style.right = Math.max(12, window.innerWidth - rect.right) + "px";
+    // Rebuild content every time it opens, so it always reflects current state
+    renderMenuContent(currentUser);
     menu.style.display = "block";
   }
 
@@ -204,6 +206,8 @@
   // =========================================================
 
   auth.onAuthStateChanged(function (user) {
+    currentUser = user;
+
     btn.disabled = false;
 
     if (user) {
@@ -223,8 +227,6 @@
         picImg.src = user.photoURL || DEFAULT_PIC;
         picImg.onerror = function () { this.src = DEFAULT_PIC; };
       }
-
-      renderMenuContent(user);
     } else {
       btn.textContent = "Sign In";
       btn.classList.remove("signed-in");
@@ -290,11 +292,8 @@
         }
       };
 
-      // Reset the nav avatar to the default
       if (picImg) picImg.src = DEFAULT_PIC;
-
       closeMenu();
-      renderMenuContent(null);
     }
   });
 })();
