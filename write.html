@@ -140,6 +140,45 @@
     background: rgba(255,176,0,0.08);
   }
 
+  /* Tag picker */
+  .tag-row {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .tag-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #55555f;
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+  .tag-pill {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.16);
+    color: #8b8b9a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    letter-spacing: 0.04em;
+  }
+  .tag-pill:hover {
+    border-color: #ffb000;
+    color: #ffb000;
+  }
+  .tag-pill.active {
+    border-color: #ffb000;
+    color: #ffb000;
+    background: rgba(255,176,0,0.08);
+  }
+
   .submit-row {
     margin-top: 28px;
     padding-top: 20px;
@@ -238,6 +277,13 @@
         <button class="tool-btn" id="addPicBtn" type="button">+ Picture</button>
         <button class="tool-btn" id="addHeadingBtn" type="button">+ Heading</button>
         <button class="tool-btn" id="addQuoteBtn" type="button">+ Quote</button>
+      </div>
+
+      <div class="tag-row" id="tagRow">
+        <span class="tag-label">TAG (optional):</span>
+        <button class="tag-pill" data-tag="Life" type="button">Life</button>
+        <button class="tag-pill" data-tag="Nerdy" type="button">Nerdy</button>
+        <button class="tag-pill" data-tag="Stories" type="button">Stories</button>
       </div>
 
       <div class="submit-row">
@@ -341,6 +387,24 @@
 
   titleInput.addEventListener('input', () => renderTiles(titleInput.value));
 
+  /* ---------- Tag picker ---------- */
+  let selectedTag = '';
+  document.querySelectorAll('.tag-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const tag = pill.dataset.tag;
+      if (selectedTag === tag) {
+        // deselect
+        selectedTag = '';
+        pill.classList.remove('active');
+      } else {
+        selectedTag = tag;
+        document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+      }
+    });
+  });
+
+  /* ---------- Selection helpers ---------- */
   function saveSelection() {
     const sel = window.getSelection();
     if (sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
@@ -479,6 +543,12 @@
     return (tmp.textContent || '').replace(/\s+/g, ' ').trim();
   }
 
+  function computeReadingTime(text) {
+    const words = text.split(/\s+/).filter(w => w.length > 0).length;
+    const minutes = Math.max(1, Math.round(words / 200));
+    return minutes;
+  }
+
   async function checkSignedIn() {
     const guard = document.getElementById('writeGuard');
     const page = document.getElementById('writePage');
@@ -526,6 +596,8 @@
 
     const blurb = plain.length > 160 ? plain.slice(0, 157) + '...' : plain;
     const author = user.displayName || (user.email ? user.email.split('@')[0] : 'Anonymous');
+    const readingTime = computeReadingTime(plain);
+    const tags = selectedTag ? [selectedTag] : [];
 
     submitBtn.disabled = true;
     submitMsg.textContent = 'Submitting...';
@@ -538,7 +610,9 @@
         author: author,
         authorId: user.uid,
         status: 'pending',
-        tags: [],
+        tags: tags,
+        readingTime: readingTime,
+        likes: 0,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -548,6 +622,8 @@
       titleInput.value = '';
       editor.innerHTML = '';
       renderTiles('');
+      selectedTag = '';
+      document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
     } catch (e) {
       console.error('Submit failed:', e);
       submitMsg.className = 'submit-msg err';
