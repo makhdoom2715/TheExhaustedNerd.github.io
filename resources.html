@@ -13,20 +13,23 @@
 <body>
 
 <header class="site-header">
-  <nav class="navbar">
+  <nav class="navbar with-hamburger">
     <a href="index.html" class="logo">exhausted_nerd<span class="cursor">_</span></a>
-    <ul class="nav-links">
+    <button id="authBtn" class="auth-btn">Sign In</button>
+    <a href="https://youtube.com/@theexhaustednerd" class="profile-pic-link" target="_blank" rel="noopener">
+      <img src="assets/profile.png" alt="profile-88" class="profile-pic">
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li>
       <li><a href="resources.html" class="active">Resources</a></li>
       <li><a href="nmtc.html">NMTC</a></li>
       <li><a href="arcade.html">Arcade</a></li>
       <li><a href="lores.html">Lores</a></li>
       <li><a href="join.html">Join Us</a></li>
-      <li><button id="authBtn" class="auth-btn">Sign In</button></li>
     </ul>
-    <a href="https://youtube.com/@theexhaustednerd" class="profile-pic-link" target="_blank" rel="noopener">
-      <img src="assets/profile.png" alt="profile-88" class="profile-pic">
-    </a>
   </nav>
   <div class="status-bar">SYSTEM ONLINE // STREAK: <span id="navStreak">0</span> // SCORE: <span id="navScore">0</span></div>
 </header>
@@ -90,6 +93,7 @@
 </footer>
 
 <script src="js/tracker.js"></script>
+<script src="js/nav.js"></script>
 <script src="js/roulette.js"></script>
 <script>
   const TOPICS = {
