@@ -4,13 +4,14 @@
    Puzzle 2: Simple code check
    To add a new puzzle: add it to VAULT_CODES, VAULT_REWARDS,
    add the HTML panel with matching IDs, and call initSimplePuzzle.
+   Puzzle solved state is saved to localStorage AND synced to
+   Firestore under users/{uid}.puzzles so it works across devices.
    ========================================================= */
 
 (function () {
 
   /* -------------------------------------------------------
      STEP 1: PUZZLE CODES
-     Replace the placeholder with the real 6-digit code.
      ------------------------------------------------------- */
   const VAULT_CODES = {
     puzzle1: "472988",   // The Architect's Mark (already set)
@@ -19,9 +20,6 @@
 
   /* -------------------------------------------------------
      STEP 2: REWARD NAMES AND STATEMENTS
-     - name: short title shown at top
-     - statement: full problem text with LaTeX (optional, leave "" to hide)
-     - video: link to solution video (leave "#" to hide the button)
      ------------------------------------------------------- */
   const VAULT_REWARDS = {
     puzzle1: {
@@ -48,7 +46,91 @@
 
   function markSolved(id) {
     localStorage.setItem(getSolvedKey(id), "1");
+    savePuzzlesToFirestore();
   }
+
+  /* ---------- Firestore sync for puzzle state ---------- */
+
+  let currentUser = null;
+  const rechecks = [];
+
+  function registerRecheck(fn) { rechecks.push(fn); }
+  function runRechecks() {
+    rechecks.forEach(function (fn) {
+      try { fn(); } catch (e) { console.error("recheck failed:", e); }
+    });
+  }
+
+  function getDb() {
+    return (window.firebase && typeof window.firebase.firestore === "function")
+      ? window.firebase.firestore()
+      : null;
+  }
+  function getAuth() {
+    return (window.firebase && typeof window.firebase.auth === "function")
+      ? window.firebase.auth()
+      : null;
+  }
+
+  function collectSolvedPuzzles() {
+    const out = {};
+    Object.keys(VAULT_CODES).forEach(function (pid) {
+      out[pid] = isSolved(pid);
+    });
+    return out;
+  }
+
+  function savePuzzlesToFirestore() {
+    const db = getDb();
+    if (!db || !currentUser) return;
+    const puzzles = collectSolvedPuzzles();
+    db.collection("users").doc(currentUser.uid).set(
+      { puzzles: puzzles },
+      { merge: true }
+    ).catch(function (e) {
+      console.error("puzzle sync failed:", e);
+    });
+  }
+
+  async function loadPuzzlesFromFirestore() {
+    const db = getDb();
+    if (!db || !currentUser) return;
+    try {
+      const doc = await db.collection("users").doc(currentUser.uid).get();
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.puzzles && typeof data.puzzles === "object") {
+          Object.keys(data.puzzles).forEach(function (pid) {
+            if (data.puzzles[pid] === true) {
+              localStorage.setItem(getSolvedKey(pid), "1");
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.error("puzzle load failed:", e);
+    }
+  }
+
+  function attachAuth() {
+    const authInst = getAuth();
+    if (!authInst) {
+      setTimeout(attachAuth, 100);
+      return;
+    }
+    authInst.onAuthStateChanged(async function (user) {
+      currentUser = user;
+      if (user) {
+        await loadPuzzlesFromFirestore();
+        // Push any local-only solves up to Firestore too
+        savePuzzlesToFirestore();
+      }
+      runRechecks();
+    });
+  }
+  attachAuth();
+
+  /* ---------- reward rendering ---------- */
 
   function showReward(id, msgEl, rewardPanel) {
     const r = VAULT_REWARDS[id];
@@ -193,6 +275,7 @@
 
     refreshHints();
     checkSolved();
+    registerRecheck(checkSolved);
   })();
 
   /* -------------------------------------------------------
@@ -254,6 +337,7 @@
     }
 
     checkSolved();
+    registerRecheck(checkSolved);
   }
 
   initSimplePuzzle("puzzle2", "p2code", "p2submit", "p2msg", "p2reward");
