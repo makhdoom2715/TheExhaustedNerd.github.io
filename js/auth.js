@@ -1,88 +1,76 @@
 // js/auth.js
-// DEBUG VERSION - shows errors on screen
+// Terminal-style sign in / sign out for the nav.
 
 (function () {
   const btn = document.getElementById("authBtn");
   if (!btn) return;
 
-  // On-screen log box (visible on any device, no DevTools needed)
-  const logBox = document.createElement("div");
-  logBox.style.cssText = `
-    position: fixed;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    max-height: 40vh;
-    overflow-y: auto;
-    background: #000;
-    color: #0f0;
-    font-family: monospace;
-    font-size: 11px;
-    line-height: 1.5;
-    padding: 10px;
-    border: 1px solid #0f0;
-    border-radius: 6px;
-    z-index: 99999;
-    white-space: pre-wrap;
-    word-break: break-all;
-  `;
-  function log(msg) {
-    const line = document.createElement("div");
-    line.textContent = msg;
-    logBox.appendChild(line);
-    logBox.scrollTop = logBox.scrollHeight;
-  }
-  document.body.appendChild(logBox);
-
-  log("auth.js loaded");
-  log("UA: " + navigator.userAgent);
-  log("auth defined: " + (typeof auth !== "undefined"));
-  log("googleProvider defined: " + (typeof googleProvider !== "undefined"));
-  log("currentUser: " + (auth && auth.currentUser ? auth.currentUser.email : "null"));
-
   btn.textContent = "...";
   btn.disabled = true;
 
+  // Force Google to always ask which account to use
   if (typeof googleProvider !== "undefined" && googleProvider.setCustomParameters) {
     googleProvider.setCustomParameters({ prompt: "select_account" });
-    log("set prompt:select_account");
   }
 
+  // Resolve a redirect sign-in if we just came back from one.
   if (typeof auth !== "undefined" && auth.getRedirectResult) {
-    auth.getRedirectResult().then(function (result) {
-      log("getRedirectResult ok, user: " + (result && result.user ? result.user.email : "none"));
-    }).catch(function (e) {
-      log("getRedirectResult error: " + (e && e.code ? e.code : e) + " / " + (e && e.message ? e.message : ""));
+    auth.getRedirectResult().catch(function (e) {
+      if (e && e.code && e.code !== "auth/no-auth-event" && e.code !== "auth/argument-error") {
+        console.error("Redirect sign-in failed:", e);
+      }
     });
   }
 
   auth.onAuthStateChanged(function (user) {
-    log("onAuthStateChanged: " + (user ? user.email : "null"));
     btn.disabled = false;
     if (user) {
       const name = user.displayName ? user.displayName.split(" ")[0] : "User";
       btn.textContent = name + " \u25BE";
       btn.classList.add("signed-in");
+
       btn.onclick = function (e) {
         e.stopPropagation();
-        if (confirm("Sign out?")) auth.signOut();
+        if (confirm("Sign out?")) {
+          auth.signOut();
+        }
       };
     } else {
       btn.textContent = "Sign In";
       btn.classList.remove("signed-in");
+
       btn.onclick = async function () {
-        log("--- Sign In clicked ---");
+        const steps = ["> connecting...", "> verifying...", "> opening portal..."];
+        let i = 0;
         btn.disabled = true;
-        btn.textContent = "> connecting...";
+        const interval = setInterval(() => {
+          btn.textContent = steps[i];
+          i++;
+          if (i >= steps.length) clearInterval(interval);
+        }, 350);
 
         try {
-          log("calling signInWithPopup...");
           const result = await auth.signInWithPopup(googleProvider);
-          log("popup ok: " + result.user.email);
-          btn.textContent = result.user.displayName ? result.user.displayName.split(" ")[0] + " \u25BE" : "User \u25BE";
+          clearInterval(interval);
+
+          const flash = document.createElement("div");
+          flash.textContent = "> WELCOME, " + (result.user.displayName || "USER").toUpperCase();
+          flash.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0f0;
+            color: #000;
+            font-family: monospace;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 9999;
+          `;
+          document.body.appendChild(flash);
+          setTimeout(() => flash.remove(), 3000);
         } catch (e) {
-          log("popup failed: " + (e && e.code ? e.code : e));
-          log("popup msg: " + (e && e.message ? e.message : ""));
+          clearInterval(interval);
 
           const fallbackCodes = [
             "auth/popup-blocked",
@@ -94,21 +82,20 @@
           ];
 
           if (e && fallbackCodes.indexOf(e.code) !== -1) {
-            log("falling back to redirect...");
-            btn.textContent = "> redirecting...";
             try {
+              btn.textContent = "> redirecting...";
               await auth.signInWithRedirect(googleProvider);
-              log("redirect initiated (page will reload)");
             } catch (e2) {
-              log("redirect failed: " + (e2 && e2.code ? e2.code : e2));
-              log("redirect msg: " + (e2 && e2.message ? e2.message : ""));
+              console.error("Sign-in redirect failed:", e2);
               btn.textContent = "Sign In";
               btn.disabled = false;
+              alert("Sign-in failed: " + e2.message);
             }
           } else {
-            log("no fallback for this code, stopping");
+            console.error("Sign-in failed:", e);
             btn.textContent = "Sign In";
             btn.disabled = false;
+            alert("Sign-in failed: " + e.message);
           }
         }
       };
