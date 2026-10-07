@@ -16,7 +16,6 @@
     margin: 0 auto;
   }
 
-  /* Header row: title on left, button on right */
   .mylores-header {
     display: flex;
     align-items: center;
@@ -34,7 +33,12 @@
     margin: 0;
     color: var(--text);
   }
-  .submit-lore-btn {
+  .header-btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .header-btn {
     display: inline-block;
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
@@ -48,12 +52,20 @@
     transition: all 0.15s ease;
     white-space: nowrap;
   }
-  .submit-lore-btn:hover {
+  .header-btn:hover {
     background: rgba(255,176,0,0.16);
     text-decoration: none;
   }
+  .header-btn.ghost {
+    border-color: rgba(255,255,255,0.16);
+    color: #8b8b9a;
+    background: transparent;
+  }
+  .header-btn.ghost:hover {
+    border-color: #ffb000;
+    color: #ffb000;
+  }
 
-  /* Card list */
   .mylores-list {
     display: flex;
     flex-direction: column;
@@ -206,7 +218,7 @@
     }
     .mylores-list { padding: 0 20px 32px; }
     .ml-card { padding: 18px 18px 16px; }
-    .submit-lore-btn {
+    .header-btn {
       font-size: 12px;
       padding: 10px 16px;
     }
@@ -231,8 +243,7 @@
       <li><a href="resources.html">Resources</a></li>
       <li><a href="nmtc.html">NMTC</a></li>
       <li><a href="arcade.html">Arcade</a></li>
-      <li><a href="lores.html">Lores</a></li>
-      <li><a href="my-lores.html" class="active">My Lores</a></li>
+      <li><a href="lores.html" class="active">Lores</a></li>
       <li><a href="join.html">Join Us</a></li>
     </ul>
   </nav>
@@ -243,7 +254,10 @@
   <div class="mylores-wrap">
     <div class="mylores-header">
       <h1 class="mylores-title">My Lores</h1>
-      <a href="write.html" class="submit-lore-btn">SUBMIT A LORE</a>
+      <div class="header-btn-row">
+        <a href="lores.html" class="header-btn ghost">BACK TO LORES</a>
+        <a href="write.html" class="header-btn">SUBMIT A LORE</a>
+      </div>
     </div>
 
     <div id="gate" class="gate">Checking sign-in...</div>
@@ -335,12 +349,6 @@
     return 0;
   }
 
-  function escapeHTML(s) {
-    return String(s || '').replace(/[&<>"']/g, c => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[c]));
-  }
-
   function fmtDate(v) {
     if (!v) return '';
     return new Date(ts(v)).toLocaleDateString('en-GB', {
@@ -366,13 +374,11 @@
       const card = document.createElement('div');
       card.className = 'ml-card ' + status;
 
-      // Tiles title
       const tiles = document.createElement('div');
       tiles.className = 'ml-tiles';
       renderTilesInto(tiles, data.title || 'Untitled', 12, 22);
       card.appendChild(tiles);
 
-      // Meta row: date + reading time + status badge
       const meta = document.createElement('div');
       meta.className = 'ml-meta';
       const dateStr = fmtDate(data.createdAt);
@@ -385,7 +391,6 @@
       meta.innerHTML = metaHTML;
       card.appendChild(meta);
 
-      // Blurb
       if (data.blurb) {
         const blurb = document.createElement('div');
         blurb.className = 'ml-blurb';
@@ -393,7 +398,6 @@
         card.appendChild(blurb);
       }
 
-      // Actions: open + delete
       const actions = document.createElement('div');
       actions.className = 'ml-actions';
 
