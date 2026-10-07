@@ -320,6 +320,7 @@
       <li><a href="nmtc.html">NMTC</a></li>
       <li><a href="arcade.html">Arcade</a></li>
       <li><a href="lores.html" class="active">Lores</a></li>
+      <li class="my-lores-nav"><a href="my-lores.html">My Lores</a></li>
       <li><a href="join.html">Join Us</a></li>
     </ul>
   </nav>
@@ -473,7 +474,6 @@
     const body = editor.innerHTML;
     const tag = selectedTag;
     if (!title.trim() && !body.trim() && !tag) {
-      // nothing worth saving
       return;
     }
     try {
@@ -798,7 +798,6 @@
         guard.style.display = 'none';
         page.style.display = 'block';
         hint.style.display = 'block';
-        // Only show banner once user is allowed to write
         showDraftBannerIfAny();
       } else {
         guard.innerHTML = 'You need to sign in before writing a lore.<br>Click <strong>Sign In</strong> in the top right.';
@@ -860,7 +859,6 @@
       submitMsg.className = 'submit-msg ok';
       submitMsg.textContent = 'Submitted. Wait for approval.';
 
-      // Clear draft on success
       clearDraft();
 
       titleInput.value = '';
