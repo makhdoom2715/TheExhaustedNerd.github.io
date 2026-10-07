@@ -96,7 +96,6 @@
     color: #c8c8d2;
     font-style: italic;
   }
-  /* Inline formatting survives from write.html */
   .read-body em, .read-body i { font-style: italic; }
   .read-body strong, .read-body b { font-weight: 700; }
   .read-body u { text-decoration: underline; }
@@ -142,6 +141,7 @@
     font-size: 13px;
     color: #8b8b9a;
     letter-spacing: 0.05em;
+    line-height: 1.8;
   }
 
   @media (max-width: 600px) {
@@ -170,6 +170,7 @@
       <li><a href="nmtc.html">NMTC</a></li>
       <li><a href="arcade.html">Arcade</a></li>
       <li><a href="lores.html" class="active">Lores</a></li>
+      <li class="my-lores-nav"><a href="my-lores.html">My Lores</a></li>
       <li><a href="join.html">Join Us</a></li>
     </ul>
   </nav>
@@ -199,6 +200,8 @@
 <script src="js/auth.js"></script>
 
 <script>
+  const ADMIN_UID = 'XgBatcSvxPOUwOyuttyXJzdulw2';
+
   const TILE_COLORS = [
     '#5fa8d3', '#2d5a3d', '#6ba8c9', '#a8c96a',
     '#b3b94d', '#4a90a4', '#c4d68f', '#5a6b9a',
@@ -294,20 +297,22 @@
     page.innerHTML = '<div class="read-state">' + escapeHTML(msg) + '</div>';
   }
 
-  (async () => {
+  function loadLore() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (!id) { setState('No lore specified.'); return; }
 
-    try {
-      const doc = await db.collection('lores').doc(id).get();
+    db.collection('lores').doc(id).get().then(doc => {
       if (!doc.exists) { setState('This lore does not exist.'); return; }
 
       const data = doc.data();
-      const isAdmin = firebase.auth().currentUser &&
-                      firebase.auth().currentUser.uid === 'XgBatcSvxPOUwOyuttyXJzdulw2';
+      const user = firebase.auth().currentUser;
+      const uid = user ? user.uid : null;
 
-      if (data.status !== 'approved' && !isAdmin) {
+      const isAdmin = uid === ADMIN_UID;
+      const isAuthor = uid && data.authorId && uid === data.authorId;
+
+      if (data.status !== 'approved' && !isAdmin && !isAuthor) {
         setState('This lore is not available.');
         return;
       }
@@ -363,11 +368,19 @@
       back.textContent = '\u2190 BACK TO LORES';
       page.appendChild(back);
 
-    } catch (e) {
+    }).catch(e => {
       console.error('Read load failed:', e);
       setState('Could not load this lore.');
-    }
-  })();
+    });
+  }
+
+  // Wait for auth to settle before loading, so we know who the user is.
+  let fired = false;
+  firebase.auth().onAuthStateChanged(() => {
+    if (fired) return;
+    fired = true;
+    loadLore();
+  });
 </script>
 </body>
 </html>
