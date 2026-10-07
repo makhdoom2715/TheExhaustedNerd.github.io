@@ -1,107 +1,114 @@
 // js/auth.js
-// Terminal-style sign in / sign out for the nav.
+// DEBUG VERSION - shows errors on screen
 
 (function () {
   const btn = document.getElementById("authBtn");
   if (!btn) return;
 
+  // On-screen log box (visible on any device, no DevTools needed)
+  const logBox = document.createElement("div");
+  logBox.style.cssText = `
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    max-height: 40vh;
+    overflow-y: auto;
+    background: #000;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 10px;
+    border: 1px solid #0f0;
+    border-radius: 6px;
+    z-index: 99999;
+    white-space: pre-wrap;
+    word-break: break-all;
+  `;
+  function log(msg) {
+    const line = document.createElement("div");
+    line.textContent = msg;
+    logBox.appendChild(line);
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+  document.body.appendChild(logBox);
+
+  log("auth.js loaded");
+  log("UA: " + navigator.userAgent);
+  log("auth defined: " + (typeof auth !== "undefined"));
+  log("googleProvider defined: " + (typeof googleProvider !== "undefined"));
+  log("currentUser: " + (auth && auth.currentUser ? auth.currentUser.email : "null"));
+
   btn.textContent = "...";
   btn.disabled = true;
 
-  // Use redirect on Safari and mobile where popups are blocked
-  function shouldUseRedirect() {
-    const ua = navigator.userAgent;
-    const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua);
-    const isMobile = /iPhone|iPad|iPod|Android/.test(ua);
-    return isSafari || isMobile;
-  }
-
-  // Force Google to always ask which account to use
   if (typeof googleProvider !== "undefined" && googleProvider.setCustomParameters) {
     googleProvider.setCustomParameters({ prompt: "select_account" });
+    log("set prompt:select_account");
   }
 
-  // If we just came back from a redirect sign-in, resolve it here.
-  // Without this line, the page never learns that the user signed in.
-  auth.getRedirectResult().then(function (result) {
-    if (result && result.user) {
-      console.log("Redirect sign-in resolved for:", result.user.email);
-    }
-  }).catch(function (e) {
-    // Ignore the "no redirect pending" case, log everything else
-    if (e && e.code && e.code !== "auth/no-auth-event" && e.code !== "auth/argument-error") {
-      console.error("Redirect sign-in failed:", e);
-    }
-  });
+  if (typeof auth !== "undefined" && auth.getRedirectResult) {
+    auth.getRedirectResult().then(function (result) {
+      log("getRedirectResult ok, user: " + (result && result.user ? result.user.email : "none"));
+    }).catch(function (e) {
+      log("getRedirectResult error: " + (e && e.code ? e.code : e) + " / " + (e && e.message ? e.message : ""));
+    });
+  }
 
   auth.onAuthStateChanged(function (user) {
+    log("onAuthStateChanged: " + (user ? user.email : "null"));
     btn.disabled = false;
     if (user) {
       const name = user.displayName ? user.displayName.split(" ")[0] : "User";
       btn.textContent = name + " \u25BE";
       btn.classList.add("signed-in");
-
       btn.onclick = function (e) {
         e.stopPropagation();
-        if (confirm("Sign out?")) {
-          auth.signOut();
-        }
+        if (confirm("Sign out?")) auth.signOut();
       };
     } else {
       btn.textContent = "Sign In";
       btn.classList.remove("signed-in");
-
       btn.onclick = async function () {
-        const useRedirect = shouldUseRedirect();
+        log("--- Sign In clicked ---");
+        btn.disabled = true;
+        btn.textContent = "> connecting...";
 
-        if (!useRedirect) {
-          // Popup flow with terminal boot sequence
-          const steps = ["> connecting...", "> verifying...", "> opening portal..."];
-          let i = 0;
-          btn.disabled = true;
-          const interval = setInterval(() => {
-            btn.textContent = steps[i];
-            i++;
-            if (i >= steps.length) {
-              clearInterval(interval);
-              auth.signInWithPopup(googleProvider)
-                .then((result) => {
-                  const flash = document.createElement("div");
-                  flash.textContent = "> WELCOME, " + (result.user.displayName || "USER").toUpperCase();
-                  flash.style.cssText = `
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    background: #0f0;
-                    color: #000;
-                    font-family: monospace;
-                    font-size: 14px;
-                    padding: 10px 20px;
-                    border-radius: 4px;
-                    z-index: 9999;
-                  `;
-                  document.body.appendChild(flash);
-                  setTimeout(() => flash.remove(), 3000);
-                })
-                .catch((e) => {
-                  console.error("Sign-in failed:", e);
-                  btn.textContent = "Sign In";
-                  btn.disabled = false;
-                  alert("Sign-in failed: " + e.message);
-                });
+        try {
+          log("calling signInWithPopup...");
+          const result = await auth.signInWithPopup(googleProvider);
+          log("popup ok: " + result.user.email);
+          btn.textContent = result.user.displayName ? result.user.displayName.split(" ")[0] + " \u25BE" : "User \u25BE";
+        } catch (e) {
+          log("popup failed: " + (e && e.code ? e.code : e));
+          log("popup msg: " + (e && e.message ? e.message : ""));
+
+          const fallbackCodes = [
+            "auth/popup-blocked",
+            "auth/popup-closed-by-user",
+            "auth/cancelled-popup-request",
+            "auth/operation-not-supported-in-this-environment",
+            "auth/web-storage-unsupported",
+            "auth/network-request-failed"
+          ];
+
+          if (e && fallbackCodes.indexOf(e.code) !== -1) {
+            log("falling back to redirect...");
+            btn.textContent = "> redirecting...";
+            try {
+              await auth.signInWithRedirect(googleProvider);
+              log("redirect initiated (page will reload)");
+            } catch (e2) {
+              log("redirect failed: " + (e2 && e2.code ? e2.code : e2));
+              log("redirect msg: " + (e2 && e2.message ? e2.message : ""));
+              btn.textContent = "Sign In";
+              btn.disabled = false;
             }
-          }, 350);
-        } else {
-          // Redirect flow for Safari / mobile
-          btn.disabled = true;
-          btn.textContent = "> redirecting...";
-          try {
-            await auth.signInWithRedirect(googleProvider);
-          } catch (e) {
-            console.error("Sign-in redirect failed:", e);
+          } else {
+            log("no fallback for this code, stopping");
             btn.textContent = "Sign In";
             btn.disabled = false;
-            alert("Sign-in failed: " + e.message);
           }
         }
       };
