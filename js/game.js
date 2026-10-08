@@ -17,37 +17,24 @@
     silas:    "Si"
   };
 
-  // ---- SOUND (Web Audio API, auto-trims leading silence) ----
+  // ---- SOUND (Preloaded Web Audio Buffer) ----
   const CLICK_SOUND_PATH = "assets/click.mp3";
   let audioContext = null;
   let clickBuffer = null;
-  let clickStartOffset = 0;
   let soundReady = false;
-
-  function findFirstSound(buffer) {
-    // Scan all channels for the first sample above a small threshold.
-    const threshold = 0.01;
-    const sampleRate = buffer.sampleRate;
-    const channel = buffer.getChannelData(0);
-    for (let i = 0; i < channel.length; i++) {
-      if (Math.abs(channel[i]) > threshold) {
-        // Back up 2ms so we don't clip the attack.
-        return Math.max(0, (i - Math.floor(sampleRate * 0.002)) / sampleRate);
-      }
-    }
-    return 0;
-  }
 
   function initSound() {
     if (soundReady) return;
     try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      // Create the context once, with low latency hint
+      audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        latencyHint: 'interactive'
+      });
       fetch(CLICK_SOUND_PATH)
         .then(function(res) { return res.arrayBuffer(); })
         .then(function(data) { return audioContext.decodeAudioData(data); })
         .then(function(buffer) {
           clickBuffer = buffer;
-          clickStartOffset = findFirstSound(buffer);
           soundReady = true;
         })
         .catch(function() {
@@ -60,13 +47,15 @@
 
   function playClick() {
     if (!soundReady || !audioContext || !clickBuffer) return;
+    // Resume the context if it was suspended by the browser
     if (audioContext.state === "suspended") {
       audioContext.resume();
     }
+    // Create a new source node and play the pre-decoded buffer immediately
     const source = audioContext.createBufferSource();
     source.buffer = clickBuffer;
     source.connect(audioContext.destination);
-    source.start(0, clickStartOffset);
+    source.start(0);
   }
 
   // ---- STATE ----
