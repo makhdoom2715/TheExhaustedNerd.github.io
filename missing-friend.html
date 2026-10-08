@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Ashcombe Footnote - The Exhausted Nerd</title>
-<meta name="description" content="A math detective story. Maya is missing. Her phone is in your hands.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -13,13 +12,10 @@
 <body class="game-body">
 
 <div id="gameWrap" class="game-wrap">
-
-  <!-- PHONE FRAME -->
   <div id="phoneFrame" class="phone-frame">
     <div class="phone-notch"></div>
     <div class="phone-screen" id="phoneScreen">
 
-      <!-- TOP BAR -->
       <div class="phone-topbar" id="topbar">
         <div class="topbar-left">
           <svg class="hex-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -35,7 +31,6 @@
         </div>
       </div>
 
-      <!-- STATUS PANEL (drops down) -->
       <div class="status-panel" id="statusPanel">
         <div class="status-time" id="statusTime">6:12 AM</div>
         <div class="status-date" id="statusDate">Tuesday, 14 October</div>
@@ -45,14 +40,10 @@
         </div>
       </div>
 
-      <!-- HOME SCREEN -->
       <div class="home-screen" id="homeScreen">
-        <div class="home-apps" id="homeApps">
-          <!-- apps injected by JS -->
-        </div>
+        <div class="home-apps" id="homeApps"></div>
       </div>
 
-      <!-- APP VIEW (hidden by default) -->
       <div class="app-view" id="appView">
         <div class="app-header">
           <button class="app-back" id="appBack">←</button>
@@ -66,22 +57,8 @@
 
     </div>
   </div>
-
 </div>
 
-<!-- Chat data container + individual chat files -->
-<script src="js/chats-data.js"></script>
-<script src="js/chats/chats-samira.js"></script>
-<script src="js/chats/chats-mum.js"></script>
-<script src="js/chats/chats-dad.js"></script>
-<script src="js/chats/chats-julian.js"></script>
-<script src="js/chats/chats-sterling.js"></script>
-<script src="js/chats/chats-homies.js"></script>
-<script src="js/chats/chats-olympiad.js"></script>
-<script src="js/chats/chats-filler.js"></script>
-<script src="js/chats/chats-calls.js"></script>
-
-<!-- Game logic loads last -->
-<script src="js/game.js"></script>
+<script src="js/game.js?v=99"></script>
 </body>
 </html>
