@@ -46,22 +46,25 @@
   .arcade-tile-title {
     font-family: "Space Grotesk", sans-serif;
     font-weight: 700;
-    color: #ffb000;
-    font-size: clamp(1.4rem, 3.5vw, 2.4rem);
-    letter-spacing: 0.02em;
-    margin: 0 0 8px;
-    text-shadow: 0 0 24px rgba(255, 176, 0, 0.3);
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    letter-spacing: 0.04em;
+    margin: 0 0 10px;
+    background: linear-gradient(180deg, #ffd76b 0%, #ffb000 40%, #cc7a00 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow:
+      0 0 30px rgba(255, 176, 0, 0.25),
+      0 2px 4px rgba(0, 0, 0, 0.5);
   }
 
   .arcade-tile-subtitle {
     font-family: "Inter", sans-serif;
     font-style: italic;
-    color: rgba(230, 230, 230, 0.85);
+    color: rgba(230, 230, 230, 0.7);
     font-size: clamp(0.85rem, 1.6vw, 1.1rem);
     margin: 0;
-    border-bottom: 1px solid rgba(230, 230, 230, 0.2);
-    padding-bottom: 3px;
-    display: inline-block;
+    letter-spacing: 0.02em;
   }
 
   .arcade-tile-btn {
