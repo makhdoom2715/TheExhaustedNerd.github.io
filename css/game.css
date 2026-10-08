@@ -287,6 +287,11 @@
   flex-shrink: 0;
 }
 
+/* When a chat thread is open, hide the app header so the thread header sits at the top */
+.app-view:has(.app-content.chat-view) .app-header {
+  display: none;
+}
+
 .app-back {
   background: none;
   border: none;
