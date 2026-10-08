@@ -245,7 +245,6 @@
   white-space: nowrap;
 }
 
-/* App colors */
 .app-chats    .app-icon-box { background: #1a6bff; }
 .app-gallery  .app-icon-box { background: #3a3a4a; }
 .app-diary    .app-icon-box { background: #8b5e3c; }
@@ -313,6 +312,8 @@
 .app-content {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 24px 20px;
   min-height: 0;
 }
@@ -394,7 +395,7 @@
 .chat-list {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  padding-bottom: 40px;
 }
 
 .chat-row {
@@ -588,7 +589,8 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 16px 14px 32px;
+  overscroll-behavior: contain;
+  padding: 16px 14px 24px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -599,15 +601,38 @@
 .thread-footer {
   flex-shrink: 0;
   min-height: 33%;
-  background: #86B2B3;
+  background: #3F6C71;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  gap: 12px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 13px;
-  color: rgba(30, 55, 58, 0.55);
+  color: rgba(240, 247, 247, 0.65);
   letter-spacing: 0.02em;
+}
+
+/* Reply buttons (used later when story engine runs, style ready now) */
+.thread-reply-btn {
+  width: 100%;
+  max-width: 340px;
+  background: #86B2B3;
+  color: #1f3a3d;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: opacity 0.15s ease;
+}
+
+.thread-reply-btn:hover {
+  opacity: 0.9;
 }
 
 .thread-empty {
@@ -693,6 +718,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding-bottom: 40px;
 }
 
 .call-row {
