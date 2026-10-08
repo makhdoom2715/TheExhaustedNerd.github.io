@@ -17,6 +17,27 @@
     silas:    "Si"
   };
 
+  // ---- SOUND ----
+  const CLICK_SOUND_PATH = "assets/click.mp3";
+  let clickSound = null;
+  let soundReady = false;
+
+  function initSound() {
+    if (soundReady) return;
+    clickSound = new Audio(CLICK_SOUND_PATH);
+    clickSound.volume = 1.0;
+    clickSound.load();
+    soundReady = true;
+  }
+
+  function playClick() {
+    if (!soundReady) return;
+    clickSound.currentTime = 0;
+    clickSound.play().catch(function() {
+      // Browsers block sound until first tap. This is fine.
+    });
+  }
+
   // ---- STATE ----
   let currentApp = null;
   let statusPanelOpen = false;
@@ -98,6 +119,7 @@
         '<div class="app-icon-box">' + app.icon + "</div>" +
         '<span class="app-icon-label">' + app.name + "</span>";
       btn.addEventListener("click", function() {
+        playClick();
         openApp(app.id);
       });
       homeApps.appendChild(btn);
@@ -147,6 +169,7 @@
 
   // ---- STATUS PANEL ----
   function toggleStatusPanel() {
+    playClick();
     statusPanelOpen = !statusPanelOpen;
     if (statusPanelOpen) {
       statusPanel.classList.add("open");
@@ -171,6 +194,7 @@
 
   // ---- INIT ----
   function init() {
+    initSound();
     renderApps();
     updateClock();
 
@@ -186,7 +210,10 @@
       }
     });
 
-    appBack.addEventListener("click", closeApp);
+    appBack.addEventListener("click", function() {
+      playClick();
+      closeApp();
+    });
 
     document.addEventListener("keydown", function(e) {
       if (e.key === "Escape") {
