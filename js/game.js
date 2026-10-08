@@ -1,6 +1,6 @@
 /* =========================================================
    THE ASHCOMBE FOOTNOTE - Game logic
-   Session 2: Chats + Calls
+   Session 2: Chats + Calls + Mail
    ========================================================= */
 
 (function() {
@@ -41,6 +41,7 @@
   // ---- STATE ----
   var currentApp = null;
   var currentThread = null;
+  var currentMailId = null;
   var statusPanelOpen = false;
 
   // ---- DOM REFS ----
@@ -140,6 +141,40 @@
 
   var HANDSET_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
 
+  // ---- HEADER HELPERS ----
+  function getSpacer() {
+    return appView.querySelector(".app-spacer");
+  }
+
+  function showMailBack() {
+    appBack.style.display = "";
+    var spacer = getSpacer();
+    if (spacer) spacer.style.display = "";
+    var closeBtn = document.getElementById("appClose");
+    if (closeBtn) closeBtn.style.display = "none";
+  }
+
+  function showMailClose() {
+    appBack.style.display = "none";
+    var spacer = getSpacer();
+    if (spacer) spacer.style.display = "none";
+
+    var closeBtn = document.getElementById("appClose");
+    if (!closeBtn) {
+      closeBtn = document.createElement("button");
+      closeBtn.className = "app-close";
+      closeBtn.id = "appClose";
+      closeBtn.setAttribute("aria-label", "Close email");
+      closeBtn.textContent = "×";
+      appBack.parentNode.appendChild(closeBtn);
+      closeBtn.addEventListener("click", function() {
+        playClick();
+        renderMail();
+      });
+    }
+    closeBtn.style.display = "";
+  }
+
   // ---- RENDER APP ICONS ----
   function renderApps() {
     homeApps.innerHTML = "";
@@ -170,12 +205,24 @@
 
     currentApp = appId;
     currentThread = null;
+    currentMailId = null;
+
+    // Reset header to default (back arrow visible, no close)
+    appBack.style.display = "";
+    var spacerReset = getSpacer();
+    if (spacerReset) spacerReset.style.display = "";
+    var closeReset = document.getElementById("appClose");
+    if (closeReset) closeReset.style.display = "none";
+    appView.classList.remove("mail-reading");
+
     appTitle.textContent = app.name;
 
     if (appId === "chats") {
       renderContactList();
     } else if (appId === "phone") {
       renderCalls();
+    } else if (appId === "mail") {
+      renderMail();
     } else {
       var placeholders = {
         gallery:  "No photos yet. Maya's gallery is locked.",
@@ -183,7 +230,6 @@
         browser:  "URL bar coming soon.",
         casebook: "No clues logged yet.",
         settings: "Sound: OFF. Reset progress coming soon.",
-        mail:     "No emails yet.",
         files:    "No files yet.",
         locket:   "No posts yet."
       };
@@ -213,6 +259,12 @@
       appContent.style.padding = "";
       currentApp = null;
       currentThread = null;
+      currentMailId = null;
+      appBack.style.display = "";
+      var spacerEnd = getSpacer();
+      if (spacerEnd) spacerEnd.style.display = "";
+      var closeEnd = document.getElementById("appClose");
+      if (closeEnd) closeEnd.style.display = "none";
     }, 300);
   }
 
@@ -275,7 +327,6 @@
 
     var html = "";
 
-    // Header
     html += '<div class="thread-header">';
     html +=   '<div class="thread-header-left">';
     html +=     '<span class="thread-avatar" style="background:' + c.avatarColor + '">' + c.avatarInitials + '</span>';
@@ -289,7 +340,6 @@
     html +=   '<button class="thread-close" id="threadClose" aria-label="Close thread">×</button>';
     html += '</div>';
 
-    // Body
     html += '<div class="thread-body" id="threadBody">';
 
     if (!c.messages || c.messages.length === 0) {
@@ -320,7 +370,6 @@
 
     html += '</div>';
 
-    // Footer strip - big empty area, currently shows "Name is offline"
     html += '<div class="thread-footer">' + c.name + ' is offline</div>';
 
     appContent.innerHTML = html;
@@ -374,6 +423,106 @@
         playClick();
       });
     }
+  }
+
+  // ---- RENDER MAIL (inbox) ----
+  function renderMail() {
+    currentMailId = null;
+    showMailBack();
+    appView.classList.remove("mail-reading");
+
+    appTitle.textContent = "Mail";
+    appContent.classList.remove("chat-view");
+    appContent.style.padding = "0";
+
+    var emails = window.MAIL_DATA || [];
+
+    var html = '<div class="mail-list">';
+    html += '<div class="mail-inbox-label">INBOX</div>';
+
+    for (var i = 0; i < emails.length; i++) {
+      var e = emails[i];
+      var initial = e.sender.charAt(0).toUpperCase();
+
+      html += '<button class="mail-row" data-id="' + e.id + '">';
+      html +=   '<span class="mail-avatar">' + initial + '</span>';
+      html +=   '<span class="mail-row-body">';
+      html +=     '<span class="mail-row-sender">' + e.sender + '</span>';
+      html +=     '<span class="mail-row-subject">' + e.subject + '</span>';
+      html +=   '</span>';
+      html += '</button>';
+    }
+
+    html += '</div>';
+
+    appContent.innerHTML = html;
+    appContent.scrollTop = 0;
+
+    var rows = appContent.querySelectorAll(".mail-row");
+    for (var j = 0; j < rows.length; j++) {
+      (function(row) {
+        row.addEventListener("click", function() {
+          playClick();
+          openMailItem(row.getAttribute("data-id"));
+        });
+      })(rows[j]);
+    }
+  }
+
+  // ---- OPEN EMAIL ----
+  function openMailItem(id) {
+    var emails = window.MAIL_DATA || [];
+    var email = null;
+    for (var i = 0; i < emails.length; i++) {
+      if (emails[i].id === id) { email = emails[i]; break; }
+    }
+    if (!email) return;
+
+    currentMailId = id;
+    email.read = true;
+
+    showMailClose();
+    appView.classList.add("mail-reading");
+
+    appTitle.textContent = "Mail";
+    appContent.classList.remove("chat-view");
+    appContent.style.padding = "0";
+
+    var initial = email.sender.charAt(0).toUpperCase();
+
+    var html = '<div class="mail-reading">';
+
+    html += '<h1 class="mail-reading-subject">' + email.subject + '</h1>';
+
+    html += '<div class="mail-reading-meta">';
+    html +=   '<span class="mail-reading-avatar">' + initial + '</span>';
+    html +=   '<div class="mail-reading-from">';
+    html +=     '<div class="mail-reading-email">' + email.email + '</div>';
+    html +=     '<div class="mail-reading-to">to me</div>';
+    html +=   '</div>';
+    html += '</div>';
+
+    html += '<div class="mail-reading-body">';
+    var paragraphs = email.body.split("\n\n");
+    for (var p = 0; p < paragraphs.length; p++) {
+      var lines = paragraphs[p].split("\n");
+      html += '<p>';
+      for (var l = 0; l < lines.length; l++) {
+        if (l > 0) html += '<br>';
+        html += lines[l];
+      }
+      html += '</p>';
+    }
+    html += '</div>';
+
+    if (email.image && email.image.length > 0) {
+      html += '<div class="mail-reading-image"><img src="' + email.image + '" alt=""></div>';
+    }
+
+    html += '</div>';
+
+    appContent.innerHTML = html;
+    appContent.scrollTop = 0;
   }
 
   // ---- STATUS PANEL ----
@@ -434,6 +583,8 @@
         if (currentThread) {
           renderContactList();
           currentThread = null;
+        } else if (currentMailId) {
+          renderMail();
         } else if (currentApp) {
           closeApp();
         } else if (statusPanelOpen) {
