@@ -109,6 +109,26 @@
   font-weight: 500;
 }
 
+/* Battery icon - 4 bars */
+.battery-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 2px;
+}
+
+.battery-icon .bar {
+  display: block;
+  width: 3px;
+  height: 8px;
+  background: #8b8b9a;
+  border-radius: 1px;
+}
+
+.battery-icon .bar.empty {
+  background: rgba(139, 139, 154, 0.3);
+}
+
 /* ---------- STATUS PANEL ---------- */
 .status-panel {
   position: absolute;
@@ -177,7 +197,7 @@
   background: #0d0d14;
   background-image: url('../assets/wallpaper.jpg');
   background-size: cover;
-  background-position: center 42%;
+  background-position: center 70%;
   background-repeat: no-repeat;
 }
 
@@ -275,7 +295,7 @@
 .app-header {
   display: flex;
   align-items: center;
-  padding: 14px 16px;
+  padding: 26px 20px 22px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   flex-shrink: 0;
 }
@@ -283,8 +303,8 @@
 .app-back {
   background: none;
   border: none;
-  color: #ffb000;
-  font-size: 22px;
+  color: #e6e6e6;
+  font-size: 26px;
   cursor: pointer;
   padding: 4px 8px;
   line-height: 1;
@@ -293,11 +313,12 @@
 
 .app-title {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
   color: #e6e6e6;
   flex: 1;
   text-align: center;
+  letter-spacing: 0.01em;
 }
 
 .app-spacer {
@@ -311,12 +332,84 @@
 }
 
 .app-placeholder {
-  color: #55555f;
+  color: #8b8b9a;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 14px;
   text-align: center;
   margin-top: 60px;
 }
+
+/* ---------- PER-APP THEMES ---------- */
+
+/* Chats */
+.app-view.app-chats .app-header  { background: #3F6C71; }
+.app-view.app-chats .app-content { background: #86B2B3; }
+.app-view.app-chats .app-back,
+.app-view.app-chats .app-title   { color: #f0f7f7; }
+.app-view.app-chats .app-placeholder { color: #1f3a3d; }
+
+/* Phone */
+.app-view.app-phone .app-header  { background: #030E0C; }
+.app-view.app-phone .app-content { background: #163229; }
+.app-view.app-phone .app-back,
+.app-view.app-phone .app-title   { color: #cfe3dd; }
+.app-view.app-phone .app-placeholder { color: #86b2a3; }
+
+/* Mail */
+.app-view.app-mail .app-header  { background: #140302; }
+.app-view.app-mail .app-content { background: #241312; }
+.app-view.app-mail .app-back,
+.app-view.app-mail .app-title   { color: #f0d8d6; }
+.app-view.app-mail .app-placeholder { color: #a37a76; }
+
+/* Diary */
+.app-view.app-diary .app-header  { background: #1a242f; }
+.app-view.app-diary .app-content { background: #f4f4f9; }
+.app-view.app-diary .app-back,
+.app-view.app-diary .app-title   { color: #f4f4f9; }
+.app-view.app-diary .app-placeholder { color: #4a5060; }
+
+/* Browser */
+.app-view.app-browser .app-header  { background: #2c3539; }
+.app-view.app-browser .app-content { background: #64767d; }
+.app-view.app-browser .app-back,
+.app-view.app-browser .app-title   { color: #e8eef0; }
+.app-view.app-browser .app-placeholder { color: #1f282c; }
+
+/* Files */
+.app-view.app-files .app-header  { background: #3a3b2c; }
+.app-view.app-files .app-content { background: #72745e; }
+.app-view.app-files .app-back,
+.app-view.app-files .app-title   { color: #eef0e3; }
+.app-view.app-files .app-placeholder { color: #2a2b20; }
+
+/* Settings */
+.app-view.app-settings .app-header  { background: #36312d; }
+.app-view.app-settings .app-content { background: #7a726a; }
+.app-view.app-settings .app-back,
+.app-view.app-settings .app-title   { color: #ebe6e1; }
+.app-view.app-settings .app-placeholder { color: #2b2622; }
+
+/* Locket */
+.app-view.app-locket .app-header  { background: #42272e; }
+.app-view.app-locket .app-content { background: #825864; }
+.app-view.app-locket .app-back,
+.app-view.app-locket .app-title   { color: #f2dee3; }
+.app-view.app-locket .app-placeholder { color: #2e181d; }
+
+/* Gallery */
+.app-view.app-gallery .app-header  { background: #4a2511; }
+.app-view.app-gallery .app-content { background: #8c5535; }
+.app-view.app-gallery .app-back,
+.app-view.app-gallery .app-title   { color: #f6e2d6; }
+.app-view.app-gallery .app-placeholder { color: #2f1608; }
+
+/* Casebook */
+.app-view.app-casebook .app-header  { background: #2d1b2e; }
+.app-view.app-casebook .app-content { background: #5b405c; }
+.app-view.app-casebook .app-back,
+.app-view.app-casebook .app-title   { color: #ecd8ed; }
+.app-view.app-casebook .app-placeholder { color: #201120; }
 
 /* ---------- RESPONSIVE ---------- */
 
