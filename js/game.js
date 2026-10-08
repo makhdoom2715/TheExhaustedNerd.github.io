@@ -148,6 +148,9 @@
 
   var HANDSET_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
 
+  var HOME_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
+  var CLOSE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
   // ---- HEADER HELPERS ----
   function getSpacer() {
     return appView.querySelector(".app-spacer");
@@ -221,6 +224,9 @@
     if (closeReset) closeReset.style.display = "none";
     appView.classList.remove("mail-reading");
 
+    appContent.classList.remove("chat-view");
+    appContent.classList.remove("browser-view");
+
     appTitle.textContent = app.name;
 
     if (appId === "chats") {
@@ -241,7 +247,6 @@
         files:    "No files yet.",
         locket:   "No posts yet."
       };
-      appContent.classList.remove("chat-view");
       appContent.style.padding = "";
       appContent.innerHTML = '<p class="app-placeholder">' +
         (placeholders[appId] || "This app is empty for now.") + '</p>';
@@ -264,6 +269,7 @@
       appView.className = "app-view";
       appContent.innerHTML = "";
       appContent.classList.remove("chat-view");
+      appContent.classList.remove("browser-view");
       appContent.style.padding = "";
       currentApp = null;
       currentThread = null;
@@ -279,6 +285,7 @@
   // ---- RENDER CONTACT LIST ----
   function renderContactList() {
     appContent.classList.remove("chat-view");
+    appContent.classList.remove("browser-view");
     appContent.style.padding = "0";
 
     var html = '<div class="chat-list">';
@@ -402,6 +409,7 @@
   // ---- RENDER CALLS ----
   function renderCalls() {
     appContent.classList.remove("chat-view");
+    appContent.classList.remove("browser-view");
     appContent.style.padding = "0";
 
     var calls = window.CALLS_DATA || [];
@@ -441,6 +449,7 @@
 
     appTitle.textContent = "Mail";
     appContent.classList.remove("chat-view");
+    appContent.classList.remove("browser-view");
     appContent.style.padding = "0";
 
     var emails = window.MAIL_DATA || [];
@@ -536,13 +545,13 @@
   // ---- RENDER SETTINGS ----
   function renderSettings() {
     appContent.classList.remove("chat-view");
+    appContent.classList.remove("browser-view");
     appContent.style.padding = "0";
 
     var s = window.SETTINGS_DATA || {};
 
     var html = '<div class="settings-list">';
 
-    // Account
     html += '<button class="settings-row" data-action="account">';
     html +=   '<span class="settings-icon">👤</span>';
     html +=   '<span class="settings-row-body">';
@@ -552,7 +561,6 @@
     html +=   '<span class="settings-row-value">' + (s.account ? s.account.status : "") + '</span>';
     html += '</button>';
 
-    // Sound
     html += '<div class="settings-row">';
     html +=   '<span class="settings-icon">🔊</span>';
     html +=   '<span class="settings-row-body">';
@@ -564,7 +572,6 @@
     html +=   '</button>';
     html += '</div>';
 
-    // Share
     html += '<button class="settings-row" data-action="share">';
     html +=   '<span class="settings-icon">🔗</span>';
     html +=   '<span class="settings-row-body">';
@@ -574,7 +581,6 @@
     html +=   '<span class="settings-row-arrow">›</span>';
     html += '</button>';
 
-    // Rate
     html += '<button class="settings-row" data-action="rate">';
     html +=   '<span class="settings-icon">⭐</span>';
     html +=   '<span class="settings-row-body">';
@@ -584,7 +590,6 @@
     html +=   '<span class="settings-row-arrow">›</span>';
     html += '</button>';
 
-    // Reset Progress
     html += '<button class="settings-row" data-action="reset">';
     html +=   '<span class="settings-icon">🔄</span>';
     html +=   '<span class="settings-row-body">';
@@ -594,7 +599,6 @@
     html +=   '<span class="settings-row-arrow">›</span>';
     html += '</button>';
 
-    // Need Help
     html += '<button class="settings-row" data-action="help">';
     html +=   '<span class="settings-icon">❓</span>';
     html +=   '<span class="settings-row-body">';
@@ -604,7 +608,6 @@
     html +=   '<span class="settings-row-arrow">›</span>';
     html += '</button>';
 
-    // Suggestion
     html += '<button class="settings-row" data-action="suggestion">';
     html +=   '<span class="settings-icon">💡</span>';
     html +=   '<span class="settings-row-body">';
@@ -614,7 +617,6 @@
     html +=   '<span class="settings-row-arrow">›</span>';
     html += '</button>';
 
-    // Socials
     html += '<div class="settings-socials">';
     if (s.socials) {
       for (var i = 0; i < s.socials.length; i++) {
@@ -627,7 +629,6 @@
     }
     html += '</div>';
 
-    // Version
     html += '<div class="settings-version">Version ' + (s.version || "1.0.0") + '</div>';
 
     html += '</div>';
@@ -775,6 +776,7 @@
 
   function renderBrowser() {
     appContent.classList.remove("chat-view");
+    appContent.classList.add("browser-view");
     appContent.style.padding = "0";
 
     browserHistory = ["synapse.search"];
@@ -782,25 +784,28 @@
 
     var html = '';
     html += '<div class="browser-shell">';
-    html +=   '<div class="browser-urlbar">';
-    html +=     '<button class="browser-nav-btn" id="browserHome" aria-label="Home">';
-    html +=       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
+
+    html +=   '<div class="browser-strip">';
+    html +=     '<button class="browser-home-btn" id="browserHome" aria-label="Home">';
+    html +=       HOME_ICON;
     html +=     '</button>';
-    html +=     '<input type="text" class="browser-url-input" id="browserUrlInput" value="synapse.search" autocomplete="off" spellcheck="false" autocapitalize="off">';
-    html +=     '<button class="browser-nav-btn" id="browserBackBtn" aria-label="Back" disabled>';
-    html +=       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+    html +=     '<input type="text" class="browser-url-input" id="browserUrlInput" placeholder="Enter website..." autocomplete="off" spellcheck="false" autocapitalize="off">';
+    html +=     '<button class="browser-close-btn" id="browserClose" aria-label="Close">';
+    html +=       CLOSE_ICON;
     html +=     '</button>';
     html +=   '</div>';
-    html +=   '<div class="browser-view">';
-    html +=     '<iframe class="browser-frame" id="browserFrame" src="sites/sites-search.html" title="Browser"></iframe>';
+
+    html +=   '<div class="browser-body" id="browserBody">';
+    html +=     renderBrowserRecentView();
     html +=   '</div>';
+
     html += '</div>';
 
     appContent.innerHTML = html;
 
     var input = document.getElementById("browserUrlInput");
     var homeBtn = document.getElementById("browserHome");
-    var backBtn = document.getElementById("browserBackBtn");
+    var closeBtn = document.getElementById("browserClose");
 
     if (input) {
       input.addEventListener("keydown", function(e) {
@@ -819,11 +824,55 @@
       });
     }
 
-    if (backBtn) {
-      backBtn.addEventListener("click", function() {
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function() {
         playClick();
-        goBrowserBack();
+        closeApp();
       });
+    }
+  }
+
+  function renderBrowserRecentView() {
+    var sites = (window.BROWSER_DATA && window.BROWSER_DATA.sites) || [];
+    var html = '';
+
+    html += '<div class="browser-section-label">Recently visited</div>';
+    html += '<div class="browser-recent-box">';
+
+    var hasAny = false;
+    for (var i = 0; i < sites.length; i++) {
+      if (sites[i].unlocked) {
+        hasAny = true;
+        html += '<button class="browser-recent-item" data-url="' + sites[i].url + '">' + sites[i].url + '</button>';
+      }
+    }
+
+    if (!hasAny) {
+      html += '<div class="browser-recent-item" style="cursor:default;color:rgba(234,243,238,0.4);">No history yet</div>';
+    }
+
+    html += '</div>';
+
+    return html;
+  }
+
+  function renderBrowserSiteView(file) {
+    return '<iframe class="browser-frame" id="browserFrame" src="' + file + '" title="Browser"></iframe>';
+  }
+
+  function wireBrowserRecentButtons() {
+    var body = document.getElementById("browserBody");
+    if (!body) return;
+    var items = body.querySelectorAll(".browser-recent-item");
+    for (var i = 0; i < items.length; i++) {
+      (function(btn) {
+        var url = btn.getAttribute("data-url");
+        if (!url) return;
+        btn.addEventListener("click", function() {
+          playClick();
+          attemptNavigate(url);
+        });
+      })(items[i]);
     }
   }
 
@@ -845,81 +894,43 @@
     var cleaned = normalizeUrl(rawUrl);
     if (!cleaned) return;
 
-    // Homepage special case
     if (cleaned === "synapse.search" || cleaned === "synapse") {
       goBrowserHome();
       return;
     }
 
     var match = findSite(cleaned);
-    if (!match) return; // nothing happens
-    if (!match.unlocked) return; // locked, nothing happens
+    if (!match) return;
+    if (!match.unlocked) return;
 
     loadSiteInBrowser(match.file, match.url);
   }
 
   function loadSiteInBrowser(file, displayUrl) {
-    var frame = document.getElementById("browserFrame");
+    var body = document.getElementById("browserBody");
     var input = document.getElementById("browserUrlInput");
-    if (!frame) return;
+    if (!body) return;
 
-    // Trim forward history if we navigated back then branched
     browserHistory = browserHistory.slice(0, browserIndex + 1);
     browserHistory.push(displayUrl);
     browserIndex = browserHistory.length - 1;
 
-    frame.src = file;
+    body.innerHTML = renderBrowserSiteView(file);
     if (input) input.value = displayUrl;
-
-    updateBrowserBackBtn();
   }
 
   function goBrowserHome() {
-    var frame = document.getElementById("browserFrame");
+    var body = document.getElementById("browserBody");
     var input = document.getElementById("browserUrlInput");
-    if (!frame) return;
+    if (!body) return;
 
     browserHistory = browserHistory.slice(0, browserIndex + 1);
     browserHistory.push("synapse.search");
     browserIndex = browserHistory.length - 1;
 
-    frame.src = "sites/sites-search.html";
-    if (input) input.value = "synapse.search";
-
-    updateBrowserBackBtn();
-  }
-
-  function goBrowserBack() {
-    if (browserIndex <= 0) return;
-    browserIndex--;
-    var url = browserHistory[browserIndex];
-
-    var frame = document.getElementById("browserFrame");
-    var input = document.getElementById("browserUrlInput");
-    if (!frame) return;
-
-    if (url === "synapse.search") {
-      frame.src = "sites/sites-search.html";
-    } else {
-      var site = findSite(normalizeUrl(url));
-      if (site) frame.src = site.file;
-    }
-
-    if (input) input.value = url;
-
-    updateBrowserBackBtn();
-  }
-
-  function updateBrowserBackBtn() {
-    var btn = document.getElementById("browserBackBtn");
-    if (!btn) return;
-    if (browserIndex <= 0) {
-      btn.disabled = true;
-      btn.style.opacity = "0.35";
-    } else {
-      btn.disabled = false;
-      btn.style.opacity = "1";
-    }
+    body.innerHTML = renderBrowserRecentView();
+    wireBrowserRecentButtons();
+    if (input) input.value = "";
   }
 
   // Listen for postMessage from sites inside the iframe
@@ -998,6 +1009,9 @@
         }
       }
     });
+
+    // Wire recent buttons on first render
+    wireBrowserRecentButtons();
   }
 
   if (document.readyState === "loading") {
