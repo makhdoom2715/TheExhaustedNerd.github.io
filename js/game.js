@@ -1,6 +1,6 @@
 /* =========================================================
    THE ASHCOMBE FOOTNOTE - Game logic
-   Session 3: Chats + Calls + Mail + Settings
+   Session 4: Chats + Calls + Mail + Settings + Browser
    ========================================================= */
 
 (function() {
@@ -46,6 +46,10 @@
   var currentMailId = null;
   var statusPanelOpen = false;
   var resetEpisodeIndex = 2;
+
+  // Browser state
+  var browserHistory = [];
+  var browserIndex = -1;
 
   // ---- DOM REFS ----
   var homeApps = document.getElementById("homeApps");
@@ -227,11 +231,12 @@
       renderMail();
     } else if (appId === "settings") {
       renderSettings();
+    } else if (appId === "browser") {
+      renderBrowser();
     } else {
       var placeholders = {
         gallery:  "No photos yet. Maya's gallery is locked.",
         diary:    "No entries yet. Maya's diary is locked.",
-        browser:  "URL bar coming soon.",
         casebook: "No clues logged yet.",
         files:    "No files yet.",
         locket:   "No posts yet."
@@ -629,7 +634,6 @@
 
     appContent.innerHTML = html;
 
-    // Wire up sound toggle
     var soundToggle = document.getElementById("soundToggle");
     if (soundToggle) {
       soundToggle.addEventListener("click", function(e) {
@@ -640,7 +644,6 @@
       });
     }
 
-    // Wire up action buttons
     var actionButtons = appContent.querySelectorAll(".settings-row[data-action]");
     for (var j = 0; j < actionButtons.length; j++) {
       (function(btn) {
@@ -765,6 +768,165 @@
       modal.classList.add("open");
     }, 10);
   }
+
+  // =========================================================
+  // BROWSER APP
+  // =========================================================
+
+  function renderBrowser() {
+    appContent.classList.remove("chat-view");
+    appContent.style.padding = "0";
+
+    browserHistory = ["synapse.search"];
+    browserIndex = 0;
+
+    var html = '';
+    html += '<div class="browser-shell">';
+    html +=   '<div class="browser-urlbar">';
+    html +=     '<button class="browser-nav-btn" id="browserHome" aria-label="Home">';
+    html +=       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
+    html +=     '</button>';
+    html +=     '<input type="text" class="browser-url-input" id="browserUrlInput" value="synapse.search" autocomplete="off" spellcheck="false" autocapitalize="off">';
+    html +=     '<button class="browser-nav-btn" id="browserBackBtn" aria-label="Back" disabled>';
+    html +=       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+    html +=     '</button>';
+    html +=   '</div>';
+    html +=   '<div class="browser-view">';
+    html +=     '<iframe class="browser-frame" id="browserFrame" src="sites/sites-search.html" title="Browser"></iframe>';
+    html +=   '</div>';
+    html += '</div>';
+
+    appContent.innerHTML = html;
+
+    var input = document.getElementById("browserUrlInput");
+    var homeBtn = document.getElementById("browserHome");
+    var backBtn = document.getElementById("browserBackBtn");
+
+    if (input) {
+      input.addEventListener("keydown", function(e) {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        var val = input.value.trim();
+        if (!val) return;
+        attemptNavigate(val);
+      });
+    }
+
+    if (homeBtn) {
+      homeBtn.addEventListener("click", function() {
+        playClick();
+        goBrowserHome();
+      });
+    }
+
+    if (backBtn) {
+      backBtn.addEventListener("click", function() {
+        playClick();
+        goBrowserBack();
+      });
+    }
+  }
+
+  function normalizeUrl(raw) {
+    return raw.replace(/^https?:\/\//i, "").toLowerCase().replace(/\/+$/, "").trim();
+  }
+
+  function findSite(url) {
+    var sites = (window.BROWSER_DATA && window.BROWSER_DATA.sites) || [];
+    for (var i = 0; i < sites.length; i++) {
+      if (normalizeUrl(sites[i].url) === url) {
+        return sites[i];
+      }
+    }
+    return null;
+  }
+
+  function attemptNavigate(rawUrl) {
+    var cleaned = normalizeUrl(rawUrl);
+    if (!cleaned) return;
+
+    // Homepage special case
+    if (cleaned === "synapse.search" || cleaned === "synapse") {
+      goBrowserHome();
+      return;
+    }
+
+    var match = findSite(cleaned);
+    if (!match) return; // nothing happens
+    if (!match.unlocked) return; // locked, nothing happens
+
+    loadSiteInBrowser(match.file, match.url);
+  }
+
+  function loadSiteInBrowser(file, displayUrl) {
+    var frame = document.getElementById("browserFrame");
+    var input = document.getElementById("browserUrlInput");
+    if (!frame) return;
+
+    // Trim forward history if we navigated back then branched
+    browserHistory = browserHistory.slice(0, browserIndex + 1);
+    browserHistory.push(displayUrl);
+    browserIndex = browserHistory.length - 1;
+
+    frame.src = file;
+    if (input) input.value = displayUrl;
+
+    updateBrowserBackBtn();
+  }
+
+  function goBrowserHome() {
+    var frame = document.getElementById("browserFrame");
+    var input = document.getElementById("browserUrlInput");
+    if (!frame) return;
+
+    browserHistory = browserHistory.slice(0, browserIndex + 1);
+    browserHistory.push("synapse.search");
+    browserIndex = browserHistory.length - 1;
+
+    frame.src = "sites/sites-search.html";
+    if (input) input.value = "synapse.search";
+
+    updateBrowserBackBtn();
+  }
+
+  function goBrowserBack() {
+    if (browserIndex <= 0) return;
+    browserIndex--;
+    var url = browserHistory[browserIndex];
+
+    var frame = document.getElementById("browserFrame");
+    var input = document.getElementById("browserUrlInput");
+    if (!frame) return;
+
+    if (url === "synapse.search") {
+      frame.src = "sites/sites-search.html";
+    } else {
+      var site = findSite(normalizeUrl(url));
+      if (site) frame.src = site.file;
+    }
+
+    if (input) input.value = url;
+
+    updateBrowserBackBtn();
+  }
+
+  function updateBrowserBackBtn() {
+    var btn = document.getElementById("browserBackBtn");
+    if (!btn) return;
+    if (browserIndex <= 0) {
+      btn.disabled = true;
+      btn.style.opacity = "0.35";
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = "1";
+    }
+  }
+
+  // Listen for postMessage from sites inside the iframe
+  window.addEventListener("message", function(e) {
+    if (!e.data || e.data.type !== "browser-navigate") return;
+    attemptNavigate(e.data.url);
+  });
 
   // ---- STATUS PANEL ----
   function toggleStatusPanel() {
