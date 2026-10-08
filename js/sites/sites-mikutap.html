@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mikutap</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    background: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 2px;
+    padding: 4px;
+  }
+
+  .pad {
+    background: #232121;
+    border-radius: 4px;
+    transition: background 0.1s ease, transform 0.1s ease;
+    cursor: pointer;
+  }
+
+  .pad.active {
+    transform: scale(0.94);
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 14px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 11px;
+    color: #4a4a4a;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage" id="stage"></div>
+  <div class="hint">TAP OR DRAG</div>
+
+<script>
+(function() {
+  "use strict";
+
+  var COLS = 8;
+  var ROWS = 8;
+  var TOTAL = COLS * ROWS;
+
+  var stage = document.getElementById("stage");
+  var audioContext = null;
+  var masterGain = null;
+  var pads = [];
+
+  // Musical scale (pentatonic, easy on the ears)
+  var scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+
+  // Colors for visual feedback
+  var colors = [
+    "#ffb000", "#00d4aa", "#ff6b6b", "#4a9dff",
+    "#c9a6ff", "#ffd76b", "#6bffb8", "#ff9ecd"
+  ];
+
+  function initAudio() {
+    if (audioContext) return;
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioContext.createGain();
+      masterGain.gain.value = 0.18;
+      masterGain.connect(audioContext.destination);
+    } catch (e) {}
+  }
+
+  function playNote(index) {
+    if (!audioContext) return;
+
+    var freq = scale[index % scale.length];
+    var now = audioContext.currentTime;
+
+    var osc = audioContext.createOscillator();
+    var gain = audioContext.createGain();
+
+    osc.type = "sine";
+    osc.frequency.value = freq;
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(1, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+    osc.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(now);
+    osc.stop(now + 0.65);
+  }
+
+  function buildStage() {
+    for (var i = 0; i < TOTAL; i++) {
+      (function(index) {
+        var pad = document.createElement("div");
+        pad.className = "pad";
+        pad.setAttribute("data-index", index);
+        pad.style.background = "#232121";
+        stage.appendChild(pad);
+        pads.push(pad);
+      })(i);
+    }
+  }
+
+  function triggerPad(pad) {
+    var index = parseInt(pad.getAttribute("data-index"), 10);
+    var color = colors[index % colors.length];
+
+    pad.style.background = color;
+    pad.classList.add("active");
+
+    playNote(index);
+
+    setTimeout(function() {
+      pad.style.background = "#232121";
+      pad.classList.remove("active");
+    }, 180);
+  }
+
+  function getPadFromEvent(e) {
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    if (el && el.classList.contains("pad")) {
+      return el;
+    }
+    return null;
+  }
+
+  // Pointer events (mouse + touch + pen)
+  stage.addEventListener("pointerdown", function(e) {
+    initAudio();
+    if (audioContext && audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+    var pad = getPadFromEvent(e);
+    if (pad) triggerPad(pad);
+  });
+
+  stage.addEventListener("pointermove", function(e) {
+    if (e.buttons === 0 && e.pointerType === "mouse") return;
+    if (!audioContext) return;
+
+    var pad = getPadFromEvent(e);
+    if (pad && !pad.classList.contains("active")) {
+      triggerPad(pad);
+    }
+  });
+
+  buildStage();
+
+})();
+</script>
+
+</body>
+</html>
