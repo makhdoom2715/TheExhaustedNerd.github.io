@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather - Ashcombe</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: #eef4f8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    padding: 0;
+    color: #2c3e50;
+  }
+
+  .top-bar {
+    background: #1e4c82;
+    color: #fff;
+    padding: 14px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .top-bar span {
+    font-weight: 400;
+    opacity: 0.75;
+    font-size: 13px;
+    margin-left: 8px;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+
+  .location {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #1e4c82;
+  }
+
+  .updated {
+    font-size: 12px;
+    color: #6b7c8e;
+    margin-bottom: 24px;
+  }
+
+  .current {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    margin-bottom: 24px;
+  }
+
+  .current-icon {
+    font-size: 60px;
+    line-height: 1;
+  }
+
+  .current-temp {
+    font-size: 52px;
+    font-weight: 300;
+    color: #1e4c82;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .current-desc {
+    font-size: 15px;
+    color: #6b7c8e;
+  }
+
+  .forecast-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .forecast {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  .day {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f4f8;
+    font-size: 14px;
+  }
+
+  .day:last-child {
+    border-bottom: none;
+  }
+
+  .day-name {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .day-icon {
+    font-size: 22px;
+  }
+
+  .day-temps {
+    color: #6b7c8e;
+    font-variant-numeric: tabular-nums;
+    min-width: 70px;
+    text-align: right;
+  }
+
+  .day-temps strong {
+    color: #1e4c82;
+    margin-right: 6px;
+    font-weight: 600;
+  }
+
+  .alert {
+    margin-top: 24px;
+    padding: 14px 18px;
+    background: #fff4d6;
+    border-left: 4px solid #f0a500;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #6b5420;
+    line-height: 1.5;
+  }
+
+  .footer {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b3;
+    letter-spacing: 0.03em;
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-bar">weather.co.uk <span>/ ashcombe</span></div>
+
+  <div class="container">
+
+    <div class="location">Ashcombe</div>
+    <div class="updated">Updated 6:45 AM, Friday 28 November</div>
+
+    <div class="current">
+      <div class="current-icon">🌧️</div>
+      <div>
+        <div class="current-temp">7°</div>
+        <div class="current-desc">Heavy rain, feels like 4°</div>
+      </div>
+    </div>
+
+    <div class="forecast-title">72-hour outlook</div>
+    <div class="forecast">
+      <div class="day">
+        <div class="day-name">Today</div>
+        <div class="day-icon">🌧️</div>
+        <div class="day-temps"><strong>7°</strong>3°</div>
+      </div>
+      <div class="day">
+        <div class="day-name">Saturday</div>
+        <div class="day-icon">🌧️</div>
+        <div class="day-temps"><strong>6°</strong>2°</div>
+      </div>
+      <div class="day">
+        <div class="day-name">Sunday</div>
+        <div class="day-icon">🌦️</div>
+        <div class="day-temps"><strong>8°</strong>3°</div>
+      </div>
+      <div class="day">
+        <div class="day-name">Monday</div>
+        <div class="day-icon">☁️</div>
+        <div class="day-temps"><strong>9°</strong>5°</div>
+      </div>
+    </div>
+
+    <div class="alert">
+      <strong>Weather warning:</strong> Persistent rain across the region for the next 72 hours. River levels rising. Avoid towpaths and low-lying areas near the Ashcombe train line.
+    </div>
+
+    <div class="footer">Data provided by UKMet Network</div>
+
+  </div>
+
+</body>
+</html>
