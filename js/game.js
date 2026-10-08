@@ -17,11 +17,26 @@
     silas:    "Si"
   };
 
-  // ---- SOUND (Web Audio API for zero-latency playback) ----
+  // ---- SOUND (Web Audio API, auto-trims leading silence) ----
   const CLICK_SOUND_PATH = "assets/click.mp3";
   let audioContext = null;
   let clickBuffer = null;
+  let clickStartOffset = 0;
   let soundReady = false;
+
+  function findFirstSound(buffer) {
+    // Scan all channels for the first sample above a small threshold.
+    const threshold = 0.01;
+    const sampleRate = buffer.sampleRate;
+    const channel = buffer.getChannelData(0);
+    for (let i = 0; i < channel.length; i++) {
+      if (Math.abs(channel[i]) > threshold) {
+        // Back up 2ms so we don't clip the attack.
+        return Math.max(0, (i - Math.floor(sampleRate * 0.002)) / sampleRate);
+      }
+    }
+    return 0;
+  }
 
   function initSound() {
     if (soundReady) return;
@@ -32,6 +47,7 @@
         .then(function(data) { return audioContext.decodeAudioData(data); })
         .then(function(buffer) {
           clickBuffer = buffer;
+          clickStartOffset = findFirstSound(buffer);
           soundReady = true;
         })
         .catch(function() {
@@ -50,7 +66,7 @@
     const source = audioContext.createBufferSource();
     source.buffer = clickBuffer;
     source.connect(audioContext.destination);
-    source.start(0);
+    source.start(0, clickStartOffset);
   }
 
   // ---- STATE ----
