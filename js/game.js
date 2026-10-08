@@ -803,6 +803,9 @@
 
     appContent.innerHTML = html;
 
+    // Wire recent items on first render
+    wireBrowserRecentButtons();
+
     var input = document.getElementById("browserUrlInput");
     var homeBtn = document.getElementById("browserHome");
     var closeBtn = document.getElementById("browserClose");
@@ -1009,9 +1012,6 @@
         }
       }
     });
-
-    // Wire recent buttons on first render
-    wireBrowserRecentButtons();
   }
 
   if (document.readyState === "loading") {
