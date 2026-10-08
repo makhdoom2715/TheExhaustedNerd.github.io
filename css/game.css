@@ -1,0 +1,367 @@
+/* =========================================================
+   THE ASHCOMBE FOOTNOTE - Game styles
+   ========================================================= */
+
+/* ---------- GAME BODY (page background) ---------- */
+.game-body {
+  background: #0a0a0f;
+  background-image:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(0,212,170,0.04), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 90% 10%, rgba(255,176,0,0.03), transparent 60%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+}
+
+/* ---------- GAME WRAP (centers the phone) ---------- */
+.game-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* ---------- PHONE FRAME ---------- */
+.phone-frame {
+  position: relative;
+  width: 100%;
+  max-width: 390px;
+  height: 780px;
+  background: #000;
+  border-radius: 48px;
+  padding: 12px;
+  box-shadow:
+    0 0 0 3px #1a1a1a,
+    0 0 0 4px #2a2a2a,
+    0 30px 60px rgba(0,0,0,0.7),
+    0 0 40px rgba(255,176,0,0.05);
+  flex-shrink: 0;
+}
+
+/* Notch */
+.phone-notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 32px;
+  background: #000;
+  border-radius: 0 0 20px 20px;
+  z-index: 20;
+  border: 1px solid #1a1a1a;
+  border-top: none;
+}
+
+/* Screen */
+.phone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0d0d14;
+  border-radius: 40px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- TOP BAR ---------- */
+.phone-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 8px;
+  color: #e6e6e6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  z-index: 10;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.topbar-left svg,
+.topbar-right svg {
+  stroke: #8b8b9a;
+}
+
+.topbar-center {
+  font-weight: 600;
+  font-size: 13px;
+  color: #e6e6e6;
+  letter-spacing: 0.02em;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.battery-text {
+  font-size: 11px;
+  color: #8b8b9a;
+  font-weight: 500;
+}
+
+/* ---------- STATUS PANEL ---------- */
+.status-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: rgba(13,13,20,0.97);
+  backdrop-filter: blur(20px);
+  padding: 50px 20px 20px;
+  transform: translateY(-100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.status-panel.open {
+  transform: translateY(0);
+}
+
+.status-time {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 42px;
+  font-weight: 300;
+  color: #e6e6e6;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.status-date {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #8b8b9a;
+  margin-bottom: 20px;
+}
+
+.status-task {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background: rgba(255,176,0,0.06);
+  border: 1px solid rgba(255,176,0,0.15);
+  border-radius: 10px;
+}
+
+.task-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: #ffb000;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.task-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #e6e6e6;
+}
+
+/* ---------- HOME SCREEN ---------- */
+.home-screen {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d14;
+  background-image: url('../assets/wallpaper.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+.home-apps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 8px;
+  padding: 40px 16px 20px;
+  align-content: start;
+}
+
+/* ---------- APP ICON ---------- */
+.app-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  transition: transform 0.15s ease;
+}
+
+.app-icon:active {
+  transform: scale(0.92);
+}
+
+.app-icon-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-icon-box svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-icon-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 10px;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* App colors */
+.app-chats    .app-icon-box { background: #1a6bff; }
+.app-gallery  .app-icon-box { background: #3a3a4a; }
+.app-diary    .app-icon-box { background: #8b5e3c; }
+.app-browser  .app-icon-box { background: #008b8b; }
+.app-casebook .app-icon-box { background: #1a5c3a; }
+.app-settings .app-icon-box { background: #55555f; }
+.app-mail     .app-icon-box { background: #cc3333; }
+.app-files    .app-icon-box { background: #2a4a8b; }
+.app-locket   .app-icon-box { background: #c94f8b; }
+.app-phone    .app-icon-box { background: #34a853; }
+
+/* ---------- APP VIEW ---------- */
+.app-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0d0d14;
+  z-index: 40;
+  display: none;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-view.open {
+  display: flex;
+  transform: translateX(0);
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+
+.app-back {
+  background: none;
+  border: none;
+  color: #ffb000;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.app-title {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #e6e6e6;
+  flex: 1;
+  text-align: center;
+}
+
+.app-spacer {
+  width: 32px;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+}
+
+.app-placeholder {
+  color: #55555f;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 60px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+/* Phone AND iPad: full screen, no frame */
+@media (max-width: 1000px) {
+  .game-body {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+    display: block;
+  }
+  .game-wrap {
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+  }
+  .phone-frame {
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    background: #0d0d14;
+  }
+  .phone-notch {
+    display: none;
+  }
+  .phone-screen {
+    border-radius: 0;
+  }
+  .home-apps {
+    padding-top: 40px;
+  }
+}
+
+/* Desktop: centered frame, iPad-sized */
+@media (min-width: 1001px) {
+  .phone-frame {
+    max-width: 560px;
+    height: 900px;
+    border-radius: 52px;
+  }
+  .phone-screen {
+    border-radius: 44px;
+  }
+}
