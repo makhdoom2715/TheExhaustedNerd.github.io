@@ -17,7 +17,6 @@
   overflow: hidden;
 }
 
-/* ---------- GAME WRAP ---------- */
 .game-wrap {
   display: flex;
   align-items: center;
@@ -26,7 +25,6 @@
   max-width: 420px;
 }
 
-/* ---------- PHONE FRAME ---------- */
 .phone-frame {
   position: relative;
   width: 100%;
@@ -69,7 +67,6 @@
   min-height: 0;
 }
 
-/* ---------- TOP BAR ---------- */
 .phone-topbar {
   display: flex;
   align-items: center;
@@ -115,7 +112,6 @@
   font-weight: 500;
 }
 
-/* ---------- STATUS PANEL ---------- */
 .status-panel {
   position: absolute;
   top: 0;
@@ -174,7 +170,6 @@
   color: #e6e6e6;
 }
 
-/* ---------- HOME SCREEN ---------- */
 .home-screen {
   flex: 1;
   position: relative;
@@ -196,7 +191,6 @@
   align-content: start;
 }
 
-/* ---------- APP ICON ---------- */
 .app-icon {
   display: flex;
   flex-direction: column;
@@ -258,7 +252,6 @@
 .app-locket   .app-icon-box { background: #c94f8b; }
 .app-phone    .app-icon-box { background: #34a853; }
 
-/* ---------- APP VIEW ---------- */
 .app-view {
   position: absolute;
   top: 0;
@@ -287,7 +280,9 @@
   flex-shrink: 0;
 }
 
-.app-view:has(.app-content.chat-view) .app-header {
+/* Hide app header when in chat thread or browser */
+.app-view:has(.app-content.chat-view) .app-header,
+.app-view:has(.app-content.browser-view) .app-header {
   display: none;
 }
 
@@ -372,12 +367,6 @@
 .app-view.app-diary .app-title   { color: #f4f4f9; }
 .app-view.app-diary .app-placeholder { color: #4a5060; }
 
-.app-view.app-browser .app-header  { background: #2c3539; }
-.app-view.app-browser .app-content { background: #64767d; }
-.app-view.app-browser .app-back,
-.app-view.app-browser .app-title   { color: #e8eef0; }
-.app-view.app-browser .app-placeholder { color: #1f282c; }
-
 .app-view.app-files .app-header  { background: #3a3b2c; }
 .app-view.app-files .app-content { background: #72745e; }
 .app-view.app-files .app-back,
@@ -409,7 +398,7 @@
 .app-view.app-casebook .app-placeholder { color: #201120; }
 
 /* =========================================================
-   CHATS APP - Contact list + thread view
+   CHATS APP
    ========================================================= */
 
 .chat-list {
@@ -518,7 +507,6 @@
   letter-spacing: 0.02em;
 }
 
-/* ---------- THREAD VIEW ---------- */
 .app-content.chat-view {
   padding: 0;
   display: flex;
@@ -731,7 +719,7 @@
 }
 
 /* =========================================================
-   CALLS APP - Call log
+   CALLS APP
    ========================================================= */
 
 .call-list {
@@ -825,7 +813,7 @@
 }
 
 /* =========================================================
-   MAIL APP - Inbox + reading view
+   MAIL APP
    ========================================================= */
 
 .mail-list {
@@ -908,7 +896,6 @@
   text-overflow: ellipsis;
 }
 
-/* ---------- MAIL READING VIEW ---------- */
 .mail-reading {
   padding: 4px 20px 40px;
 }
@@ -1011,7 +998,6 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* ---------- Settings rows ---------- */
 .settings-row {
   display: flex;
   align-items: center;
@@ -1086,7 +1072,6 @@
   line-height: 1;
 }
 
-/* ---------- Toggle switch ---------- */
 .settings-toggle {
   flex-shrink: 0;
   position: relative;
@@ -1122,7 +1107,6 @@
   background: #0a0a0f;
 }
 
-/* ---------- Social icons ---------- */
 .settings-socials {
   display: flex;
   align-items: center;
@@ -1160,7 +1144,6 @@
   cursor: default;
 }
 
-/* ---------- Version ---------- */
 .settings-version {
   text-align: center;
   font-size: 11px;
@@ -1209,7 +1192,6 @@
   transform: translateY(0) scale(1);
 }
 
-/* ---------- Warning section ---------- */
 .reset-warning {
   text-align: center;
   margin-bottom: 24px;
@@ -1237,7 +1219,6 @@
   font-style: italic;
 }
 
-/* ---------- Episode carousel ---------- */
 .reset-carousel {
   display: flex;
   align-items: center;
@@ -1290,7 +1271,6 @@
   opacity: 0.3;
 }
 
-/* ---------- Checkbox ---------- */
 .reset-checkbox-label {
   display: flex;
   align-items: flex-start;
@@ -1348,7 +1328,6 @@
   line-height: 1.4;
 }
 
-/* ---------- Reset button ---------- */
 .reset-button {
   width: 100%;
   padding: 14px 20px;
@@ -1381,7 +1360,6 @@
   transform: translateY(0);
 }
 
-/* ---------- Cancel ---------- */
 .reset-cancel {
   width: 100%;
   padding: 10px 20px;
@@ -1398,6 +1376,144 @@
 
 .reset-cancel:hover {
   color: rgba(235, 230, 225, 0.7);
+}
+
+/* =========================================================
+   BROWSER APP
+   Strip takes one colour, page takes another.
+   Swap: search bar takes page colour, recent box takes strip colour.
+   ========================================================= */
+
+.app-view.app-browser .app-content.browser-view {
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  min-height: 0;
+  background: #64767d;
+}
+
+.browser-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: #64767d;
+}
+
+.browser-strip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #2c3539;
+}
+
+.browser-home-btn,
+.browser-close-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #eaf3ee;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.browser-home-btn:hover,
+.browser-close-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.browser-home-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.browser-close-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.browser-url-input {
+  flex: 1;
+  min-width: 0;
+  background: #64767d;
+  border: none;
+  border-radius: 18px;
+  padding: 11px 18px;
+  color: #eaf3ee;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+
+.browser-url-input::placeholder {
+  color: rgba(234, 243, 238, 0.55);
+}
+
+.browser-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  min-height: 0;
+  background: #64767d;
+}
+
+.browser-section-label {
+  padding: 22px 22px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(30, 55, 58, 0.6);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.browser-recent-box {
+  margin: 0 16px;
+  border-radius: 12px;
+  background: #2c3539;
+  overflow: hidden;
+}
+
+.browser-recent-item {
+  display: block;
+  width: 100%;
+  padding: 18px 22px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #eaf3ee;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.browser-recent-item:last-child {
+  border-bottom: none;
+}
+
+.browser-recent-item:hover,
+.browser-recent-item:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.browser-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: #fff;
 }
 
 /* ---------- RESPONSIVE ---------- */
