@@ -1,22 +1,12 @@
 /* =========================================================
    THE ASHCOMBE FOOTNOTE - Game logic
-   Session 1: Phone shell, home screen, app icons
+   Session 2: Chats app with real threads
    ========================================================= */
 
 (function() {
   "use strict";
 
-  // ---- CONFIG ----
-  const AVATARS = {
-    alex:     "A",
-    maya:     "M",
-    julian:   "J",
-    samira:   "S",
-    sterling: "D",
-    silas:    "Si"
-  };
-
-  // ---- SOUND (Preloaded Web Audio Buffer) ----
+  // ---- SOUND ----
   const CLICK_SOUND_PATH = "assets/click.mp3";
   let audioContext = null;
   let clickBuffer = null;
@@ -26,7 +16,7 @@
     if (soundReady) return;
     try {
       audioContext = new (window.AudioContext || window.webkitAudioContext)({
-        latencyHint: 'interactive'
+        latencyHint: "interactive"
       });
       fetch(CLICK_SOUND_PATH)
         .then(function(res) { return res.arrayBuffer(); })
@@ -41,9 +31,7 @@
 
   function playClick() {
     if (!soundReady || !audioContext || !clickBuffer) return;
-    if (audioContext.state === "suspended") {
-      audioContext.resume();
-    }
+    if (audioContext.state === "suspended") audioContext.resume();
     const source = audioContext.createBufferSource();
     source.buffer = clickBuffer;
     source.connect(audioContext.destination);
@@ -52,10 +40,10 @@
 
   // ---- STATE ----
   let currentApp = null;
+  let currentThread = null;
   let statusPanelOpen = false;
 
   // ---- DOM REFS ----
-  const homeScreen = document.getElementById("homeScreen");
   const homeApps = document.getElementById("homeApps");
   const appView = document.getElementById("appView");
   const appTitle = document.getElementById("appTitle");
@@ -68,56 +56,39 @@
 
   // ---- APP DEFINITIONS ----
   const APPS = [
-    {
-      id: "chats",
-      name: "Chats",
-      icon: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
-    },
-    {
-      id: "gallery",
-      name: "Gallery",
-      icon: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'
-    },
-    {
-      id: "diary",
-      name: "Diary",
-      icon: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'
-    },
-    {
-      id: "browser",
-      name: "Browser",
-      icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>'
-    },
-    {
-      id: "casebook",
-      name: "Casebook",
-      icon: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>'
-    },
-    {
-      id: "settings",
-      name: "Settings",
-      icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'
-    },
-    {
-      id: "mail",
-      name: "Mail",
-      icon: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>'
-    },
-    {
-      id: "files",
-      name: "Files",
-      icon: '<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
-    },
-    {
-      id: "locket",
-      name: "Locket",
-      icon: '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
-    },
-    {
-      id: "phone",
-      name: "Phone",
-      icon: '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>'
-    }
+    { id: "chats",    name: "Chats",    icon: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' },
+    { id: "gallery",  name: "Gallery",  icon: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' },
+    { id: "diary",    name: "Diary",    icon: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' },
+    { id: "browser",  name: "Browser",  icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' },
+    { id: "casebook", name: "Casebook", icon: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>' },
+    { id: "settings", name: "Settings", icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>' },
+    { id: "mail",     name: "Mail",     icon: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>' },
+    { id: "files",    name: "Files",    icon: '<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' },
+    { id: "locket",   name: "Locket",   icon: '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' },
+    { id: "phone",    name: "Phone",    icon: '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1></-8.63-3.07 19.5 19svg.5 0 0 1-6-6 >'19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/ }
+  ];
+
+  // ---- ORDER OF CONTACTS ON THE LIST ----
+  const CONTACT_ORDER = [
+    "samira",
+    "mum",
+    "dad",
+    "julian",
+    "sterling",
+    "homies",
+    "toby",
+    "chloe",
+    "benji",
+    "henderson",
+    "lily",
+    "library",
+    "pizza",
+    "gran",
+    "hale",
+    "olympiad",
+    "bioproject",
+    "family",
+    "unknown"
   ];
 
   // ---- RENDER APP ICONS ----
@@ -144,23 +115,26 @@
     if (!app) return;
 
     currentApp = appId;
+    currentThread = null;
     appTitle.textContent = app.name;
 
-    const placeholders = {
-      chats:    "No messages yet. Samira will message you soon.",
-      gallery:  "No photos yet. Maya's gallery is locked.",
-      diary:    "No entries yet. Maya's diary is locked.",
-      browser:  "URL bar coming soon.",
-      casebook: "No clues logged yet.",
-      settings: "Sound: OFF. Reset progress coming soon.",
-      mail:     "No emails yet.",
-      files:    "No files yet.",
-      locket:   "No posts yet.",
-      phone:    "Call log empty."
-    };
-
-    appContent.innerHTML = '<p class="app-placeholder">' +
-      (placeholders[appId] || "This app is empty for now.") + "</p>";
+    if (appId === "chats") {
+      renderContactList();
+    } else {
+      const placeholders = {
+        gallery:  "No photos yet. Maya's gallery is locked.",
+        diary:    "No entries yet. Maya's diary is locked.",
+        browser:  "URL bar coming soon.",
+        casebook: "No clues logged yet.",
+        settings: "Sound: OFF. Reset progress coming soon.",
+        mail:     "No emails yet.",
+        files:    "No files yet.",
+        locket:   "No posts yet.",
+        phone:    "Call log empty."
+      };
+      appContent.innerHTML = '<p class="app-placeholder">' +
+        (placeholders[appId] || "This app is empty for now.") + "</p>";
+    }
 
     appView.className = "app-view app-" + appId;
     appView.classList.add("open");
@@ -177,8 +151,127 @@
       appView.classList.remove("open");
       appView.style.display = "none";
       appView.className = "app-view";
+      appContent.innerHTML = "";
+      appContent.classList.remove("chat-view");
+      appContent.style.padding = "";
       currentApp = null;
+      currentThread = null;
     }, 300);
+  }
+
+  // ---- RENDER CONTACT LIST ----
+  function renderContactList() {
+    appContent.classList.remove("chat-view");
+    appContent.style.padding = "0";
+
+    let html = '<div class="chat-list">';
+    CONTACT_ORDER.forEach(function(key) {
+      const c = window.CHATS_DATA[key];
+      if (!c) return;
+
+      const preview = c.preview || "";
+      const unread = c.unreadCount > 0;
+      const badge = unread ? '<span class="chat-badge">' + c.unreadCount + "</span>" : "";
+
+      html +=
+        '<button class="chat-row" data-key="' + key + '">' +
+          '<span class="chat-avatar" style="background:' + c.avatarColor + '">' + c.avatarInitials + "</span>" +
+          '<span class="chat-row-body">' +
+            '<span class="chat-row-top">' +
+              '<span class="chat-row-name">' + c.name + "</span>" +
+              '<span class="chat-row-time">' + (c.time || "") + "</span>" +
+            "</span>" +
+            '<span class="chat-row-bottom">' +
+              '<span class="chat-row-preview">' + preview + "</span>" +
+              badge +
+            "</span>" +
+          "</span>" +
+        "</button>";
+    });
+    html += "</div>";
+
+    appContent.innerHTML = html;
+
+    appContent.querySelectorAll(".chat-row").forEach(function(row) {
+      row.addEventListener("click", function() {
+        playClick();
+        openThread(row.getAttribute("data-key"));
+      });
+    });
+  }
+
+  // ---- OPEN THREAD ----
+  function openThread(key) {
+    const c = window.CHATS_DATA[key];
+    if (!c) return;
+
+    currentThread = key;
+    appContent.classList.add("chat-view");
+    appContent.style.padding = "0";
+
+    // Build the thread HTML
+    let html = "";
+
+    // Header
+    html +=
+      '<div class="thread-header">' +
+        '<div class="thread-header-left">' +
+          '<span class="thread-avatar" style="background:' + c.avatarColor + '">' + c.avatarInitials + "</span>" +
+          '<div class="thread-header-text">' +
+            '<div class="thread-name">' + c.name + "</div>" +
+            (c.bio ? '<div class="thread-bio">' + c.bio + "</div>" : "") +
+          "</div>" +
+        "</div>" +
+        '<button class="thread-close" id="threadClose" aria-label="Close thread">×</button>' +
+      "</div>";
+
+    // Body
+    html += '<div class="thread-body" id="threadBody">';
+
+    if (!c.messages || c.messages.length === 0) {
+      html += '<div class="thread-empty">' + (c.corrupted ? c.corruptedMessage : "No messages.") + "</div>";
+    } else {
+      c.messages.forEach(function(m) {
+        if (m.day) {
+          html += '<div class="thread-day">' + m.day + "</div>";
+          return;
+        }
+        const isMaya = m.from === "maya";
+        const side = isMaya ? "right" : "left";
+        const senderLabel = (!isMaya && m.name) ? '<div class="thread-sender">' + m.name + "</div>" : "";
+        html +=
+          '<div class="bubble-row ' + side + '">' +
+            '<div class="bubble">' +
+              senderLabel +
+              '<div class="bubble-text">' + m.text + "</div>" +
+              '<div class="bubble-time">' + (m.time || "") + "</div>" +
+            "</div>" +
+          "</div>";
+      });
+    }
+
+    html += "</div>";
+
+    appContent.innerHTML = html;
+
+    // Wire up close button
+    const closeBtn = document.getElementById("threadClose");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function() {
+        playClick();
+        renderContactList();
+        currentThread = null;
+      });
+    }
+
+    // Scroll thread to bottom
+    const body = document.getElementById("threadBody");
+    if (body) body.scrollTop = body.scrollHeight;
+
+    // Mark thread as read
+    if (c.unreadCount > 0) {
+      c.unreadCount = 0;
+    }
   }
 
   // ---- STATUS PANEL ----
@@ -226,13 +319,24 @@
 
     appBack.addEventListener("click", function() {
       playClick();
-      closeApp();
+      if (currentThread) {
+        renderContactList();
+        currentThread = null;
+      } else {
+        closeApp();
+      }
     });
 
     document.addEventListener("keydown", function(e) {
       if (e.key === "Escape") {
-        if (currentApp) closeApp();
-        else if (statusPanelOpen) toggleStatusPanel();
+        if (currentThread) {
+          renderContactList();
+          currentThread = null;
+        } else if (currentApp) {
+          closeApp();
+        } else if (statusPanelOpen) {
+          toggleStatusPanel();
+        }
       }
     });
   }
