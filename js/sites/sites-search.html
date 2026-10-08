@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synapse Search</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #333;
+  }
+
+  .logo {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #4a5568;
+    margin-bottom: 8px;
+  }
+
+  .logo span:nth-child(1) { color: #3b82f6; }
+  .logo span:nth-child(2) { color: #10b981; }
+  .logo span:nth-child(3) { color: #f59e0b; }
+  .logo span:nth-child(4) { color: #ef4444; }
+  .logo span:nth-child(5) { color: #8b5cf6; }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 460px;
+    border: 1px solid #d1d5db;
+    border-radius: 24px;
+    padding: 0 6px 0 20px;
+    margin-top: 24px;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .search-box:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  }
+
+  .search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    padding: 14px 0;
+    background: transparent;
+    color: #333;
+    font-family: inherit;
+  }
+
+  .search-box input::placeholder {
+    color: #9ca3af;
+  }
+
+  .search-btn {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #3b82f6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+  }
+
+  .search-btn:hover {
+    background: #2563eb;
+  }
+
+  .search-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .tagline {
+    margin-top: 18px;
+    font-size: 12px;
+    color: #9ca3af;
+    letter-spacing: 0.02em;
+  }
+
+  .no-results {
+    margin-top: 28px;
+    font-size: 14px;
+    color: #9ca3af;
+    display: none;
+    text-align: center;
+    max-width: 380px;
+    line-height: 1.6;
+  }
+
+  .no-results.show {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+  <div class="logo">
+    <span>S</span><span>y</span><span>n</span><span>a</span><span>p</span><span>s</span><span>e</span>
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search or type a URL..." autocomplete="off" spellcheck="false">
+    <button class="search-btn" id="searchBtn" aria-label="Search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+  </div>
+
+  <div class="tagline">Privacy-focused search for the curious.</div>
+
+  <div class="no-results" id="noResults">
+    No results found for your search. Try typing a specific URL instead.
+  </div>
+
+<script>
+  var input = document.getElementById("searchInput");
+  var btn = document.getElementById("searchBtn");
+  var noResults = document.getElementById("noResults");
+
+  function doSearch() {
+    var val = input.value.trim();
+    if (!val) return;
+
+    // If it looks like a URL, try to navigate the parent browser
+    if (val.indexOf(".") !== -1 && val.indexOf(" ") === -1) {
+      // Strip protocol if present
+      var cleaned = val.replace(/^https?:\/\//, "");
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "browser-navigate", url: cleaned }, "*");
+      }
+      return;
+    }
+
+    // Otherwise show no results
+    noResults.classList.add("show");
+  }
+
+  btn.addEventListener("click", doSearch);
+  input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      doSearch();
+    }
+  });
+</script>
+
+</body>
+</html>
