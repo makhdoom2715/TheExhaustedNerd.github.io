@@ -320,6 +320,9 @@
 
     html += '</div>';
 
+    // Footer strip - big empty area, currently shows "Name is offline"
+    html += '<div class="thread-footer">' + c.name + ' is offline</div>';
+
     appContent.innerHTML = html;
 
     var closeBtn = document.getElementById("threadClose");
