@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ashcombe Footnote - The Exhausted Nerd</title>
+<meta name="description" content="A math detective story. Maya is missing. Her phone is in your hands.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body class="game-body">
+
+<div id="gameWrap" class="game-wrap">
+
+  <!-- PHONE FRAME -->
+  <div id="phoneFrame" class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="phone-screen" id="phoneScreen">
+
+      <!-- TOP BAR -->
+      <div class="phone-topbar" id="topbar">
+        <div class="topbar-left">
+          <svg class="hex-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12,2 21,7 21,17 12,22 3,17 3,7"/>
+          </svg>
+        </div>
+        <div class="topbar-center">Maya's Phone</div>
+        <div class="topbar-right">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
+          </svg>
+          <span class="battery-text">87%</span>
+        </div>
+      </div>
+
+      <!-- STATUS PANEL (drops down) -->
+      <div class="status-panel" id="statusPanel">
+        <div class="status-time" id="statusTime">6:12 AM</div>
+        <div class="status-date" id="statusDate">Tuesday, 14 October</div>
+        <div class="status-task">
+          <span class="task-label">CURRENT TASK</span>
+          <span class="task-text">Unlock the phone</span>
+        </div>
+      </div>
+
+      <!-- HOME SCREEN -->
+      <div class="home-screen" id="homeScreen">
+        <div class="home-apps" id="homeApps">
+          <!-- apps injected by JS -->
+        </div>
+      </div>
+
+      <!-- APP VIEW (hidden by default) -->
+      <div class="app-view" id="appView">
+        <div class="app-header">
+          <button class="app-back" id="appBack">←</button>
+          <span class="app-title" id="appTitle">App</span>
+          <span class="app-spacer"></span>
+        </div>
+        <div class="app-content" id="appContent">
+          <p class="app-placeholder">This app is empty for now. Content coming soon.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script src="js/game.js"></script>
+</body>
+</html>
