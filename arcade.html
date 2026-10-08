@@ -87,6 +87,27 @@
     box-shadow: 0 0 28px rgba(255, 176, 0, 0.7);
     background: rgba(255, 176, 0, 0.12);
   }
+
+  /* Phone fix: taller tile so the title and ENTER always fit */
+  @media (max-width: 600px) {
+    .arcade-tile {
+      aspect-ratio: auto;
+      min-height: 320px;
+    }
+    .arcade-tile-text {
+      padding: 24px 20px 0;
+    }
+    .arcade-tile-title {
+      font-size: clamp(1.5rem, 7vw, 2rem);
+    }
+    .arcade-tile-subtitle {
+      font-size: 0.85rem;
+    }
+    .arcade-tile-btn {
+      margin-bottom: 24px;
+      padding: 11px 32px;
+    }
+  }
 </style>
 </head>
 <body>
