@@ -15,21 +15,21 @@ window.BROWSER_DATA = {
 
     // -------- DAY 1 FILLER (unlocked) --------
     {
-      url: "weather.co.uk/ashcombe",
-      name: "Weather - Ashcombe",
+      url: "weatheruk.com",
+      name: "Weather UK",
       file: "sites/sites-weather.html",
       unlocked: true
     },
     {
-      url: "ashcombelibrary.gov.uk",
-      name: "Ashcombe Library",
-      file: "sites/sites-library.html",
+      url: "findthecat.com",
+      name: "Find the Cat",
+      file: "sites/sites-find-the-cat.html",
       unlocked: true
     },
     {
-      url: "bbc.co.uk/news/local/ashcombe",
-      name: "BBC News - Local - Ashcombe",
-      file: "sites/sites-bbc.html",
+      url: "olympiadmath.com",
+      name: "Olympiad Math",
+      file: "sites/sites-olympiadmath.html",
       unlocked: true
     },
 
