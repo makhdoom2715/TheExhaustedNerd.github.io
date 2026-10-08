@@ -17,25 +17,40 @@
     silas:    "Si"
   };
 
-  // ---- SOUND ----
+  // ---- SOUND (Web Audio API for zero-latency playback) ----
   const CLICK_SOUND_PATH = "assets/click.mp3";
-  let clickSound = null;
+  let audioContext = null;
+  let clickBuffer = null;
   let soundReady = false;
 
   function initSound() {
     if (soundReady) return;
-    clickSound = new Audio(CLICK_SOUND_PATH);
-    clickSound.volume = 1.0;
-    clickSound.load();
-    soundReady = true;
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      fetch(CLICK_SOUND_PATH)
+        .then(function(res) { return res.arrayBuffer(); })
+        .then(function(data) { return audioContext.decodeAudioData(data); })
+        .then(function(buffer) {
+          clickBuffer = buffer;
+          soundReady = true;
+        })
+        .catch(function() {
+          // Sound file missing or failed to load. Silent fallback.
+        });
+    } catch (e) {
+      // Web Audio not supported.
+    }
   }
 
   function playClick() {
-    if (!soundReady) return;
-    clickSound.currentTime = 0;
-    clickSound.play().catch(function() {
-      // Browsers block sound until first tap. This is fine.
-    });
+    if (!soundReady || !audioContext || !clickBuffer) return;
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+    const source = audioContext.createBufferSource();
+    source.buffer = clickBuffer;
+    source.connect(audioContext.destination);
+    source.start(0);
   }
 
   // ---- STATE ----
