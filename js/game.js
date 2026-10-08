@@ -7,10 +7,10 @@
   "use strict";
 
   // ---- SOUND ----
-  const CLICK_SOUND_PATH = "assets/click.mp3";
-  let audioContext = null;
-  let clickBuffer = null;
-  let soundReady = false;
+  var CLICK_SOUND_PATH = "assets/click.mp3";
+  var audioContext = null;
+  var clickBuffer = null;
+  var soundReady = false;
 
   function initSound() {
     if (soundReady) return;
@@ -32,30 +32,30 @@
   function playClick() {
     if (!soundReady || !audioContext || !clickBuffer) return;
     if (audioContext.state === "suspended") audioContext.resume();
-    const source = audioContext.createBufferSource();
+    var source = audioContext.createBufferSource();
     source.buffer = clickBuffer;
     source.connect(audioContext.destination);
     source.start(0);
   }
 
   // ---- STATE ----
-  let currentApp = null;
-  let currentThread = null;
-  let statusPanelOpen = false;
+  var currentApp = null;
+  var currentThread = null;
+  var statusPanelOpen = false;
 
   // ---- DOM REFS ----
-  const homeApps = document.getElementById("homeApps");
-  const appView = document.getElementById("appView");
-  const appTitle = document.getElementById("appTitle");
-  const appContent = document.getElementById("appContent");
-  const appBack = document.getElementById("appBack");
-  const statusPanel = document.getElementById("statusPanel");
-  const topbar = document.getElementById("topbar");
-  const statusTime = document.getElementById("statusTime");
-  const statusDate = document.getElementById("statusDate");
+  var homeApps = document.getElementById("homeApps");
+  var appView = document.getElementById("appView");
+  var appTitle = document.getElementById("appTitle");
+  var appContent = document.getElementById("appContent");
+  var appBack = document.getElementById("appBack");
+  var statusPanel = document.getElementById("statusPanel");
+  var topbar = document.getElementById("topbar");
+  var statusTime = document.getElementById("statusTime");
+  var statusDate = document.getElementById("statusDate");
 
   // ---- APP DEFINITIONS ----
-  const APPS = [
+  var APPS = [
     {
       id: "chats",
       name: "Chats",
@@ -108,8 +108,8 @@
     }
   ];
 
-  // ---- ORDER OF CONTACTS ON THE LIST ----
-  const CONTACT_ORDER = [
+  // ---- ORDER OF CONTACTS ----
+  var CONTACT_ORDER = [
     "samira",
     "mum",
     "dad",
@@ -131,40 +131,45 @@
     "unknown"
   ];
 
-  // ---- DIRECTION ICONS FOR CALLS ----
-  const CALL_ICONS = {
+  // ---- CALL ICONS ----
+  var CALL_ICONS = {
     incoming: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="7" x2="7" y2="17"/><polyline points="17 17 7 17 7 7"/></svg>',
     outgoing: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>',
     missed:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="7" x2="17" y2="17"/><line x1="17" y1="7" x2="7" y2="17"/></svg>'
   };
 
-  const HANDSET_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+  var HANDSET_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
 
   // ---- RENDER APP ICONS ----
   function renderApps() {
     homeApps.innerHTML = "";
-    APPS.forEach(function(app) {
-      const btn = document.createElement("button");
-      btn.className = "app-icon app-" + app.id;
-      btn.setAttribute("aria-label", "Open " + app.name);
-      btn.innerHTML =
-        '<div class="app-icon-box">' + app.icon + "</div>" +
-        '<span class="app-icon-label">' + app.name + "</span>";
-      btn.addEventListener("click", function() {
-        playClick();
-        openApp(app.id);
-      });
-      homeApps.appendChild(btn);
-    });
+    for (var i = 0; i < APPS.length; i++) {
+      (function(app) {
+        var btn = document.createElement("button");
+        btn.className = "app-icon app-" + app.id;
+        btn.setAttribute("aria-label", "Open " + app.name);
+        btn.innerHTML =
+          '<div class="app-icon-box">' + app.icon + '</div>' +
+          '<span class="app-icon-label">' + app.name + '</span>';
+        btn.addEventListener("click", function() {
+          playClick();
+          openApp(app.id);
+        });
+        homeApps.appendChild(btn);
+      })(APPS[i]);
+    }
   }
 
   // ---- OPEN APP ----
   function openApp(appId) {
-    const app = APPS.find(function(a) { return a.id === appId; });
-    if "</ (!app) return;
+    var app = null;
+    for (var i = 0; i < APPS.length; i++) {
+      if (APPS[i].id === appId) { app = APPS[i]; break; }
+    }
+    if (!app) return;
 
     currentApp = appId;
-   button currentThread = null;
+    currentThread = null;
     appTitle.textContent = app.name;
 
     if (appId === "chats") {
@@ -172,11 +177,10 @@
     } else if (appId === "phone") {
       renderCalls();
     } else {
-      const placeholders = {
+      var placeholders = {
         gallery:  "No photos yet. Maya's gallery is locked.",
-        diary:    "No>";
- entries yet. Maya's diary is locked.",
-        browser:  "URL bar    coming soon.",
+        diary:    "No entries yet. Maya's diary is locked.",
+        browser:  "URL bar coming soon.",
         casebook: "No clues logged yet.",
         settings: "Sound: OFF. Reset progress coming soon.",
         mail:     "No emails yet.",
@@ -186,7 +190,7 @@
       appContent.classList.remove("chat-view");
       appContent.style.padding = "";
       appContent.innerHTML = '<p class="app-placeholder">' +
-        (placeholders[appId] || "This app is empty for now.") + "</p>";
+        (placeholders[appId] || "This app is empty for now.") + '</p>';
     }
 
     appView.className = "app-view app-" + appId;
@@ -217,93 +221,108 @@
     appContent.classList.remove("chat-view");
     appContent.style.padding = "0";
 
-    let html = '<div class="chat-list">';
-    CONTACT_ORDER.forEach(function(key) {
-      const c = window.CHATS_DATA[key];
-      if (!c) return;
+    var html = '<div class="chat-list">';
 
-      const preview = c.preview || "";
-      const unread = c.unreadCount > 0;
-      const badge = unread ? '<span class="chat-badge">' + c.unreadCount + "</span>" : "";
+    for (var i = 0; i < CONTACT_ORDER.length; i++) {
+      var key = CONTACT_ORDER[i];
+      var c = window.CHATS_DATA[key];
+      if (!c) continue;
 
-      html +=
-        '<button class="chat-row" data-key="' + key + '">' +
-          '<span class="chat-avatar" style="background:' + c.avatarColor + '">' + c.avatarInitials + "</span>" +
-          '<span class="chat-row-body">' +
-            '<span class="chat-row-top">' +
-              '<span class="chat-row-name">' + c.name + "</span>" +
-              '<span class="chat-row-time">' + (c.time || "") + "</span>" +
-            "</span>" +
-            '<span class="chat-row-bottom">' +
-              '<span class="chat-row-preview">' + preview + "</span>" +
-              badge +
-            "</span>" +
-          "</span>" +
-        });
-    html += "</div>";
+      var preview = c.preview || "";
+      var badge = "";
+      if (c.unreadCount > 0) {
+        badge = '<span class="chat-badge">' + c.unreadCount + '</span>';
+      }
+
+      html += '<button class="chat-row" data-key="' + key + '">';
+      html +=   '<span class="chat-avatar" style="background:' + c.avatarColor + '">' + c.avatarInitials + '</span>';
+      html +=   '<span class="chat-row-body">';
+      html +=     '<span class="chat-row-top">';
+      html +=       '<span class="chat-row-name">' + c.name + '</span>';
+      html +=       '<span class="chat-row-time">' + (c.time || "") + '</span>';
+      html +=     '</span>';
+      html +=     '<span class="chat-row-bottom">';
+      html +=       '<span class="chat-row-preview">' + preview + '</span>';
+      html +=       badge;
+      html +=     '</span>';
+      html +=   '</span>';
+      html += '</button>';
+    }
+
+    html += '</div>';
 
     appContent.innerHTML = html;
 
-    appContent.querySelectorAll(".chat-row").forEach(function(row) {
-      row.addEventListener("click", function() {
-        playClick();
-        openThread(row.getAttribute("data-key"));
-      });
-    });
+    var rows = appContent.querySelectorAll(".chat-row");
+    for (var j = 0; j < rows.length; j++) {
+      (function(row) {
+        row.addEventListener("click", function() {
+          playClick();
+          openThread(row.getAttribute("data-key"));
+        });
+      })(rows[j]);
+    }
   }
 
   // ---- OPEN THREAD ----
   function openThread(key) {
-    const c = window.CHATS_DATA[key];
+    var c = window.CHATS_DATA[key];
     if (!c) return;
 
     currentThread = key;
     appContent.classList.add("chat-view");
     appContent.style.padding = "0";
 
-    let html = "";
+    var html = "";
 
-    html +=
-      '<div class="thread-header">' +
-        '<div class="thread-header-left">' +
-          '<span class="thread-avatar" style="background:' + c.avatarColor + '">' + c.avatarInitials + "</span>" +
-          '<div class="thread-header-text">' +
-            '<div class="thread-name">' + c.name + "</div>" +
-            (c.bio ? '<div class="thread-bio">' + c.bio + "</div>" : "") +
-          "</div>" +
-        "</div>" +
-        '<button class="thread-close" id="threadClose" aria-label="Close thread">×</button>' +
-      "</div>";
+    // Header
+    html += '<div class="thread-header">';
+    html +=   '<div class="thread-header-left">';
+    html +=     '<span class="thread-avatar" style="background:' + c.avatarColor + '">' + c.avatarInitials + '</span>';
+    html +=     '<div class="thread-header-text">';
+    html +=       '<div class="thread-name">' + c.name + '</div>';
+    if (c.bio) {
+      html +=     '<div class="thread-bio">' + c.bio + '</div>';
+    }
+    html +=     '</div>';
+    html +=   '</div>';
+    html +=   '<button class="thread-close" id="threadClose" aria-label="Close thread">×</button>';
+    html += '</div>';
 
+    // Body
     html += '<div class="thread-body" id="threadBody">';
 
     if (!c.messages || c.messages.length === 0) {
-      html += '<div class="thread-empty">' + (c.corrupted ? c.corruptedMessage : "No messages.") + "</div>";
+      var emptyMsg = c.corrupted ? c.corruptedMessage : "No messages.";
+      html += '<div class="thread-empty">' + emptyMsg + '</div>';
     } else {
-      c.messages.forEach(function(m) {
+      for (var i = 0; i < c.messages.length; i++) {
+        var m = c.messages[i];
         if (m.day) {
-          html += '<div class="thread-day">' + m.day + "</div>";
-          return;
+          html += '<div class="thread-day">' + m.day + '</div>';
+          continue;
         }
-        const isMaya = m.from === "maya";
-        const side = isMaya ? "right" : "left";
-        const senderLabel = (!isMaya && m.name) ? '<div class="thread-sender">' + m.name + "</div>" : "";
-        html +=
-          '<div class="bubble-row ' + side + '">' +
-            '<div class="bubble">' +
-              senderLabel +
-              '<div class="bubble-text">' + m.text + "</div>" +
-              '<div class="bubble-time">' + (m.time || "") + "</div>" +
-            "</div>" +
-          "</div>";
-      });
+        var isMaya = m.from === "maya";
+        var side = isMaya ? "right" : "left";
+        var senderLabel = "";
+        if (!isMaya && m.name) {
+          senderLabel = '<div class="thread-sender">' + m.name + '</div>';
+        }
+        html += '<div class="bubble-row ' + side + '">';
+        html +=   '<div class="bubble">';
+        html +=     senderLabel;
+        html +=     '<div class="bubble-text">' + m.text + '</div>';
+        html +=     '<div class="bubble-time">' + (m.time || "") + '</div>';
+        html +=   '</div>';
+        html += '</div>';
+      }
     }
 
-    html += "</div>";
+    html += '</div>';
 
     appContent.innerHTML = html;
 
-    const closeBtn = document.getElementById("threadClose");
+    var closeBtn = document.getElementById("threadClose");
     if (closeBtn) {
       closeBtn.addEventListener("click", function() {
         playClick();
@@ -312,7 +331,7 @@
       });
     }
 
-    const body = document.getElementById("threadBody");
+    var body = document.getElementById("threadBody");
     if (body) body.scrollTop = body.scrollHeight;
 
     if (c.unreadCount > 0) {
@@ -325,32 +344,33 @@
     appContent.classList.remove("chat-view");
     appContent.style.padding = "0";
 
-    const calls = window.CALLS_DATA || [];
+    var calls = window.CALLS_DATA || [];
 
-    let html = '<div class="call-list">';
-    calls.forEach(function(c) {
-      const icon = CALL_ICONS[c.direction] || "";
-      html +=
-        '<div class="call-row">' +
-          '<div class="call-icon ' + c.direction + '">' + icon + "</div>" +
-          '<div class="call-body">' +
-            '<div class="call-name">' + c.name + "</div>" +
-            '<div class="call-status">' + c.status + "</div>" +
-          "</div>" +
-          '<div class="call-time">' + c.time + "</div>" +
-          '<button class="call-handset" aria-label="Call back">' + HANDSET_ICON + "</button>" +
-        "</div>";
-    });
-    html += "</div>";
+    var html = '<div class="call-list">';
+    for (var i = 0; i < calls.length; i++) {
+      var c = calls[i];
+      var icon = CALL_ICONS[c.direction] || "";
+      html += '<div class="call-row">';
+      html +=   '<div class="call-icon ' + c.direction + '">' + icon + '</div>';
+      html +=   '<div class="call-body">';
+      html +=     '<div class="call-name">' + c.name + '</div>';
+      html +=     '<div class="call-status">' + c.status + '</div>';
+      html +=   '</div>';
+      html +=   '<div class="call-time">' + c.time + '</div>';
+      html +=   '<button class="call-handset" aria-label="Call back">' + HANDSET_ICON + '</button>';
+      html += '</div>';
+    }
+    html += '</div>';
 
     appContent.innerHTML = html;
 
-    appContent.querySelectorAll(".call-handset").forEach(function(btn) {
-      btn.addEventListener("click", function(e) {
+    var handsetBtns = appContent.querySelectorAll(".call-handset");
+    for (var j = 0; j < handsetBtns.length; j++) {
+      handsetBtns[j].addEventListener("click", function(e) {
         e.stopPropagation();
         playClick();
       });
-    });
+    }
   }
 
   // ---- STATUS PANEL ----
@@ -366,15 +386,15 @@
   }
 
   function updateClock() {
-    const now = new Date();
-    const hours = now.getHours();
-    const mins = String(now.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    const h12 = hours % 12 || 12;
+    var now = new Date();
+    var hours = now.getHours();
+    var mins = String(now.getMinutes()).padStart(2, "0");
+    var ampm = hours >= 12 ? "PM" : "AM";
+    var h12 = hours % 12 || 12;
     statusTime.textContent = h12 + ":" + mins + " " + ampm;
 
-    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     statusDate.textContent = days[now.getDay()] + ", " + now.getDate() + " " + months[now.getMonth()];
   }
 
