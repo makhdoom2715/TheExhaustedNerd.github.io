@@ -1,6 +1,6 @@
 /* =========================================================
    THE ASHCOMBE FOOTNOTE - Game logic
-   Session 2: Chats + Calls + Mail
+   Session 3: Chats + Calls + Mail + Settings
    ========================================================= */
 
 (function() {
@@ -11,6 +11,7 @@
   var audioContext = null;
   var clickBuffer = null;
   var soundReady = false;
+  var soundEnabled = true;
 
   function initSound() {
     if (soundReady) return;
@@ -30,6 +31,7 @@
   }
 
   function playClick() {
+    if (!soundEnabled) return;
     if (!soundReady || !audioContext || !clickBuffer) return;
     if (audioContext.state === "suspended") audioContext.resume();
     var source = audioContext.createBufferSource();
@@ -43,6 +45,7 @@
   var currentThread = null;
   var currentMailId = null;
   var statusPanelOpen = false;
+  var resetEpisodeIndex = 2; // 0 = Episode 1, 1 = Episode 2, 2 = Episode 3
 
   // ---- DOM REFS ----
   var homeApps = document.getElementById("homeApps");
@@ -207,7 +210,7 @@
     currentThread = null;
     currentMailId = null;
 
-    // Reset header to default (back arrow visible, no close)
+    // Reset header to default
     appBack.style.display = "";
     var spacerReset = getSpacer();
     if (spacerReset) spacerReset.style.display = "";
@@ -223,13 +226,14 @@
       renderCalls();
     } else if (appId === "mail") {
       renderMail();
+    } else if (appId === "settings") {
+      renderSettings();
     } else {
       var placeholders = {
         gallery:  "No photos yet. Maya's gallery is locked.",
         diary:    "No entries yet. Maya's diary is locked.",
         browser:  "URL bar coming soon.",
         casebook: "No clues logged yet.",
-        settings: "Sound: OFF. Reset progress coming soon.",
         files:    "No files yet.",
         locket:   "No posts yet."
       };
@@ -525,6 +529,251 @@
     appContent.scrollTop = 0;
   }
 
+  // ---- RENDER SETTINGS ----
+  function renderSettings() {
+    appContent.classList.remove("chat-view");
+    appContent.style.padding = "0";
+
+    var s = window.SETTINGS_DATA || {};
+
+    var html = '<div class="settings-list">';
+
+    // Account
+    html += '<button class="settings-row" data-action="account">';
+    html +=   '<span class="settings-icon">👤</span>';
+    html +=   '<span class="settings-row-body">';
+    html +=     '<span class="settings-row-label">' + (s.account ? s.account.label : "Account") + '</span>';
+    html +=     '<span class="settings-row-sub">' + (s.account ? s.account.subtitle : "") + '</span>';
+    html +=   '</span>';
+    html +=   '<span class="settings-row-value">' + (s.account ? s.account.status : "") + '</span>';
+    html += '</button>';
+
+    // Sound
+    html += '<div class="settings-row">';
+    html +=   '<span class="settings-icon">🔊</span>';
+    html +=   '<span class="settings-row-body">';
+    html +=     '<span class="settings-row-label">' + (s.sound ? s.sound.label : "Sound") + '</span>';
+    html +=     '<span class="settings-row-sub">' + (s.sound ? s.sound.subtitle : "") + '</span>';
+    html +=   '</span>';
+    html +=   '<button class="settings-toggle' + (soundEnabled ? ' active' : '') + '" id="soundToggle" aria-label="Toggle sound">';
+    html +=     '<span class="settings-toggle-knob"></span>';
+    html +=   '</button>';
+    html += '</div>';
+
+    // Share
+    html += '<button class="settings-row" data-action="share">';
+    html +=   '<span class="settings-icon">🔗</span>';
+    html +=   '<span class="settings-row-body">';
+    html +=     '<span class="settings-row-label">' + (s.share ? s.share.label : "Share") + '</span>';
+    html +=     '<span class="settings-row-sub">' + (s.share ? s.share.subtitle : "") + '</span>';
+    html +=   '</span>';
+    html +=   '<span class="settings-row-arrow">›</span>';
+    html += '</button>';
+
+    // Rate
+    html += '<button class="settings-row" data-action="rate">';
+    html +=   '<span class="settings-icon">⭐</span>';
+    html +=   '<span class="settings-row-body">';
+    html +=     '<span class="settings-row-label">' + (s.rate ? s.rate.label : "Rate the Game") + '</span>';
+    html +=     '<span class="settings-row-sub">' + (s.rate ? s.rate.subtitle : "") + '</span>';
+    html +=   '</span>';
+    html +=   '<span class="settings-row-arrow">›</span>';
+    html += '</button>';
+
+    // Reset Progress
+    html += '<button class="settings-row" data-action="reset">';
+    html +=   '<span class="settings-icon">🔄</span>';
+    html +=   '<span class="settings-row-body">';
+    html +=     '<span class="settings-row-label">' + (s.reset ? s.reset.label : "Reset Progress") + '</span>';
+    html +=     '<span class="settings-row-sub">' + (s.reset ? s.reset.subtitle : "") + '</span>';
+    html +=   '</span>';
+    html +=   '<span class="settings-row-arrow">›</span>';
+    html += '</button>';
+
+    // Need Help
+    html += '<button class="settings-row" data-action="help">';
+    html +=   '<span class="settings-icon">❓</span>';
+    html +=   '<span class="settings-row-body">';
+    html +=     '<span class="settings-row-label">' + (s.help ? s.help.label : "Need Help?") + '</span>';
+    html +=     '<span class="settings-row-sub">' + (s.help ? s.help.subtitle : "") + '</span>';
+    html +=   '</span>';
+    html +=   '<span class="settings-row-arrow">›</span>';
+    html += '</button>';
+
+    // Suggestion
+    html += '<button class="settings-row" data-action="suggestion">';
+    html +=   '<span class="settings-icon">💡</span>';
+    html +=   '<span class="settings-row-body">';
+    html +=     '<span class="settings-row-label">' + (s.suggestion ? s.suggestion.label : "Send a Suggestion") + '</span>';
+    html +=     '<span class="settings-row-sub">' + (s.suggestion ? s.suggestion.subtitle : "") + '</span>';
+    html +=   '</span>';
+    html +=   '<span class="settings-row-arrow">›</span>';
+    html += '</button>';
+
+    // Socials
+    html += '<div class="settings-socials">';
+    if (s.socials) {
+      for (var i = 0; i < s.socials.length; i++) {
+        var soc = s.socials[i];
+        var disabled = !soc.url;
+        html += '<a class="settings-social' + (disabled ? ' disabled' : '') + '" ' +
+          (disabled ? '' : 'href="' + soc.url + '" target="_blank" rel="noopener" ') +
+          'aria-label="' + soc.name + '">' + soc.name.charAt(0) + '</a>';
+      }
+    }
+    html += '</div>';
+
+    // Version
+    html += '<div class="settings-version">Version ' + (s.version || "1.0.0") + '</div>';
+
+    html += '</div>';
+
+    appContent.innerHTML = html;
+
+    // Wire up sound toggle
+    var soundToggle = document.getElementById("soundToggle");
+    if (soundToggle) {
+      soundToggle.addEventListener("click", function(e) {
+        e.stopPropagation();
+        soundEnabled = !soundEnabled;
+        soundToggle.classList.toggle("active", soundEnabled);
+        if (soundEnabled) playClick();
+      });
+    }
+
+    // Wire up action buttons
+    var actionButtons = appContent.querySelectorAll(".settings-row[data-action]");
+    for (var j = 0; j < actionButtons.length; j++) {
+      (function(btn) {
+        btn.addEventListener("click", function() {
+          playClick();
+          var action = btn.getAttribute("data-action");
+          if (action === "share") {
+            if (navigator.share) {
+              navigator.share({
+                title: "The Ashcombe Footnote",
+                text: "A math detective story. Maya is missing.",
+                url: s.share ? s.share.url : ""
+              }).catch(function() {});
+            }
+          } else if (action === "reset") {
+            openResetModal();
+          } else if (action === "suggestion") {
+            if (s.suggestion && s.suggestion.url) {
+              window.open(s.suggestion.url, "_blank");
+            }
+          }
+        });
+      })(actionButtons[j]);
+    }
+  }
+
+  // ---- OPEN RESET MODAL ----
+  function openResetModal() {
+    var existingModal = document.getElementById("resetModal");
+    if (existingModal) existingModal.remove();
+
+    resetEpisodeIndex = 2; // Start at Episode 3
+
+    var html = '<div class="reset-modal-overlay" id="resetModal">';
+    html +=   '<div class="reset-modal">';
+
+    // Warning
+    html +=     '<div class="reset-warning">';
+    html +=       '<div class="reset-warning-line"></div>';
+    html +=       '<p class="reset-warning-text">Your current progress will not be saved.</p>';
+    html +=       '<p class="reset-warning-sub">This action cannot be undone.</p>';
+    html +=       '<div class="reset-warning-line"></div>';
+    html +=     '</div>';
+
+    // Episode carousel
+    html +=     '<div class="reset-carousel">';
+    html +=       '<button class="reset-arrow" id="resetPrev" aria-label="Previous episode">‹</button>';
+    html +=       '<div class="reset-episode-display">';
+    html +=         '<div class="reset-episode-number" id="resetEpisodeNum">Episode 3</div>';
+    html +=       '</div>';
+    html +=       '<button class="reset-arrow" id="resetNext" aria-label="Next episode">›</button>';
+    html +=     '</div>';
+
+    // Checkbox
+    html +=     '<label class="reset-checkbox-label">';
+    html +=       '<input type="checkbox" class="reset-checkbox-input" id="resetConfirm">';
+    html +=       '<span class="reset-checkbox-box"></span>';
+    html +=       '<span class="reset-checkbox-text">I understand my progress will be reset.</span>';
+    html +=     '</label>';
+
+    // Reset button
+    html +=     '<button class="reset-button" id="resetButton" disabled>RESET</button>';
+
+    // Cancel
+    html +=     '<button class="reset-cancel" id="resetCancel">Cancel</button>';
+
+    html +=   '</div>';
+    html += '</div>';
+
+    appView.appendChild(html);
+
+    var modal = document.getElementById("resetModal");
+    var episodeNum = document.getElementById("resetEpisodeNum");
+    var prevBtn = document.getElementById("resetPrev");
+    var nextBtn = document.getElementById("resetNext");
+    var confirmCheck = document.getElementById("resetConfirm");
+    var resetBtn = document.getElementById("resetButton");
+    var cancelBtn = document.getElementById("resetCancel");
+
+    var episodes = ["Episode 1", "Episode 2", "Episode 3"];
+
+    function updateEpisode() {
+      episodeNum.textContent = episodes[resetEpisodeIndex];
+      episodeNum.classList.add("flip");
+      setTimeout(function() {
+        episodeNum.classList.remove("flip");
+      }, 300);
+    }
+
+    prevBtn.addEventListener("click", function() {
+      playClick();
+      if (resetEpisodeIndex > 0) {
+        resetEpisodeIndex--;
+        updateEpisode();
+      }
+    });
+
+    nextBtn.addEventListener("click", function() {
+      playClick();
+      if (resetEpisodeIndex < episodes.length - 1) {
+        resetEpisodeIndex++;
+        updateEpisode();
+      }
+    });
+
+    confirmCheck.addEventListener("change", function() {
+      resetBtn.disabled = !confirmCheck.checked;
+      resetBtn.classList.toggle("enabled", confirmCheck.checked);
+    });
+
+    resetBtn.addEventListener("click", function() {
+      if (resetBtn.disabled) return;
+      playClick();
+      // Placeholder: would clear save data here
+      modal.remove();
+    });
+
+    cancelBtn.addEventListener("click", function() {
+      playClick();
+      modal.remove();
+    });
+
+    modal.addEventListener("click", function(e) {
+      if (e.target === modal) modal.remove();
+    });
+
+    // Animate in
+    setTimeout(function() {
+      modal.classList.add("open");
+    }, 10);
+  }
+
   // ---- STATUS PANEL ----
   function toggleStatusPanel() {
     playClick();
@@ -580,7 +829,10 @@
 
     document.addEventListener("keydown", function(e) {
       if (e.key === "Escape") {
-        if (currentThread) {
+        var modal = document.getElementById("resetModal");
+        if (modal) {
+          modal.remove();
+        } else if (currentThread) {
           renderContactList();
           currentThread = null;
         } else if (currentMailId) {
