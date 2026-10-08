@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Find the Cat</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    background: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    user-select: none;
+  }
+
+  /* ---------- Start screen ---------- */
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 380px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .screen.active {
+    display: flex;
+  }
+
+  .title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffb000;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: #8b8b9a;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    max-width: 280px;
+  }
+
+  .cat-big {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .btn {
+    background: #ffb000;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 40px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+
+  .btn:hover {
+    background: #ffc233;
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+  }
+
+  /* ---------- Game screen ---------- */
+  .game-top {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding: 0 4px;
+  }
+
+  .timer-text {
+    font-family: "JetBrains Mono", monospace, -apple-system, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #00d4aa;
+    letter-spacing: 0.04em;
+  }
+
+  .timer-text.low {
+    color: #e14b4b;
+  }
+
+  .attempts-text {
+    font-size: 13px;
+    color: #8b8b9a;
+    letter-spacing: 0.02em;
+  }
+
+  .timer-bar-track {
+    width: 100%;
+    max-width: 380px;
+    height: 4px;
+    background: #2a2a2a;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+
+  .timer-bar {
+    height: 100%;
+    width: 100%;
+    background: #00d4aa;
+    border-radius: 4px;
+    transition: width 0.2s linear, background 0.3s ease;
+  }
+
+  .timer-bar.low {
+    background: #e14b4b;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .cell {
+    aspect-ratio: 1 / 1;
+    background: #2a2828;
+    border: 1px solid #323030;
+    border-radius: 8px;
+    font-size: 20px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+    color: #4a4848;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 0;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .cell:hover {
+    background: #333030;
+    border-color: #4a4848;
+  }
+
+  .cell:active {
+    transform: scale(0.94);
+  }
+
+  .cell.opened {
+    background: #202020;
+    border-color: #2a2828;
+    cursor: default;
+  }
+
+  .cell.cat {
+    background: #3a2a10;
+    border-color: #ffb000;
+    font-size: 24px;
+    animation: pop 0.4s ease;
+  }
+
+  .cell.wrong {
+    background: #2a1818;
+    border-color: #5a2a2a;
+  }
+
+  .cell.miss {
+    animation: shake 0.3s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+
+  /* ---------- End screen ---------- */
+  .end-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffb000;
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .end-title.lose {
+    color: #e14b4b;
+  }
+
+  .end-message {
+    font-size: 14px;
+    color: #8b8b9a;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 280px;
+  }
+
+  .end-emoji {
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 18px;
+  }
+
+  .footer-note {
+    position: fixed;
+    bottom: 14px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10px;
+    color: #4a4a4a;
+    letter-spacing: 0.08em;
+  }
+</style>
+</head>
+<body>
+
+  <!-- START SCREEN -->
+  <div class="screen active" id="startScreen">
+    <div class="cat-big">🐈‍⬛</div>
+    <div class="title">Find the Cat</div>
+    <div class="subtitle">A black cat is hiding in the boxes. Find it in 30 seconds.</div>
+    <button class="btn" id="startBtn">START</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen" id="gameScreen">
+    <div class="game-top">
+      <div class="timer-text" id="timerText">30s</div>
+      <div class="attempts-text" id="attemptsText">0 tries</div>
+    </div>
+    <div class="timer-bar-track">
+      <div class="timer-bar" id="timerBar"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div class="screen" id="endScreen">
+    <div class="end-emoji" id="endEmoji">🐈‍⬛</div>
+    <div class="end-title" id="endTitle">Found it!</div>
+    <div class="end-message" id="endMessage"></div>
+    <button class="btn" id="playAgainBtn">PLAY AGAIN</button>
+  </div>
+
+  <div class="footer-note">FENWICK COLLEGE WINTER FAIR</div>
+
+<script>
+(function() {
+  "use strict";
+
+  var GRID_SIZE = 30;
+  var GAME_DURATION = 30;
+
+  var grid = document.getElementById("grid");
+  var timerText = document.getElementById("timerText");
+  var timerBar = document.getElementById("timerBar");
+  var attemptsText = document.getElementById("attemptsText");
+  var startScreen = document.getElementById("startScreen");
+  var gameScreen = document.getElementById("gameScreen");
+  var endScreen = document.getElementById("endScreen");
+  var endEmoji = document.getElementById("endEmoji");
+  var endTitle = document.getElementById("endTitle");
+  var endMessage = document.getElementById("endMessage");
+
+  var catIndex = 0;
+  var attempts = 0;
+  var timeLeft = GAME_DURATION;
+  var timerInterval = null;
+  var gameActive = false;
+
+  // Emojis for empty cells (subtle, dark-friendly)
+  var fillerEmojis = ["·", "·", "·", "·", "·", "·"];
+
+  function showScreen(screen) {
+    startScreen.classList.remove("active");
+    gameScreen.classList.remove("active");
+    endScreen.classList.remove("active");
+    screen.classList.add("active");
+  }
+
+  function buildGrid() {
+    grid.innerHTML = "";
+    catIndex = Math.floor(Math.random() * GRID_SIZE);
+
+    for (var i = 0; i < GRID_SIZE; i++) {
+      var cell = document.createElement("button");
+      cell.className = "cell";
+      cell.setAttribute("data-index", i);
+      cell.setAttribute("aria-label", "Box " + (i + 1));
+      cell.textContent = "";
+      cell.addEventListener("click", onCellClick);
+      grid.appendChild(cell);
+    }
+  }
+
+  function onCellClick(e) {
+    if (!gameActive) return;
+
+    var cell = e.currentTarget;
+    if (cell.classList.contains("opened") || cell.classList.contains("cat") || cell.classList.contains("wrong")) return;
+
+    var index = parseInt(cell.getAttribute("data-index"), 10);
+    attempts++;
+    updateAttempts();
+
+    if (index === catIndex) {
+      cell.classList.add("cat");
+      cell.textContent = "🐈‍⬛";
+      winGame();
+    } else {
+      cell.classList.add("wrong");
+      cell.classList.add("miss");
+      cell.textContent = "✕";
+      setTimeout(function() {
+        cell.classList.remove("miss");
+      }, 300);
+    }
+  }
+
+  function updateAttempts() {
+    if (attempts === 0) {
+      attemptsText.textContent = "0 tries";
+    } else if (attempts === 1) {
+      attemptsText.textContent = "1 try";
+    } else {
+      attemptsText.textContent = attempts + " tries";
+    }
+  }
+
+  function updateTimer() {
+    timerText.textContent = timeLeft + "s";
+    timerBar.style.width = (timeLeft / GAME_DURATION * 100) + "%";
+
+    if (timeLeft <= 10) {
+      timerText.classList.add("low");
+      timerBar.classList.add("low");
+    } else {
+      timerText.classList.remove("low");
+      timerBar.classList.remove("low");
+    }
+  }
+
+  function startGame() {
+    attempts = 0;
+    timeLeft = GAME_DURATION;
+    gameActive = true;
+
+    updateAttempts();
+    updateTimer();
+    buildGrid();
+    showScreen(gameScreen);
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(function() {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        timeLeft = 0;
+        updateTimer();
+        loseGame();
+        return;
+      }
+      updateTimer();
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  function winGame() {
+    gameActive = false;
+    stopTimer();
+    showScreen(endScreen);
+    endEmoji.textContent = "🐈‍⬛";
+    endTitle.textContent = "Found it!";
+    endTitle.classList.remove("lose");
+    var secs = GAME_DURATION - timeLeft;
+    var triesLabel = attempts === 1 ? "try" : "tries";
+    endMessage.textContent = "You found the cat in " + secs + " seconds using " + attempts + " " + triesLabel + ".";
+  }
+
+  function loseGame() {
+    gameActive = false;
+    stopTimer();
+    showScreen(endScreen);
+    endEmoji.textContent = "🙀";
+    endTitle.textContent = "Time's up";
+    endTitle.classList.add("lose");
+    endMessage.textContent = "The cat is still hiding. Better luck next time.";
+  }
+
+  document.getElementById("startBtn").addEventListener("click", startGame);
+  document.getElementById("playAgainBtn").addEventListener("click", startGame);
+
+  // Preload grid so it looks ready
+  buildGrid();
+
+})();
+</script>
+
+</body>
+</html>
