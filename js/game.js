@@ -45,7 +45,7 @@
   var currentThread = null;
   var currentMailId = null;
   var statusPanelOpen = false;
-  var resetEpisodeIndex = 2; // 0 = Episode 1, 1 = Episode 2, 2 = Episode 3
+  var resetEpisodeIndex = 2;
 
   // ---- DOM REFS ----
   var homeApps = document.getElementById("homeApps");
@@ -210,7 +210,6 @@
     currentThread = null;
     currentMailId = null;
 
-    // Reset header to default
     appBack.style.display = "";
     var spacerReset = getSpacer();
     if (spacerReset) spacerReset.style.display = "";
@@ -673,12 +672,11 @@
     var existingModal = document.getElementById("resetModal");
     if (existingModal) existingModal.remove();
 
-    resetEpisodeIndex = 2; // Start at Episode 3
+    resetEpisodeIndex = 2;
 
     var html = '<div class="reset-modal-overlay" id="resetModal">';
     html +=   '<div class="reset-modal">';
 
-    // Warning
     html +=     '<div class="reset-warning">';
     html +=       '<div class="reset-warning-line"></div>';
     html +=       '<p class="reset-warning-text">Your current progress will not be saved.</p>';
@@ -686,7 +684,6 @@
     html +=       '<div class="reset-warning-line"></div>';
     html +=     '</div>';
 
-    // Episode carousel
     html +=     '<div class="reset-carousel">';
     html +=       '<button class="reset-arrow" id="resetPrev" aria-label="Previous episode">‹</button>';
     html +=       '<div class="reset-episode-display">';
@@ -695,23 +692,20 @@
     html +=       '<button class="reset-arrow" id="resetNext" aria-label="Next episode">›</button>';
     html +=     '</div>';
 
-    // Checkbox
     html +=     '<label class="reset-checkbox-label">';
     html +=       '<input type="checkbox" class="reset-checkbox-input" id="resetConfirm">';
     html +=       '<span class="reset-checkbox-box"></span>';
     html +=       '<span class="reset-checkbox-text">I understand my progress will be reset.</span>';
     html +=     '</label>';
 
-    // Reset button
     html +=     '<button class="reset-button" id="resetButton" disabled>RESET</button>';
 
-    // Cancel
     html +=     '<button class="reset-cancel" id="resetCancel">Cancel</button>';
 
     html +=   '</div>';
     html += '</div>';
 
-    appView.appendChild(html);
+    appView.insertAdjacentHTML("beforeend", html);
 
     var modal = document.getElementById("resetModal");
     var episodeNum = document.getElementById("resetEpisodeNum");
@@ -755,7 +749,6 @@
     resetBtn.addEventListener("click", function() {
       if (resetBtn.disabled) return;
       playClick();
-      // Placeholder: would clear save data here
       modal.remove();
     });
 
@@ -768,7 +761,6 @@
       if (e.target === modal) modal.remove();
     });
 
-    // Animate in
     setTimeout(function() {
       modal.classList.add("open");
     }, 10);
