@@ -27,9 +27,9 @@ window.BROWSER_DATA = {
       unlocked: true
     },
     {
-      url: "olympiadmath.com",
-      name: "Olympiad Math",
-      file: "sites/sites-olympiadmath.html",
+      url: "mikutap.com",
+      name: "Mikutap",
+      file: "sites/sites-mikutap.html",
       unlocked: true
     },
 
