@@ -88,6 +88,63 @@
     background: rgba(255, 176, 0, 0.12);
   }
 
+  /* Mini game tiles */
+  .mini-games-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .mini-game-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+  }
+
+  .mini-game-tile:hover {
+    border-color: rgba(255, 176, 0, 0.5);
+    box-shadow: 0 0 20px rgba(255, 176, 0, 0.15);
+    text-decoration: none;
+  }
+
+  .mini-game-tile:active {
+    transform: scale(0.98);
+  }
+
+  .mini-game-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .mini-game-title {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--text);
+    transition: color 0.2s ease;
+  }
+
+  .mini-game-tile:hover .mini-game-title {
+    color: #ffb000;
+  }
+
+  .mini-game-desc {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
   /* Phone fix: taller tile so the title and ENTER always fit */
   @media (max-width: 600px) {
     .arcade-tile {
@@ -106,6 +163,9 @@
     .arcade-tile-btn {
       margin-bottom: 24px;
       padding: 11px 32px;
+    }
+    .mini-games-row {
+      grid-template-columns: 1fr;
     }
   }
 </style>
@@ -201,13 +261,27 @@
       </div>
     </div>
 
-    <!-- THE ASHCOMBE FOOTNOTE TILE -->
-    <div class="arcade-tile" aria-label="The Ashcombe Footnote">
+    <!-- WHERE IS MAYA TILE -->
+    <div class="arcade-tile" aria-label="Where is Maya">
       <div class="arcade-tile-text">
-        <h2 class="arcade-tile-title">The Ashcombe Footnote</h2>
+        <h2 class="arcade-tile-title">Where is Maya?</h2>
         <p class="arcade-tile-subtitle">nothing unusual happened, officially</p>
       </div>
-      <a href="missing-friend.html" class="arcade-tile-btn">ENTER</a>
+      <a href="where-is-maya.html" class="arcade-tile-btn">ENTER</a>
+    </div>
+
+    <!-- MINI GAMES ROW -->
+    <div class="mini-games-row">
+      <a href="sites/sites-find-the-cat.html" class="mini-game-tile" target="_blank" rel="noopener">
+        <span class="mini-game-label">Mini Game</span>
+        <span class="mini-game-title">Find the Cat</span>
+        <span class="mini-game-desc">A black cat is hiding in the boxes.</span>
+      </a>
+      <a href="sites/sites-mikutap.html" class="mini-game-tile" target="_blank" rel="noopener">
+        <span class="mini-game-label">Music Toy</span>
+        <span class="mini-game-title">Mikutap</span>
+        <span class="mini-game-desc">Tap the grid. Make some noise.</span>
+      </a>
     </div>
   </section>
 </main>
